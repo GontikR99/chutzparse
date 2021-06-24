@@ -1,0 +1,6 @@
+<div id="page_root">
+    <throughput:Throughput width="100%" height="100%" :TopBars="topBars" :BottomBars="bottomBars" />
+</div>
+<script type="application/x-go">
+    import "github.com/gontikr99/chutzparse/cmd/overlay/throughput"
+</script>

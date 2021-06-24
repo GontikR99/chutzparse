@@ -1,0 +1,76 @@
+{
+  "name": "chutzparse",
+  "productName": "chutzparse",
+  "version": "0.0.1",
+  "description": "An EverQuest log parser and heads-up-display",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gontikr99/chutzparse.git"
+  },
+  "keywords": [],
+  "author": {
+    "name": "GontikR99"
+  },
+  "license": "MIT",
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "chutzparse"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  },
+  "iohook": {
+    "targets": [
+      "electron-87",
+      "node-88"
+    ],
+    "platforms": [
+      "win32"
+    ],
+    "arches": [
+      "ia32"
+    ]
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "iohook": "^0.9.3",
+    "ref-napi": "^3.0.3",
+    "win32-api": "^9.6.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.57",
+    "@electron-forge/maker-deb": "^6.0.0-beta.57",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.57",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.57",
+    "@electron-forge/maker-zip": "^6.0.0-beta.57",
+    "electron": "12.0.12"
+  }
+}

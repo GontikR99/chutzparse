@@ -1,0 +1,9 @@
+bin
+.idea
+**/*.wasm
+**/0_components_vgen.go
+electron/node_modules
+electron/.electron
+electron/src
+build/
+electron/out/
