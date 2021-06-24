@@ -13,8 +13,8 @@ var win32api=nodejs.Require("win32-api")
 var user32=win32api.Get("U").Call("load")
 var buffer=js.Global().Get("Buffer")
 
-func findWindow(name string) (uint32, error) {
-	nameBuf := buffer.Call("from", name+"\x00", "ucs2")
+func findWindow() (uint32, error) {
+	nameBuf := buffer.Call("from", "EverQuest\x00", "ucs2")
 	resultInt := user32.Call("FindWindowExW", 0, 0, js.Null(), nameBuf).Int()
 	if resultInt==0 {
 		return 0, errors.New("window not found")
@@ -23,8 +23,17 @@ func findWindow(name string) (uint32, error) {
 	}
 }
 
+func IsTop() bool {
+	hwnd, err := findWindow()
+	if err!=nil {
+		return false
+	}
+	topHwnd := uint32(user32.Call("GetForegroundWindow").Int())
+	return hwnd==topHwnd
+}
+
 func GetExtents() (*electron.Rectangle, error) {
-	hwnd, err := findWindow("EverQuest")
+	hwnd, err := findWindow()
 	if err!=nil {return nil, err}
 
 	rectRef := buffer.Call("alloc", 16)

@@ -67,7 +67,7 @@ func main() {
 			}
 			newLoc, err := eqwnd.GetExtents()
 			if overlayWnd == nil {
-				if err!=nil {continue}
+				if err!=nil || !eqwnd.IsTop() {continue}
 				wndRect = *newLoc
 				overlayWnd = browserwindow.New(&browserwindow.Conf{
 					X:              wndRect.X,
@@ -96,7 +96,7 @@ func main() {
 				})
 				overlayWnd.LoadFile(path.Join(application.GetAppPath(), "src","overlay.html"))
 			} else {
-				if err!=nil {
+				if err!=nil || !eqwnd.IsTop() {
 					overlayWnd.Close()
 					overlayWnd = nil
 					continue
