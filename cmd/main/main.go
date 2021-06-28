@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"github.com/gontikr99/chutzparse/internal/dmodel"
 	"github.com/gontikr99/chutzparse/internal/eqlog"
 	"github.com/gontikr99/chutzparse/internal/eqwnd"
 	"github.com/gontikr99/chutzparse/internal/settings"
@@ -27,6 +28,8 @@ func main() {
 
 	appCtx, exitApp := context.WithCancel(context.Background())
 	application.OnWindowAllClosed(exitApp)
+
+	dmodel.ListenForHits()
 	eqlog.RestartLogScans(appCtx)
 
 	startup, ready := context.WithCancel(appCtx)
@@ -67,7 +70,7 @@ func main() {
 			}
 			newLoc, err := eqwnd.GetExtents()
 			if overlayWnd == nil {
-				if err!=nil || !eqwnd.IsTop() {continue}
+				if err!=nil {continue}
 				wndRect = *newLoc
 				overlayWnd = browserwindow.New(&browserwindow.Conf{
 					X:              wndRect.X,
@@ -90,13 +93,13 @@ func main() {
 					overlayWnd.ShowInactive()
 					overlayWnd.SetAlwaysOnTop(true)
 					overlayWnd.SetIgnoreMouseEvents(true)
-					//overlayWnd.JSValue().Get("webContents").Call("openDevTools", map[string]interface{} {
-					//	"mode":"detach",
-					//})
+					overlayWnd.JSValue().Get("webContents").Call("openDevTools", map[string]interface{} {
+						"mode":"detach",
+					})
 				})
 				overlayWnd.LoadFile(path.Join(application.GetAppPath(), "src","overlay.html"))
 			} else {
-				if err!=nil || !eqwnd.IsTop() {
+				if err!=nil {
 					overlayWnd.Close()
 					overlayWnd = nil
 					continue

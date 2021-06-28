@@ -40,6 +40,10 @@ func CreateElement(tag string) dom.Element {
 	return dom.WrapElement(doc.Call("createElement", tag))
 }
 
+func CreateElementNS(namespace string, name string) dom.Element {
+	return dom.WrapElement(doc.Call("createElementNS", namespace, name))
+}
+
 func CreateTextNode(content string) dom.Element {
 	return dom.WrapElement(doc.Call("createTextNode", content))
 }

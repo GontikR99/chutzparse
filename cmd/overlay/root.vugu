@@ -1,6 +1,10 @@
-<div id="page_root">
-    <throughput:Throughput width="100%" height="100%" :TopBars="topBars" :BottomBars="bottomBars" />
+<div class="container">
+    <throughput:Throughput class="fullscreen" :TopBars="topBars" :BottomBars="bottomBars"></throughput:Throughput>
+    <hit_display:HitDisplay class="fullscreen"></hit_display:HitDisplay>
 </div>
 <script type="application/x-go">
-    import "github.com/gontikr99/chutzparse/cmd/overlay/throughput"
+import (
+    "github.com/gontikr99/chutzparse/cmd/overlay/throughput"
+    "github.com/gontikr99/chutzparse/cmd/overlay/hit_display"
+)
 </script>

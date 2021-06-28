@@ -1,11 +1,11 @@
 .PHONY: all clean start package
 
-$(shell mkdir -p bin electron/src/bin >/dev/null 2>&1 || true)
+$(shell mkdir -p bin electron/src/bin build>/dev/null 2>&1 || true)
 
-start: electron/.electron
+start: build/electron-built
 	cd electron && npm start
 
-electron/.electron: bin/main.wasm bin/window.wasm bin/overlay.wasm cmd/main/main.js cmd/main/preload.js
+build/electron-built: bin/main.wasm bin/window.wasm bin/overlay.wasm cmd/main/main.js cmd/main/preload.js
 	cp -r web/static/data/* electron/src
 	cp cmd/main/main.js cmd/main/preload.js electron/src
 	cp bin/main.wasm bin/window.wasm bin/overlay.wasm electron/src/bin
