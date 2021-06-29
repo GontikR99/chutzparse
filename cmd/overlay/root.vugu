@@ -1,5 +1,5 @@
 <div class="container">
-    <throughput:Throughput class="fullscreen" :TopBars="topBars" :BottomBars="bottomBars"></throughput:Throughput>
+    <throughput:Throughput class="fullscreen"></throughput:Throughput>
     <hit_display:HitDisplay class="fullscreen"></hit_display:HitDisplay>
 </div>
 <script type="application/x-go">

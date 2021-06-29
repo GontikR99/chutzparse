@@ -29,6 +29,7 @@ var logListeners = make(map[ListenerHandle]func([]*LogEntry))
 var newListeners = make(map[ListenerHandle]func([]*LogEntry))
 
 type LogEntry struct {
+	Id        int
 	Character string
 	Server    string
 	Timestamp time.Time
@@ -81,6 +82,9 @@ func readAllLogsLoop(ctx context.Context) {
 	}
 }
 
+// Provide unique identifers to log events
+var logIdGen = 0
+
 func tailLog(ctx context.Context, filename string, character string, server string) {
 	fd, err := os.OpenFile(filename, os.O_RDONLY, 0)
 	if err != nil {
@@ -127,12 +131,14 @@ func tailLog(ctx context.Context, filename string, character string, server stri
 					interp = interp.Visit(substituteYouHandler{charName: character}).(ParsedLog)
 				}
 				entry := &LogEntry{
+					Id: logIdGen,
 					Character: character,
 					Server:    server,
 					Timestamp: parsedTime,
 					Message:   parts[2],
 					Meaning:   interp,
 				}
+				logIdGen++
 				entries = append(entries, entry)
 			}
 		}
@@ -154,10 +160,14 @@ func tailLog(ctx context.Context, filename string, character string, server stri
 	}
 }
 
-var logterpreter = handleHeal(handleDamage(handleDeath(multipattern.New())))
+var logterpreter = handleZone(handleHeal(handleDamage(handleDeath(multipattern.New()))))
 
 type substituteYouHandler struct {
 	charName string
+}
+
+func (s substituteYouHandler) OnZone(log *ZoneLog) interface{} {
+	return log
 }
 
 func (s substituteYouHandler) OnDamage(log *DamageLog) interface{} {

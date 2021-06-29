@@ -2,7 +2,8 @@ package hit_display
 
 import (
 	"fmt"
-	"github.com/gontikr99/chutzparse/internal/dmodel"
+	"github.com/gontikr99/chutzparse/internal/parse_model/parsecomms"
+	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
 	"github.com/gontikr99/chutzparse/pkg/dom/document"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
@@ -12,6 +13,7 @@ import (
 	"time"
 )
 
+// HitDisplay is the Vugu component which renders hit events
 type HitDisplay struct {
 	vuguutil.BackgroundComponent
 	AttrMap   vugu.AttrMap
@@ -25,32 +27,34 @@ func (c *HitDisplay) Init(vCtx vugu.InitCtx) {
 }
 
 func (c *HitDisplay) RunInBackground() {
-	topEvent := dmodel.HitDisplayListen(dmodel.ChannelTopTarget)
-	bottomEvent := dmodel.HitDisplayListen(dmodel.ChannelBottomTarget)
+	topEvent := parsecomms.HitDisplayListen(c.Ctx, parsedefs.ChannelHitTop)
+	bottomEvent := parsecomms.HitDisplayListen(c.Ctx, parsedefs.ChannelHitBottom)
 	topSide:=0
 	bottomSide:=0
 	for {
 		select {
+		case <- c.Done():
+			return
 		case hde := <- topEvent:
 			c.drawRandomRange(hde.Text, hde.Color, hde.Big, (0+topSide)*pathCount/4, (1+topSide)*pathCount/4)
 			topSide = 1 - topSide
 		case hde:= <-bottomEvent:
 			c.drawRandomRange(hde.Text, hde.Color, hde.Big, (2+bottomSide)*pathCount/4, (3+bottomSide)*pathCount/4)
 			bottomSide = 1 - bottomSide
-		case <- c.Ctx.Done():
-			return
 		}
 	}
 }
 
-const outerBox = 120
-const strokeSegments = 8
-const centerRadius = 40
-const pathCount = 32
-const skipYSteps = 5
-const screenSeconds = 3
-const svgNS = "http://www.w3.org/2000/svg"
 
+const pathCount = 32 // number of text paths to reserve
+const screenSeconds = 3 // how long a hit text remains on screen
+
+// drawRandomRange draws a given text string with a given color into one of the text paths of the hit display.
+// The path to use is chosen randomly, within the range of [rangeBegin, rangeEnd).  If possible, an unused
+// path is chosen.
+//
+// Text paths are numbered left to right in the range [0, pathCount/2) for the top, and [pathCount/2, pathCount) for the
+// bottom.
 func (c *HitDisplay) drawRandomRange(text string, color string, big bool, rangeBegin int, rangeEnd int) {
 	options := []int{}
 	for i := rangeBegin; i < rangeEnd; i++ {
@@ -65,6 +69,16 @@ func (c *HitDisplay) drawRandomRange(text string, color string, big bool, rangeB
 	}
 }
 
+// tweakable drawing parameters
+const outerBox = 120
+const strokeSegments = 8
+const centerRadius = 40
+const skipYSteps = 5
+
+// pathParams calculates the beginning and ending points for a specfied text path.
+//
+// Text paths are numbered left to right in the range [0, pathCount/2) for the top, and [pathCount/2, pathCount) for the
+// bottom.
 func pathParams(pathIndex int) (startX, startY, endX, endY float64) {
 	var startAngle float64
 	var yStep int
@@ -91,8 +105,12 @@ func pathParams(pathIndex int) (startX, startY, endX, endY float64) {
 	return
 }
 
-func textPath(barIndex int) string {
-	startX, startY, endX, endY := pathParams(barIndex)
+// textPath returns the SVG path "d" parameter describing a specific text path.
+//
+// Text paths are numbered left to right in the range [0, pathCount/2) for the top, and [pathCount/2, pathCount) for the
+// bottom.
+func textPath(pathIndex int) string {
+	startX, startY, endX, endY := pathParams(pathIndex)
 	path := strings.Builder{}
 	path.WriteString(fmt.Sprintf("M %f %f", startX, startY))
 	for i := 0; i < strokeSegments+1; i++ {
@@ -104,10 +122,12 @@ func textPath(barIndex int) string {
 	return path.String()
 }
 
-var drawIdGen = 0
+var drawIdGen = 0 // provide each displayed text item a unique id
+const namespaceSvg = "http://www.w3.org/2000/svg"
 
+// draw places text upon a specified text path, starts it moving, and arranges it to
+// be removed at the end of its animation.
 func (c *HitDisplay) draw(pathIndex int, text string, color string, big bool) {
-	pathIndex = ((pathIndex % pathCount) + pathCount) % pathCount
 	c.allocated[pathIndex]++
 	svgElem := document.GetElementById("hit")
 
@@ -115,7 +135,7 @@ func (c *HitDisplay) draw(pathIndex int, text string, color string, big bool) {
 	animId := fmt.Sprintf("hit-anim%d", drawIdGen)
 	drawIdGen++
 
-	txtElem := document.CreateElementNS(svgNS, "text")
+	txtElem := document.CreateElementNS(namespaceSvg, "text")
 	txtElem.AppendChild(document.CreateTextNode(text))
 
 	txtElem.SetAttribute("id", txtId)
@@ -137,7 +157,7 @@ func (c *HitDisplay) draw(pathIndex int, text string, color string, big bool) {
 	txtElem.SetAttribute("y", fmt.Sprintf("%.1f", startY))
 	svgElem.AppendChild(txtElem)
 
-	animMotionElem := document.CreateElementNS(svgNS, "animateMotion")
+	animMotionElem := document.CreateElementNS(namespaceSvg, "animateMotion")
 	animMotionElem.SetAttribute("id", animId)
 	animMotionElem.SetAttribute("href", fmt.Sprintf("#%s", txtId))
 	animMotionElem.SetAttribute("dur", fmt.Sprintf("%ds", screenSeconds))
@@ -148,19 +168,19 @@ func (c *HitDisplay) draw(pathIndex int, text string, color string, big bool) {
 	animMotionElem.SetAttribute("begin", "click")
 	animMotionElem.SetAttribute("repeatCount", "1")
 
-	mpathElem := document.CreateElementNS(svgNS, "mpath")
+	mpathElem := document.CreateElementNS(namespaceSvg, "mpath")
 	mpathElem.SetAttribute("href", fmt.Sprintf("#hit-path%d", pathIndex))
 	animMotionElem.AppendChild(mpathElem)
 	svgElem.AppendChild(animMotionElem)
 
 	go func() {
+		// StartMain animation
 		<-time.After(10 * time.Millisecond)
 		txtElem.SetAttribute("x", 0)
 		txtElem.SetAttribute("y", 0)
-		document.GetElementById(animId).JSValue().Call("beginElement")
-	}()
+		animMotionElem.JSValue().Call("beginElement")
 
-	go func() {
+		// Remove/reclaim text
 		<-time.After(screenSeconds * time.Second)
 		animMotionElem.Remove()
 		txtElem.Remove()
@@ -181,6 +201,7 @@ var keyTimes = (func() string {
 	}
 	return sb.String()
 })()
+
 var keyPoints = (func () string {
 	sb := strings.Builder{}
 	needSep := false

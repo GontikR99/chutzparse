@@ -4,9 +4,9 @@ package main
 
 import (
 	"context"
-	"github.com/gontikr99/chutzparse/internal/dmodel"
 	"github.com/gontikr99/chutzparse/internal/eqlog"
 	"github.com/gontikr99/chutzparse/internal/eqwnd"
+	"github.com/gontikr99/chutzparse/internal/parse_model"
 	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron"
@@ -29,7 +29,7 @@ func main() {
 	appCtx, exitApp := context.WithCancel(context.Background())
 	application.OnWindowAllClosed(exitApp)
 
-	dmodel.Start()
+	parse_model.StartMain()
 	eqlog.RestartLogScans(appCtx)
 
 	startup, ready := context.WithCancel(appCtx)
@@ -93,9 +93,9 @@ func main() {
 					overlayWnd.ShowInactive()
 					overlayWnd.SetAlwaysOnTop(true)
 					overlayWnd.SetIgnoreMouseEvents(true)
-					//overlayWnd.JSValue().Get("webContents").Call("openDevTools", map[string]interface{} {
-					//	"mode":"detach",
-					//})
+					overlayWnd.JSValue().Get("webContents").Call("openDevTools", map[string]interface{} {
+						"mode":"detach",
+					})
 				})
 				overlayWnd.LoadFile(path.Join(application.GetAppPath(), "src","overlay.html"))
 			} else {

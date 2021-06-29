@@ -2,6 +2,7 @@ package eqlog
 
 import (
 	"github.com/gontikr99/chutzparse/pkg/multipattern"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -14,12 +15,21 @@ func amount(text string) int64 {
 	return result
 }
 
+var statusRE = regexp.MustCompile("^(.+) \\(.*\\)$")
+
 func normalizeName(name string) string {
 	if strings.EqualFold("you", name) || strings.EqualFold("your", name) || strings.EqualFold("yourself", name) {
 		return "You"
 	}
 	if strings.HasSuffix(name, "'s corpse") {
 		return name[:len(name)-9]
+	}
+	// Handle names like "Mayong Mistmoore (Vulnerable)" or "Kessdona (Frozen Aura)"
+	if m := statusRE.FindStringSubmatch(name); m!=nil {
+		name = m[1]
+	}
+	if name!="" {
+		name = strings.ToUpper(name[:1])+name[1:]
 	}
 	return name
 }

@@ -2,26 +2,20 @@ package throughput
 
 import (
 	"fmt"
+	"github.com/gontikr99/chutzparse/internal/parse_model/parsecomms"
+	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
+	"github.com/gontikr99/chutzparse/pkg/console"
+	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
 	"math"
 )
 
-type BarSector struct {
-	Color   string
-	Portion float64
-}
-
-type Bar struct {
-	LeftText   string
-	CenterText string
-	RightText  string
-	Sectors    []BarSector
-}
-
+// Throughput is the Vugu component representing the throughput display
 type Throughput struct {
+	vuguutil.BackgroundComponent
 	AttrMap    vugu.AttrMap
-	TopBars    []Bar
-	BottomBars []Bar
+	TopBars    []parsedefs.ThroughputBar
+	BottomBars []parsedefs.ThroughputBar
 
 	TextSize    string
 	TextColor string
@@ -40,7 +34,7 @@ const defaultStepMargin = 2
 const defaultInitialStep = 8
 const defaultArcWidth = 2 * math.Pi / 3
 
-func (c *Throughput) Init(ctx vugu.InitCtx) {
+func (c *Throughput) Init(vCtx vugu.InitCtx) {
 	if c.TextSize == "" {
 		c.TextSize = defaultTextSize
 	}
@@ -62,7 +56,30 @@ func (c *Throughput) Init(ctx vugu.InitCtx) {
 	if c.ArcWidth == 0 {
 		c.ArcWidth = defaultArcWidth
 	}
+	c.InitBackground(vCtx, c)
 }
+
+func (c *Throughput) RunInBackground() {
+	inChan := parsecomms.ThroughputListen(c.Ctx)
+	for {
+		select {
+		case <-c.Done():
+			return
+		case barSet := <-inChan:
+			console.Logf("Received %d states", len(barSet))
+			c.Env().Lock()
+			if len(barSet)==0 {
+				c.TopBars = nil
+				c.BottomBars = nil
+			} else {
+				c.TopBars = barSet[0].TopBars
+				c.BottomBars = barSet[0].BottomBars
+			}
+			c.Env().UnlockRender()
+		}
+	}
+}
+
 
 func (c *Throughput) radius(step int) float64 {
 	return (c.StepRadius+c.StepMargin)*float64(c.InitialStep+step)
@@ -115,7 +132,7 @@ func (c *Throughput) sectorPath(pathIdx int, arcStart, arcEnd float64) string {
 
 type packedBar struct {
 	index int
-	bar   *Bar
+	bar   *parsedefs.ThroughputBar
 }
 
 // packBars combines the top and bottom bars into a single array for consumption by the web page
