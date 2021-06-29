@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gontikr99/chutzparse/internal/dmodel"
 	"github.com/gontikr99/chutzparse/pkg/dom/document"
+	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
 	"math"
 	"math/rand"
@@ -11,29 +12,44 @@ import (
 	"time"
 )
 
-const outerBox = 150
-const strokeSegments = 8
-const centerRadius = 80
-const pathCount = 32
-const skipYSteps = 5
-const screenSeconds = 3
-const svgNS = "http://www.w3.org/2000/svg"
-
 type HitDisplay struct {
+	vuguutil.BackgroundComponent
 	AttrMap   vugu.AttrMap
 	allocated []int
 }
 
-func (c *HitDisplay) Init(ctx vugu.InitCtx) {
+func (c *HitDisplay) Init(vCtx vugu.InitCtx) {
 	rand.Seed(time.Now().Unix())
 	c.allocated = make([]int, pathCount)
-	dmodel.HitDisplayListen(dmodel.ChannelTopTarget, func(evt *dmodel.HitDisplayEvent) {
-		c.drawRandomRange(evt.Text, evt.Color, evt.Big, 0, pathCount/2)
-	})
-	dmodel.HitDisplayListen(dmodel.ChannelBottomTarget, func(evt *dmodel.HitDisplayEvent) {
-		c.drawRandomRange(evt.Text, evt.Color, evt.Big, pathCount/2, pathCount)
-	})
+	c.InitBackground(vCtx, c)
 }
+
+func (c *HitDisplay) RunInBackground() {
+	topEvent := dmodel.HitDisplayListen(dmodel.ChannelTopTarget)
+	bottomEvent := dmodel.HitDisplayListen(dmodel.ChannelBottomTarget)
+	topSide:=0
+	bottomSide:=0
+	for {
+		select {
+		case hde := <- topEvent:
+			c.drawRandomRange(hde.Text, hde.Color, hde.Big, (0+topSide)*pathCount/4, (1+topSide)*pathCount/4)
+			topSide = 1 - topSide
+		case hde:= <-bottomEvent:
+			c.drawRandomRange(hde.Text, hde.Color, hde.Big, (2+bottomSide)*pathCount/4, (3+bottomSide)*pathCount/4)
+			bottomSide = 1 - bottomSide
+		case <- c.Ctx.Done():
+			return
+		}
+	}
+}
+
+const outerBox = 120
+const strokeSegments = 8
+const centerRadius = 40
+const pathCount = 32
+const skipYSteps = 5
+const screenSeconds = 3
+const svgNS = "http://www.w3.org/2000/svg"
 
 func (c *HitDisplay) drawRandomRange(text string, color string, big bool, rangeBegin int, rangeEnd int) {
 	options := []int{}
