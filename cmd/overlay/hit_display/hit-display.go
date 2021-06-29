@@ -1,11 +1,11 @@
 package hit_display
 
 import (
+	"context"
 	"fmt"
 	"github.com/gontikr99/chutzparse/internal/parse_model/parsecomms"
 	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
 	"github.com/gontikr99/chutzparse/pkg/dom/document"
-	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
 	"math"
 	"math/rand"
@@ -15,26 +15,33 @@ import (
 
 // HitDisplay is the Vugu component which renders hit events
 type HitDisplay struct {
-	vuguutil.BackgroundComponent
 	AttrMap   vugu.AttrMap
 	allocated []int
 }
 
-func (c *HitDisplay) Init(vCtx vugu.InitCtx) {
+func (c *HitDisplay) Run() {
 	rand.Seed(time.Now().Unix())
 	c.allocated = make([]int, pathCount)
-	c.InitBackground(vCtx, c)
+	defsElem := document.GetElementById("hitDefs")
+	for i:=0;i<pathCount;i++ {
+		pathElem := document.CreateElementNS(namespaceSvg, "path")
+		pathElem.SetAttribute("id", fmt.Sprintf("hit-path%d", i))
+		pathElem.SetAttribute("fill", "none")
+		pathElem.SetAttribute("d", textPath(i))
+		defsElem.AppendChild(pathElem)
+	}
+	go func() {
+		c.RunInBackground()
+	}()
 }
 
 func (c *HitDisplay) RunInBackground() {
-	topEvent := parsecomms.HitDisplayListen(c.Ctx, parsedefs.ChannelHitTop)
-	bottomEvent := parsecomms.HitDisplayListen(c.Ctx, parsedefs.ChannelHitBottom)
+	topEvent := parsecomms.HitDisplayListen(context.Background(), parsedefs.ChannelHitTop)
+	bottomEvent := parsecomms.HitDisplayListen(context.Background(), parsedefs.ChannelHitBottom)
 	topSide:=0
 	bottomSide:=0
 	for {
 		select {
-		case <- c.Done():
-			return
 		case hde := <- topEvent:
 			c.drawRandomRange(hde.Text, hde.Color, hde.Big, (0+topSide)*pathCount/4, (1+topSide)*pathCount/4)
 			topSide = 1 - topSide
@@ -70,7 +77,7 @@ func (c *HitDisplay) drawRandomRange(text string, color string, big bool, rangeB
 }
 
 // tweakable drawing parameters
-const outerBox = 120
+const outerBox = 160
 const strokeSegments = 8
 const centerRadius = 40
 const skipYSteps = 5

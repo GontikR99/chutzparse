@@ -28,7 +28,7 @@ func (r *Report) Throughput(fight *parsedefs.Fight) []parsedefs.ThroughputBar {
 
 	var bars []parsedefs.ThroughputBar
 	bars = append (bars, parsedefs.ThroughputBar{
-		CenterText: fmt.Sprintf("%s in %s", r.Target, parsedefs.RenderAmount(durationSec)),
+		LeftText: fmt.Sprintf("%s in %s", r.Target, parsedefs.RenderAmount(durationSec)),
 		RightText:  fmt.Sprintf("%s = %s dps", parsedefs.RenderAmount(float64(totalDamage)), parsedefs.RenderAmount(dps)),
 		Sectors:    []parsedefs.BarSector{{"green", 1.0}},
 	})
@@ -45,8 +45,7 @@ func (r *Report) Throughput(fight *parsedefs.Fight) []parsedefs.ThroughputBar {
 		}
 		dps = float64(contribs[i].DamageTotal())/durationSec
 		bars = append (bars, parsedefs.ThroughputBar{
-			LeftText:   fmt.Sprintf("%d.", 1+i),
-			CenterText: contribs[i].Source,
+			LeftText:   fmt.Sprintf("%d. %s", 1+i, contribs[i].Source),
 			RightText:  fmt.Sprintf("%s [%.3g%%] = %s dps",
 				parsedefs.RenderAmount(float64(contribs[i].DamageTotal())),
 				float64(100*contribs[i].DamageTotal())/float64(totalDamage),
@@ -58,8 +57,7 @@ func (r *Report) Throughput(fight *parsedefs.Fight) []parsedefs.ThroughputBar {
 		if contribs[i].Source != r.LastCharName {continue}
 		dps = float64(contribs[i].DamageTotal())/durationSec
 		bars = append (bars, parsedefs.ThroughputBar{
-			LeftText:   fmt.Sprintf("%d.", 1+i),
-			CenterText: contribs[i].Source,
+			LeftText:   fmt.Sprintf("%d. %s", 1+i, contribs[i].Source),
 			RightText:  fmt.Sprintf("%s [%.3g%%] = %s dps",
 				parsedefs.RenderAmount(float64(contribs[i].DamageTotal())),
 				float64(100*contribs[i].DamageTotal())/float64(totalDamage),

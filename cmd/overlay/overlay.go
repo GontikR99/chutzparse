@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/gontikr99/chutzparse/cmd/overlay/hit_display"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
@@ -10,6 +11,9 @@ import (
 )
 
 func main() {
+	hd := &hit_display.HitDisplay{}
+	hd.Run()
+
 	renderer, err := domrender.New("#page_root")
 	if err != nil {
 		panic(err)

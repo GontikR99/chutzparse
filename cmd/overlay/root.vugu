@@ -1,10 +1,8 @@
 <div class="container">
     <throughput:Throughput class="fullscreen"></throughput:Throughput>
-    <hit_display:HitDisplay class="fullscreen"></hit_display:HitDisplay>
 </div>
 <script type="application/x-go">
 import (
     "github.com/gontikr99/chutzparse/cmd/overlay/throughput"
-    "github.com/gontikr99/chutzparse/cmd/overlay/hit_display"
 )
 </script>

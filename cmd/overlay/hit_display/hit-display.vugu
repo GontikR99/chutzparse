@@ -1,8 +1,0 @@
-<svg class="fullscreen" preserveAspectRatio="xMidYMid meet" viewBox="-400 -250 800 600" vg-attr="c.AttrMap" id="hit">
-    <defs>
-        <path vg-for="pathIndex:=0; pathIndex<pathCount; pathIndex++" :d="textPath(pathIndex)" fill="none" :id='fmt.Sprintf("hit-path%d", pathIndex)'/>
-    </defs>
-</svg>
-<script type="application/x-go">
-import "fmt"
-</script>

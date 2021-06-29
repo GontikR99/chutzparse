@@ -3,7 +3,7 @@
         <path vg-for="barIndex:=-20;barIndex<20;barIndex++" :id='fmt.Sprintf("throughput-path%d",barIndex)' :d="c.textPath(barIndex)" fill="none"/>
     </defs>
     <path vg-for="_, bar := range c.packBars()" :d="c.sectorPath(bar.index, 0, 1)" fill="black" fill-opacity="0.3" stroke="none"/>
-    <path vg-for="_, sector := range c.packSectors()" :d="c.sectorPath(sector.barIndex, sector.arcStart, sector.arcEnd)" stroke="none" :fill="sector.color" fill-opacity="0.3" />
+    <path vg-for="_, sector := range c.packSectors()" :d="c.sectorPath(sector.barIndex, sector.arcStart, sector.arcEnd)" stroke="none" :fill="sector.color" fill-opacity="0.5" />
     <text vg-for="_, bar := range c.packBars()" text-anchor="start" vg-if='bar.bar.LeftText!=""' :style='fmt.Sprintf("fill: %s; fill-opacity: 0.6; font-size: %s;", c.TextColor, c.TextSize)'>
         <textPath :href='fmt.Sprintf("#throughput-path%d",bar.index)' startOffset="0%" vg-content="bar.bar.LeftText"></textPath>
     </text>
