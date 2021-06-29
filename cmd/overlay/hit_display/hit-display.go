@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+const outerBox = 150
 const strokeSegments = 8
 const centerRadius = 80
 const pathCount = 32
@@ -27,14 +28,14 @@ func (c *HitDisplay) Init(ctx vugu.InitCtx) {
 	rand.Seed(time.Now().Unix())
 	c.allocated = make([]int, pathCount)
 	dmodel.HitDisplayListen(dmodel.ChannelTopTarget, func(evt *dmodel.HitDisplayEvent) {
-		c.drawRandomRange(evt.Text, evt.Color, 0, pathCount/2)
+		c.drawRandomRange(evt.Text, evt.Color, evt.Big, 0, pathCount/2)
 	})
 	dmodel.HitDisplayListen(dmodel.ChannelBottomTarget, func(evt *dmodel.HitDisplayEvent) {
-		c.drawRandomRange(evt.Text, evt.Color, pathCount/2, pathCount)
+		c.drawRandomRange(evt.Text, evt.Color, evt.Big, pathCount/2, pathCount)
 	})
 }
 
-func (c *HitDisplay) drawRandomRange(text string, color string, rangeBegin int, rangeEnd int) {
+func (c *HitDisplay) drawRandomRange(text string, color string, big bool, rangeBegin int, rangeEnd int) {
 	options := []int{}
 	for i := rangeBegin; i < rangeEnd; i++ {
 		if c.allocated[(i+pathCount)%pathCount]==0 {
@@ -42,9 +43,9 @@ func (c *HitDisplay) drawRandomRange(text string, color string, rangeBegin int, 
 		}
 	}
 	if len(options) == 0 {
-		c.draw(rangeBegin+rand.Intn(rangeEnd-rangeBegin), text, color)
+		c.draw(rangeBegin+rand.Intn(rangeEnd-rangeBegin), text, color, big)
 	} else {
-		c.draw(options[rand.Intn(len(options))], text, color)
+		c.draw(options[rand.Intn(len(options))], text, color, big)
 	}
 }
 
@@ -52,25 +53,25 @@ func pathParams(pathIndex int) (startX, startY, endX, endY float64) {
 	var startAngle float64
 	var yStep int
 	if pathIndex < pathCount/4 {
-		endX = -180
+		endX = -outerBox
 		yStep = pathCount/4 - 1 - pathIndex
 		startAngle = math.Pi - 2*math.Pi*float64(pathIndex+1)/(pathCount+4)
 	} else if pathIndex < 2*pathCount/4 {
-		endX = 180
+		endX = outerBox
 		yStep = pathIndex - pathCount/4
 		startAngle = math.Pi/2 - 2*math.Pi*float64(pathIndex-pathCount/4+1)/(pathCount+4)
 	} else if pathIndex < 3*pathCount/4 {
-		endX = -180
+		endX = -outerBox
 		yStep = pathCount/4 + skipYSteps + pathIndex - 2*pathCount/4
 		startAngle = math.Pi + 2*math.Pi*float64(pathIndex-2*pathCount/4+1)/(pathCount+4)
 	} else {
-		endX = 180
+		endX = outerBox
 		yStep = pathCount/4 + skipYSteps + pathCount/4 - 1 - (pathIndex - 3*pathCount/4)
 		startAngle = 2*math.Pi - 2*math.Pi*float64(pathCount-pathIndex)/(pathCount+4)
 	}
 	startX = centerRadius * math.Cos(startAngle)
 	startY = -centerRadius * math.Sin(startAngle)
-	endY = -180 + 360*float64(yStep)/(pathCount/2+skipYSteps-1)
+	endY = -outerBox + 2*outerBox*float64(yStep)/(pathCount/2+skipYSteps-1)
 	return
 }
 
@@ -89,7 +90,7 @@ func textPath(barIndex int) string {
 
 var drawIdGen = 0
 
-func (c *HitDisplay) draw(pathIndex int, text string, color string) {
+func (c *HitDisplay) draw(pathIndex int, text string, color string, big bool) {
 	pathIndex = ((pathIndex % pathCount) + pathCount) % pathCount
 	c.allocated[pathIndex]++
 	svgElem := document.GetElementById("hit")
@@ -104,10 +105,17 @@ func (c *HitDisplay) draw(pathIndex int, text string, color string) {
 	txtElem.SetAttribute("id", txtId)
 	txtElem.SetAttribute("fill", color)
 	txtElem.SetAttribute("fill-opacity", "90%")
-	txtElem.SetAttribute("font-size", "12px")
+	txtElem.SetAttribute("font-family", "Arial Black")
+	if big {
+		txtElem.SetAttribute("font-size", "20px")
+	} else {
+		txtElem.SetAttribute("font-size", "10px")
+	}
 	txtElem.SetAttribute("font-weight", "bolder")
 	txtElem.SetAttribute("text-anchor", "middle")
-	txtElem.SetAttribute("stroke", "none")
+	txtElem.SetAttribute("stroke", "black")
+	txtElem.SetAttribute("stroke-width", "1")
+	txtElem.SetAttribute("vector-effect", "non-scaling-stroke")
 	startX, startY, _, _ := pathParams(pathIndex)
 	txtElem.SetAttribute("x", fmt.Sprintf("%.1f", startX))
 	txtElem.SetAttribute("y", fmt.Sprintf("%.1f", startY))

@@ -1,9 +1,12 @@
-.PHONY: all clean start package
+.PHONY: all clean start package npm-install
 
 $(shell mkdir -p bin electron/src/bin build>/dev/null 2>&1 || true)
 
 start: build/electron-built
-	cd electron && npm start
+	cd electron && npm start --arch=ia32
+
+npm-install:
+	cd electron && npm install --arch=ia32
 
 build/electron-built: bin/main.wasm bin/window.wasm bin/overlay.wasm cmd/main/main.js cmd/main/preload.js
 	cp -r web/static/data/* electron/src

@@ -35,45 +35,51 @@ func renderAmt(amount int64) string {
 	}
 }
 
-func ListenForHits() {
+func listenForHits() {
 	eqlog.RegisterLogsListener(func(entries []*eqlog.LogEntry) {
 		for _, entry := range entries {
 			if dmgEntry, ok := entry.Meaning.(*eqlog.DamageLog); ok {
 				if dmgEntry.Source == entry.Character {
 					if dmgEntry.SpellName!="" {
 						broadcastHitDisplay(ChannelTopTarget, &HitDisplayEvent{
-							Text:  renderAmt(dmgEntry.Amount),
-							Color: "yellow",
+							Text:   renderAmt(dmgEntry.Amount),
+							Color:  "yellow",
+							Big: dmgEntry.Flag & eqlog.CriticalFlag != 0,
 						})
 					} else if dmgEntry.Element==eqlog.PhysicalDamage {
 						broadcastHitDisplay(ChannelTopTarget, &HitDisplayEvent{
-							Text:  renderAmt(dmgEntry.Amount),
-							Color: "white",
+							Text:   renderAmt(dmgEntry.Amount),
+							Color:  "white",
+							Big: dmgEntry.Flag & eqlog.CriticalFlag != 0,
 						})
 					} else {
 						broadcastHitDisplay(ChannelTopTarget, &HitDisplayEvent{
-							Text:  renderAmt(dmgEntry.Amount),
-							Color: "gray",
+							Text:   renderAmt(dmgEntry.Amount),
+							Color:  "gray",
+							Big: dmgEntry.Flag & eqlog.CriticalFlag != 0,
 						})
 					}
 				}
 				if dmgEntry.Target == entry.Character {
 					broadcastHitDisplay(ChannelBottomTarget, &HitDisplayEvent{
-						Text:  renderAmt(dmgEntry.Amount),
-						Color: "red",
+						Text:   renderAmt(dmgEntry.Amount),
+						Color:  "red",
+						Big: dmgEntry.Flag & eqlog.CriticalFlag != 0,
 					})
 				}
 			} else if healEntry, ok := entry.Meaning.(*eqlog.HealLog); ok {
 				if healEntry.Source == entry.Character {
 					broadcastHitDisplay(ChannelTopTarget, &HitDisplayEvent{
 						Text:  renderAmt(healEntry.Actual),
-						Color: "green",
+						Color: "cyan",
+						Big: healEntry.Flag & eqlog.CriticalFlag != 0,
 					})
 				}
 				if healEntry.Target == entry.Character {
 					broadcastHitDisplay(ChannelBottomTarget, &HitDisplayEvent{
 						Text:  renderAmt(healEntry.Actual),
 						Color: "green",
+						Big: healEntry.Flag & eqlog.CriticalFlag != 0,
 					})
 				}
 			}

@@ -29,7 +29,7 @@ func main() {
 	appCtx, exitApp := context.WithCancel(context.Background())
 	application.OnWindowAllClosed(exitApp)
 
-	dmodel.ListenForHits()
+	dmodel.Start()
 	eqlog.RestartLogScans(appCtx)
 
 	startup, ready := context.WithCancel(appCtx)
@@ -93,9 +93,9 @@ func main() {
 					overlayWnd.ShowInactive()
 					overlayWnd.SetAlwaysOnTop(true)
 					overlayWnd.SetIgnoreMouseEvents(true)
-					overlayWnd.JSValue().Get("webContents").Call("openDevTools", map[string]interface{} {
-						"mode":"detach",
-					})
+					//overlayWnd.JSValue().Get("webContents").Call("openDevTools", map[string]interface{} {
+					//	"mode":"detach",
+					//})
 				})
 				overlayWnd.LoadFile(path.Join(application.GetAppPath(), "src","overlay.html"))
 			} else {

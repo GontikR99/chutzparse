@@ -1,4 +1,4 @@
-<svg preserveAspectRatio="xMidYMid meet" :viewBox='fmt.Sprintf("%f %f %f %f",-c.radius(0), -c.radius(25), 2*c.radius(0), 2*c.radius(25))' vg-attr="c.AttrMap">
+<svg preserveAspectRatio="xMidYMid meet" :viewBox='fmt.Sprintf("%f %f %f %f",-c.radius(0), -c.radius(25), 2*c.radius(0), 2*c.radius(35))' vg-attr="c.AttrMap">
     <defs>
         <path vg-for="barIndex:=-20;barIndex<20;barIndex++" :id='fmt.Sprintf("throughput-path%d",barIndex)' :d="c.textPath(barIndex)" fill="none"/>
     </defs>
