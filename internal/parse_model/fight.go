@@ -6,10 +6,8 @@ import (
 	"github.com/gontikr99/chutzparse/internal/eqlog"
 	"github.com/gontikr99/chutzparse/internal/parse_model/parsecomms"
 	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
-	"github.com/gontikr99/chutzparse/pkg/console"
 	"strings"
 	"time"
-	"unicode"
 )
 
 var activeFights=map[string]*parsedefs.Fight{}
@@ -22,7 +20,7 @@ type npcReader struct {
 func (nr *npcReader) OnDamage(log *eqlog.DamageLog) interface{} {nr.storeNPC(log.Source); nr.storeNPC(log.Target); return nil}
 func (nr *npcReader) OnHeal(log *eqlog.HealLog) interface{} {nr.storeNPC(log.Source); nr.storeNPC(log.Target); return nil}
 func (nr *npcReader) OnDeath(log *eqlog.DeathLog) interface{} {nr.storeNPC(log.Source); nr.storeNPC(log.Target); return nil}
-func (nr *npcReader) OnZone(log *eqlog.ZoneLog) interface{} {return nil}
+func (nr *npcReader) OnZone(*eqlog.ZoneLog) interface{} {return nil}
 
 func (nr *npcReader) storeNPC(name string) {
 	// Damage done by "Pain and Suffering" isn't all that useful
@@ -43,12 +41,6 @@ func (nr *npcReader) storeNPC(name string) {
 		return
 	}
 
-	// all PC names start with a capital letter
-	if name!="" && unicode.IsLower(rune(name[0])) {
-		nr.npcs[name]=struct{}{}
-		return
-	}
-
 	// Heuristic: all NPC names contain spaces
 	// FIXME: maybe enumerate the few NPCs whose names don't contain spaces?
 	if !strings.ContainsRune(name, ' ') {
@@ -60,7 +52,6 @@ func (nr *npcReader) storeNPC(name string) {
 const inactivityTimeout=12*time.Second
 
 func retireActiveFight(target string) {
-	console.Logf("Retiring %s", target)
 	delete(activeFights, target)
 }
 

@@ -148,7 +148,7 @@
 
     window.vuguGetRenderArray = function () {
         if (!window.vuguRenderArray) {
-            window.vuguRenderArray = new Uint8Array(16384);
+            window.vuguRenderArray = new Uint8Array(65536);
         }
         return window.vuguRenderArray;
     }
@@ -814,7 +814,7 @@
                                 const requiredBufferSize = dataSize + 4
 
                                 const computeEventBufferSize = (requiredBufferSize) => {
-                                    const sixteen_kb = 16384
+                                    const sixteen_kb = 65536
                                     const actualRequired = requiredBufferSize + 1
                                     const remainder = actualRequired % sixteen_kb
 

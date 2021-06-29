@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gontikr99/chutzparse/internal/parse_model/parsecomms"
 	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
-	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
 	"math"
@@ -66,7 +65,6 @@ func (c *Throughput) RunInBackground() {
 		case <-c.Done():
 			return
 		case barSet := <-inChan:
-			console.Logf("Received %d states", len(barSet))
 			c.Env().Lock()
 			if len(barSet)==0 {
 				c.TopBars = nil
