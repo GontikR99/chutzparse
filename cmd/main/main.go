@@ -25,6 +25,9 @@ func main() {
 		}
 	}()
 
+	application.JSValue().Get("commandLine").Call("appendSwitch", "high-dpi-support", 1)
+	application.JSValue().Get("commandLine").Call("appendSwitch", "force-device-scale-factor", 1)
+
 	settings.DefaultSetting(settings.EverQuestDirectory, "C:\\Users\\Public\\Daybreak Game Company\\Installed Games\\EverQuest")
 
 	appCtx, exitApp := context.WithCancel(context.Background())

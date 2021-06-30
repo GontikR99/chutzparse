@@ -12,7 +12,7 @@ import (
 )
 
 var memoizedSettings map[string]string
-var dbDir = path.Join(application.GetPath("appData"), "chillmodeinfo")
+var dbDir = path.Join(application.GetPath("appData"), "chutzparse")
 var dbFilename = path.Join(dbDir, "settings.json")
 
 // Set a setting value, but only if there's not one currently present
