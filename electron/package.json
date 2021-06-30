@@ -1,7 +1,7 @@
 {
   "name": "chutzparse",
   "productName": "chutzparse",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An EverQuest log parser and heads-up-display",
   "main": "src/main.js",
   "scripts": {
@@ -23,7 +23,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon":"./src/favicon.ico"
+        "icon": "./src/favicon.ico"
       },
       "makers": [
         {
@@ -31,20 +31,6 @@
           "config": {
             "name": "chutzparse"
           }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
         }
       ]
     }
@@ -69,10 +55,7 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.57",
-    "@electron-forge/maker-deb": "^6.0.0-beta.57",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.57",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.57",
-    "@electron-forge/maker-zip": "^6.0.0-beta.57",
     "electron": "12.0.12"
   }
 }
