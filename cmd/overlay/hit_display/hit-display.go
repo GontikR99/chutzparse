@@ -157,7 +157,7 @@ func (c *HitDisplay) draw(pathIndex int, text string, color string, big bool) {
 	txtElem.SetAttribute("font-weight", "bolder")
 	txtElem.SetAttribute("text-anchor", "middle")
 	txtElem.SetAttribute("stroke", "black")
-	txtElem.SetAttribute("stroke-width", "1")
+	txtElem.SetAttribute("stroke-width", "3")
 	txtElem.SetAttribute("vector-effect", "non-scaling-stroke")
 	startX, startY, _, _ := pathParams(pathIndex)
 	txtElem.SetAttribute("x", fmt.Sprintf("%.1f", startX))

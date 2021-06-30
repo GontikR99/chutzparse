@@ -24,8 +24,8 @@ func (nr *npcReader) OnDeath(log *eqlog.DeathLog) interface{} {nr.storeNPC(log.S
 func (nr *npcReader) OnZone(*eqlog.ZoneLog) interface{} {return nil}
 
 func (nr *npcReader) storeNPC(name string) {
-	// Damage done by "Pain and Suffering" isn't all that useful
-	if name==eqlog.UnspecifiedName {return}
+	// Damage done by "Pain and Suffering", or by "" isn't all that useful
+	if name==eqlog.UnspecifiedName || name == "" {return}
 
 	// Corpses don't count at all
 	if strings.HasSuffix(name, "`s corpse") {
@@ -125,7 +125,7 @@ func (t tsById) Swap(i, j int) {t[i], t[j] = t[j], t[i]}
 func maintainThroughput() {
 	go func() {
 		for {
-			<-time.After(1*time.Second)
+			<-time.After(333*time.Millisecond) // damage meter update frequency
 			var states []parsedefs.ThroughputState
 			for _, fight := range activeFights {
 				if dmgRep, present := fight.Reports["Damage"]; present {
