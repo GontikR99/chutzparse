@@ -6,6 +6,7 @@ import (
 	"github.com/gontikr99/chutzparse/internal/eqlog"
 	"github.com/gontikr99/chutzparse/internal/parse_model/parsecomms"
 	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
+	"sort"
 	"strings"
 	"time"
 )
@@ -31,7 +32,11 @@ func (nr *npcReader) storeNPC(name string) {
 		return
 	}
 
-	// Warders and pets don't count, unless they're NPC warders/pets
+	// Wards, warders and pets don't count, unless they're NPC warders/pets
+	if strings.HasSuffix(name, "`s ward") {
+		nr.storeNPC(name[:len(name)-7])
+		return
+	}
 	if strings.HasSuffix(name, "`s warder") {
 		nr.storeNPC(name[:len(name)-9])
 		return
@@ -131,6 +136,7 @@ func maintainThroughput() {
 					})
 				}
 			}
+			sort.Sort(tsById(states))
 			parsecomms.BroadcastThroughput(states)
 		}
 	}()
