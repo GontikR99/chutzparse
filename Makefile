@@ -5,6 +5,10 @@ $(shell mkdir -p bin electron/src/bin build>/dev/null 2>&1 || true)
 start: build/electron-built
 	cd electron && npm start --arch=ia32
 
+package: build/electron-built
+	cd electron && npm run make --arch=ia32
+	find electron/out/make -name \*.exe -exec cp \{\} bin \;
+
 npm-install:
 	cd electron && npm install --arch=ia32
 

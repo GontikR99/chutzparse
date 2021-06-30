@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"github.com/gontikr99/chutzparse/cmd/main/mainrpc"
 	"github.com/gontikr99/chutzparse/internal/eqlog"
 	"github.com/gontikr99/chutzparse/internal/eqwnd"
 	"github.com/gontikr99/chutzparse/internal/parse_model"
@@ -49,18 +50,53 @@ func main() {
 		},
 	})
 	mainWindow.OnClosed(exitApp)
+	mainWindow.ServeRPC(mainrpc.NewServer())
 
 	mainWindow.Once("ready-to-show", func() {
-		//mainWindow.RemoveMenu()
+		mainWindow.RemoveMenu()
 		mainWindow.Show()
 		shown()
 	})
 	mainWindow.LoadFile(path.Join(application.GetAppPath(), "src/window.html"))
 	<- mainBuilding.Done()
 
+	wndRect := electron.Rectangle{
+		X:      100,
+		Y:      100,
+		Width:  100,
+		Height: 100,
+	}
+	overlayWnd := browserwindow.New(&browserwindow.Conf{
+		X:              wndRect.X,
+		Y:              wndRect.Y,
+		Title:          "ChutzParse Overlay",
+		Width:          wndRect.Width,
+		Height:         wndRect.Height,
+		Show:           false,
+		Transparent:    true,
+		Resizable:      false,
+		Frame:          false,
+		WebPreferences: &browserwindow.WebPreferences{
+			Preload:          path.Join(application.GetAppPath(), "src/preload.js"),
+			NodeIntegration:  false,
+			ContextIsolation: true,
+		},
+	})
+	overlayWnd.OnClosed(exitApp)
+	overlayWnd.ServeRPC(mainrpc.NewServer())
+
+	overlayWnd.Once("ready-to-show", func() {
+		overlayWnd.RemoveMenu()
+		overlayWnd.ShowInactive()
+		overlayWnd.SetAlwaysOnTop(true)
+		overlayWnd.SetIgnoreMouseEvents(true)
+		//overlayWnd.JSValue().Get("webContents").Call("openDevTools", map[string]interface{} {
+		//	"mode":"detach",
+		//})
+	})
+	overlayWnd.LoadFile(path.Join(application.GetAppPath(), "src","overlay.html"))
+
 	go func() {
-		var wndRect electron.Rectangle
-		var overlayWnd browserwindow.BrowserWindow
 		for {
 			select {
 			case <-appCtx.Done():
@@ -69,47 +105,13 @@ func main() {
 				break
 			}
 			newLoc, err := eqwnd.GetExtents()
-			if overlayWnd == nil {
-				if err!=nil {continue}
-				wndRect = *newLoc
-				overlayWnd = browserwindow.New(&browserwindow.Conf{
-					X:              wndRect.X,
-					Y:              wndRect.Y,
-					Title:          "ChutzParse Overlay",
-					Width:          wndRect.Width,
-					Height:         wndRect.Height,
-					Show:           false,
-					Transparent:    true,
-					Resizable:      false,
-					Frame:          false,
-					WebPreferences: &browserwindow.WebPreferences{
-						Preload:          path.Join(application.GetAppPath(), "src/preload.js"),
-						NodeIntegration:  false,
-						ContextIsolation: true,
-					},
-				})
-				overlayWnd.Once("ready-to-show", func() {
-					overlayWnd.RemoveMenu()
-					overlayWnd.ShowInactive()
-					overlayWnd.SetAlwaysOnTop(true)
-					overlayWnd.SetIgnoreMouseEvents(true)
-					//overlayWnd.JSValue().Get("webContents").Call("openDevTools", map[string]interface{} {
-					//	"mode":"detach",
-					//})
-				})
-				overlayWnd.LoadFile(path.Join(application.GetAppPath(), "src","overlay.html"))
-			} else {
-				if err!=nil {
-					overlayWnd.Close()
-					overlayWnd = nil
-					continue
-				}
-				if wndRect != *newLoc {
-					wndRect = *newLoc
-					overlayWnd.SetContentBounds(&wndRect)
-				}
+			if err!=nil {
+				continue
 			}
-
+			if wndRect != *newLoc {
+				wndRect = *newLoc
+				overlayWnd.SetContentBounds(&wndRect)
+			}
 		}
 	}()
 

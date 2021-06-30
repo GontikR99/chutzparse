@@ -12,7 +12,15 @@ func listenForHits() {
 	eqlog.RegisterLogsListener(func(entries []*eqlog.LogEntry) {
 		for _, entry := range entries {
 			if dmgEntry, ok := entry.Meaning.(*eqlog.DamageLog); ok {
-				if dmgEntry.Source == entry.Character {
+				if dmgEntry.Source == entry.Character && dmgEntry.Target == entry.Character {
+					// self-inflicted damage
+					parsecomms.BroadcastHitEvent(parsedefs.ChannelHitTop, &parsedefs.HitEvent{
+						Text:  parsedefs.RenderAmount(float64(dmgEntry.Amount)),
+						Color: "red",
+						Big:   dmgEntry.Flag&eqlog.CriticalFlag != 0,
+					})
+				} else if dmgEntry.Source == entry.Character {
+					// outgoing damage
 					if dmgEntry.SpellName != "" {
 						parsecomms.BroadcastHitEvent(parsedefs.ChannelHitTop, &parsedefs.HitEvent{
 							Text:  parsedefs.RenderAmount(float64(dmgEntry.Amount)),
@@ -38,8 +46,8 @@ func listenForHits() {
 							Big:   dmgEntry.Flag&eqlog.CriticalFlag != 0,
 						})
 					}
-				}
-				if dmgEntry.Target == entry.Character {
+				} else if dmgEntry.Target == entry.Character {
+					// incoming damage
 					parsecomms.BroadcastHitEvent(parsedefs.ChannelHitBottom, &parsedefs.HitEvent{
 						Text:  parsedefs.RenderAmount(float64(dmgEntry.Amount)),
 						Color: "red",
@@ -48,26 +56,26 @@ func listenForHits() {
 				}
 			} else if healEntry, ok := entry.Meaning.(*eqlog.HealLog); ok {
 				if healEntry.Source == entry.Character && healEntry.Target == entry.Character {
+					// self-healing
 					parsecomms.BroadcastHitEvent(parsedefs.ChannelHitTop, &parsedefs.HitEvent{
 						Text:  parsedefs.RenderAmount(float64(healEntry.Actual)),
 						Color: parsedefs.ColorLimeGreen,
 						Big:   healEntry.Flag&eqlog.CriticalFlag != 0,
 					})
-				} else {
-					if healEntry.Source == entry.Character {
-						parsecomms.BroadcastHitEvent(parsedefs.ChannelHitTop, &parsedefs.HitEvent{
-							Text:  parsedefs.RenderAmount(float64(healEntry.Actual)),
-							Color: "cyan",
-							Big:   healEntry.Flag&eqlog.CriticalFlag != 0,
-						})
-					}
-					if healEntry.Target == entry.Character {
-						parsecomms.BroadcastHitEvent(parsedefs.ChannelHitBottom, &parsedefs.HitEvent{
-							Text:  parsedefs.RenderAmount(float64(healEntry.Actual)),
-							Color: parsedefs.ColorLimeGreen,
-							Big:   healEntry.Flag&eqlog.CriticalFlag != 0,
-						})
-					}
+				} else if healEntry.Source == entry.Character {
+					// outgoing healing
+					parsecomms.BroadcastHitEvent(parsedefs.ChannelHitTop, &parsedefs.HitEvent{
+						Text:  parsedefs.RenderAmount(float64(healEntry.Actual)),
+						Color: "cyan",
+						Big:   healEntry.Flag&eqlog.CriticalFlag != 0,
+					})
+				} else if healEntry.Target == entry.Character {
+					// incoming healing
+					parsecomms.BroadcastHitEvent(parsedefs.ChannelHitBottom, &parsedefs.HitEvent{
+						Text:  parsedefs.RenderAmount(float64(healEntry.Actual)),
+						Color: parsedefs.ColorLimeGreen,
+						Big:   healEntry.Flag&eqlog.CriticalFlag != 0,
+					})
 				}
 			}
 		}
