@@ -1,4 +1,4 @@
-package parsedefs
+package fight
 
 import (
 	"bytes"
@@ -9,16 +9,16 @@ import (
 type FightReportSet map[string]FightReport
 
 type FightReportFactory interface {
-	// Type of report this factory creates
+	// Type of fight this factory creates
 	Type() string
 
-	// NewEmpty creates a report of this type focused on a fight with the specified target
+	// NewEmpty creates a fight of this type focused on a fight with the specified target
 	NewEmpty(target string) FightReport
 
 	// Merge a collection of reports of this type
 	Merge(reports []FightReport) FightReport
 
-	// Deserialize a serialized report of this factory's type.
+	// Deserialize a serialized fight of this factory's type.
 	Deserialize(serialized []byte) (FightReport, error)
 }
 

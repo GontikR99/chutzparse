@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"github.com/gontikr99/chutzparse/internal/eqlog"
-	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
+	"github.com/gontikr99/chutzparse/internal/model/fight"
 	"github.com/vugu/vugu"
 )
 
@@ -25,7 +25,7 @@ func (c *Contribution) DamageTotal() int64 {
 	return c.TotalDamage
 }
 
-func (r *Report) Offer(entry *eqlog.LogEntry, epoch int) parsedefs.FightReport {
+func (r *Report) Offer(entry *eqlog.LogEntry, epoch int) fight.FightReport {
 	r.LastCharName = entry.Character
 	dmg, ok := entry.Meaning.(*eqlog.DamageLog)
 	if !ok {return r}
@@ -45,26 +45,26 @@ func (r *Report) Serialize() ([]byte, error) {
 	return b.Bytes(), err
 }
 
-func (r *Report) Detail(fight *parsedefs.Fight) vugu.Builder {return nil}
-func (r *Report) Finalize() parsedefs.FightReport            {return r}
+func (r *Report) Detail(fight *fight.Fight) vugu.Builder {return nil}
+func (r *Report) Finalize() fight.FightReport                {return r}
 
 type ReportFactory struct {}
 
 func (r ReportFactory) Type() string {return "Damage"}
 
-func (r ReportFactory) NewEmpty(target string) parsedefs.FightReport {
+func (r ReportFactory) NewEmpty(target string) fight.FightReport {
 	return &Report{
 		Target:        target,
 		Contributions: make(map[string]*Contribution),
 	}
 }
 
-func (r ReportFactory) Merge(reports []parsedefs.FightReport) parsedefs.FightReport {
+func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
 	// FIXME: implement
 	return r.NewEmpty("")
 }
 
-func (r ReportFactory) Deserialize(serialized []byte) (parsedefs.FightReport, error) {
+func (r ReportFactory) Deserialize(serialized []byte) (fight.FightReport, error) {
 	var result Report
 	err := gob.NewDecoder(bytes.NewReader(serialized)).Decode(&result)
 	return &result, err

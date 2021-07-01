@@ -1,26 +1,25 @@
 // +build wasm,web
 
-package parsecomms
+package presenter
 
 import (
 	"bytes"
 	"context"
 	"encoding/gob"
-	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc/ipcrenderer"
 )
 
-func HitDisplayListen(ctx context.Context, channel string) <-chan *parsedefs.HitEvent {
+func HitDisplayListen(ctx context.Context, channel string) <-chan *HitEvent {
 	chn, _ := ipcrenderer.Endpoint{}.Listen(channel)
-	outChan := make(chan *parsedefs.HitEvent)
+	outChan := make(chan *HitEvent)
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case inMsg := <-chn:
-				hde := &parsedefs.HitEvent{}
+				hde := &HitEvent{}
 				err := gob.NewDecoder(bytes.NewReader(inMsg.Content())).Decode(hde)
 				if err != nil {
 					console.Log(err)
@@ -33,16 +32,16 @@ func HitDisplayListen(ctx context.Context, channel string) <-chan *parsedefs.Hit
 	return outChan
 }
 
-func ThroughputListen(ctx context.Context) <-chan []parsedefs.ThroughputState {
-	chn, _ := ipcrenderer.Endpoint{}.Listen(parsedefs.ChannelThroughput)
-	outChan := make(chan []parsedefs.ThroughputState)
+func ThroughputListen(ctx context.Context) <-chan []ThroughputState {
+	chn, _ := ipcrenderer.Endpoint{}.Listen(ChannelThroughput)
+	outChan := make(chan []ThroughputState)
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case inMsg := <-chn:
-				tse := &parsedefs.ThroughputStateEvent{}
+				tse := &ThroughputStateEvent{}
 				err := gob.NewDecoder(bytes.NewReader(inMsg.Content())).Decode(tse)
 				if err != nil {
 					console.Log(err)

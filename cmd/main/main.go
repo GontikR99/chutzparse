@@ -7,7 +7,7 @@ import (
 	"github.com/gontikr99/chutzparse/cmd/main/mainrpc"
 	"github.com/gontikr99/chutzparse/internal/eqlog"
 	"github.com/gontikr99/chutzparse/internal/eqwnd"
-	"github.com/gontikr99/chutzparse/internal/parse_model"
+	"github.com/gontikr99/chutzparse/internal/model"
 	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron"
@@ -31,7 +31,7 @@ func main() {
 	appCtx, exitApp := context.WithCancel(context.Background())
 	application.OnWindowAllClosed(exitApp)
 
-	parse_model.StartMain()
+	model.StartMain()
 	eqlog.RestartLogScans(appCtx)
 
 	startup, ready := context.WithCancel(appCtx)

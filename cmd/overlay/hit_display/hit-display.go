@@ -3,8 +3,7 @@ package hit_display
 import (
 	"context"
 	"fmt"
-	"github.com/gontikr99/chutzparse/internal/parse_model/parsecomms"
-	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
+	"github.com/gontikr99/chutzparse/internal/presenter"
 	"github.com/gontikr99/chutzparse/pkg/dom/document"
 	"github.com/vugu/vugu"
 	"math"
@@ -36,8 +35,8 @@ func (c *HitDisplay) Run() {
 }
 
 func (c *HitDisplay) RunInBackground() {
-	topEvent := parsecomms.HitDisplayListen(context.Background(), parsedefs.ChannelHitTop)
-	bottomEvent := parsecomms.HitDisplayListen(context.Background(), parsedefs.ChannelHitBottom)
+	topEvent := presenter.HitDisplayListen(context.Background(), presenter.ChannelHitTop)
+	bottomEvent := presenter.HitDisplayListen(context.Background(), presenter.ChannelHitBottom)
 	topSide:=0
 	bottomSide:=0
 	for {

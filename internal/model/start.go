@@ -1,6 +1,6 @@
 // +build wasm,electron
 
-package parse_model
+package model
 
 func StartMain() {
 	listenForHits()

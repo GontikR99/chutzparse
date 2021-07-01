@@ -1,17 +1,18 @@
 // +build wasm,electron
 
-package parse_model
+package model
 
 import (
 	"github.com/gontikr99/chutzparse/internal/eqlog"
-	"github.com/gontikr99/chutzparse/internal/parse_model/parsecomms"
-	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
+	"github.com/gontikr99/chutzparse/internal/model/fight"
+	"github.com/gontikr99/chutzparse/internal/presenter"
 	"sort"
 	"strings"
 	"time"
 )
 
-var activeFights=map[string]*parsedefs.Fight{}
+var activeFights=map[string]*fight.Fight{}
+var activeUpdated bool
 
 // npcReader determines if an event involves an NPC, and stores the last NPC involved
 type npcReader struct {
@@ -57,6 +58,7 @@ func (nr *npcReader) storeNPC(name string) {
 const inactivityTimeout=12*time.Second
 
 func retireActiveFight(target string) {
+	activeUpdated=true
 	delete(activeFights, target)
 }
 
@@ -88,13 +90,14 @@ func listenForFights() {
 					if _, present := activeFights[npc]; present {
 						activeFights[npc].LastActivity = time.Now()
 					} else {
-						activeFights[npc] = &parsedefs.Fight{
+						activeFights[npc] = &fight.Fight{
 							Id:        fightIdGen,
 							Target:    npc,
-							Reports:   parsedefs.NewFightReports(npc),
+							Reports:   fight.NewFightReports(npc),
 							StartTime: time.Now(),
 						}
 						fightIdGen++
+						activeUpdated=true
 					}
 				}
 			}
@@ -103,6 +106,7 @@ func listenForFights() {
 			for _, fight := range activeFights {
 				for repName, report := range fight.Reports {
 					fight.Reports[repName]=report.Offer(entry, fightIdGen)
+					activeUpdated=true
 				}
 			}
 
@@ -116,7 +120,7 @@ func listenForFights() {
 	})
 }
 
-type tsById []parsedefs.ThroughputState
+type tsById []presenter.ThroughputState
 
 func (t tsById) Len() int {return len(t)}
 func (t tsById) Less(i, j int) bool {return t[i].FightId < t[j].FightId}
@@ -126,10 +130,12 @@ func maintainThroughput() {
 	go func() {
 		for {
 			<-time.After(333*time.Millisecond) // damage meter update frequency
-			var states []parsedefs.ThroughputState
+			if !activeUpdated {continue}
+			activeUpdated=false
+			var states []presenter.ThroughputState
 			for _, fight := range activeFights {
 				if dmgRep, present := fight.Reports["Damage"]; present {
-					states = append(states, parsedefs.ThroughputState{
+					states = append(states, presenter.ThroughputState{
 						FightId:    fight.Id,
 						TopBars:    nil,
 						BottomBars: dmgRep.Throughput(fight),
@@ -137,7 +143,7 @@ func maintainThroughput() {
 				}
 			}
 			sort.Sort(tsById(states))
-			parsecomms.BroadcastThroughput(states)
+			presenter.BroadcastThroughput(states)
 		}
 	}()
 }

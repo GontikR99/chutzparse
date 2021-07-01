@@ -11,7 +11,7 @@ start: build/electron-built build/npm-installed
 
 # Clean up
 clean:
-	rm -rf bin/* build/electron-built electron/.electron electron/src/* electron/out $(shell find . -name 0_components_vgen.go)
+	rm -rf bin/* build/electron-built electron/src/* electron/out $(shell find . -name 0_components_vgen.go)
 
 # Clean up everything, including electron/node modules
 full-clean: clean

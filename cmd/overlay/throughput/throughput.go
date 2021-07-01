@@ -2,8 +2,7 @@ package throughput
 
 import (
 	"fmt"
-	"github.com/gontikr99/chutzparse/internal/parse_model/parsecomms"
-	"github.com/gontikr99/chutzparse/internal/parse_model/parsedefs"
+	"github.com/gontikr99/chutzparse/internal/presenter"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
 	"math"
@@ -13,8 +12,8 @@ import (
 type Throughput struct {
 	vuguutil.BackgroundComponent
 	AttrMap    vugu.AttrMap
-	TopBars    []parsedefs.ThroughputBar
-	BottomBars []parsedefs.ThroughputBar
+	TopBars    []presenter.ThroughputBar
+	BottomBars []presenter.ThroughputBar
 
 	TextSize    string
 	TextColor string
@@ -59,7 +58,7 @@ func (c *Throughput) Init(vCtx vugu.InitCtx) {
 }
 
 func (c *Throughput) RunInBackground() {
-	inChan := parsecomms.ThroughputListen(c.Ctx)
+	inChan := presenter.ThroughputListen(c.Ctx)
 	for {
 		select {
 		case <-c.Done():
@@ -130,7 +129,7 @@ func (c *Throughput) sectorPath(pathIdx int, arcStart, arcEnd float64) string {
 
 type packedBar struct {
 	index int
-	bar   *parsedefs.ThroughputBar
+	bar   *presenter.ThroughputBar
 }
 
 // packBars combines the top and bottom bars into a single array for consumption by the web page

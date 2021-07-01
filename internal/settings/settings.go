@@ -15,7 +15,7 @@ var memoizedSettings map[string]string
 var dbDir = path.Join(application.GetPath("appData"), "chutzparse")
 var dbFilename = path.Join(dbDir, "settings.json")
 
-// Set a setting value, but only if there's not one currently present
+// Set a setting value, but only if there's not one currently presenter
 func DefaultSetting(key string, value string) {
 	_, p, err := LookupSetting(key)
 	if err==nil && !p {
