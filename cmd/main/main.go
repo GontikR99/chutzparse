@@ -13,6 +13,7 @@ import (
 	"github.com/gontikr99/chutzparse/pkg/electron"
 	"github.com/gontikr99/chutzparse/pkg/electron/application"
 	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
+	"github.com/gontikr99/chutzparse/pkg/electron/screen"
 	"github.com/gontikr99/chutzparse/pkg/nodejs/path"
 	"time"
 )
@@ -24,9 +25,6 @@ func main() {
 			panic(err)
 		}
 	}()
-
-	application.JSValue().Get("commandLine").Call("appendSwitch", "high-dpi-support", 1)
-	application.JSValue().Get("commandLine").Call("appendSwitch", "force-device-scale-factor", 1)
 
 	settings.DefaultSetting(settings.EverQuestDirectory, "C:\\Users\\Public\\Daybreak Game Company\\Installed Games\\EverQuest")
 
@@ -58,17 +56,20 @@ func main() {
 	mainWindow.Once("ready-to-show", func() {
 		mainWindow.RemoveMenu()
 		mainWindow.Show()
-		shown()
 	})
+	mainWindow.Once("show", shown)
 	mainWindow.LoadFile(path.Join(application.GetAppPath(), "src/window.html"))
 	<- mainBuilding.Done()
 
+	primaryDisplay := screen.GetPrimaryDisplay()
 	wndRect := electron.Rectangle{
-		X:      100,
-		Y:      100,
+		X:      primaryDisplay.Bounds.X+100,
+		Y:      primaryDisplay.Bounds.Y+100,
 		Width:  100,
 		Height: 100,
 	}
+
+	overlayBuilding, oShown := context.WithCancel(appCtx)
 	overlayWnd := browserwindow.New(&browserwindow.Conf{
 		X:              wndRect.X,
 		Y:              wndRect.Y,
@@ -97,7 +98,9 @@ func main() {
 		//	"mode":"detach",
 		//})
 	})
+	overlayWnd.Once("show", oShown)
 	overlayWnd.LoadFile(path.Join(application.GetAppPath(), "src","overlay.html"))
+	<- overlayBuilding.Done()
 
 	go func() {
 		for {
@@ -113,7 +116,24 @@ func main() {
 			}
 			if wndRect != *newLoc {
 				wndRect = *newLoc
-				overlayWnd.SetContentBounds(&wndRect)
+
+				// A bit of a hack to account for high DPI support
+				eqDisp := screen.GetDisplayMatching(&wndRect)
+
+				overlayWnd.SetContentBounds(&electron.Rectangle{
+					X:      primaryDisplay.Bounds.X+100,
+					Y:      primaryDisplay.Bounds.Y+100,
+					Width:  100,
+					Height: 100,
+				})
+				<- time.After(50*time.Millisecond)
+
+				overlayWnd.SetContentBounds(&electron.Rectangle{
+					X:      int(float64(wndRect.X)/primaryDisplay.ScaleFactor),
+					Y:      int(float64(wndRect.Y)/primaryDisplay.ScaleFactor),
+					Width:  int(float64(wndRect.Width)/eqDisp.ScaleFactor),
+					Height: int(float64(wndRect.Height)/eqDisp.ScaleFactor),
+				})
 			}
 		}
 	}()

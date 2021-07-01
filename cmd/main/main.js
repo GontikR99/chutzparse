@@ -1,5 +1,9 @@
 (function() {
     const {app} = require('electron');
+
+    app.commandLine.appendSwitch("high-dpi-support", 1)
+    // app.commandLine.appendSwitch("force-device-scale-factor", 1)
+
     const path = require('path');
     const fs = require('fs');
     require(path.join(app.getAppPath(), 'src/external/wasm_exec.js'));
