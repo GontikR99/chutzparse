@@ -22,7 +22,9 @@ func normalizeName(name string) string {
 		return "You"
 	}
 	if strings.HasSuffix(name, "'s corpse") {
-		return name[:len(name)-9]
+		//return name[:len(name)-9]
+		//FIXME: hack:  Attribute damage/healing from corpses to nobody
+		return UnspecifiedName
 	}
 	// Handle names like "Mayong Mistmoore (Vulnerable)" or "Kessdona (Frozen Aura)"
 	if m := statusRE.FindStringSubmatch(name); m!=nil {

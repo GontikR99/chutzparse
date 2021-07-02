@@ -1,17 +1,17 @@
-<svg preserveAspectRatio="xMidYMid meet" :viewBox='fmt.Sprintf("%f %f %f %f",-c.radius(0), -c.radius(15), 2*c.radius(0), 2*c.radius(21))' vg-attr="c.AttrMap">
+<svg preserveAspectRatio="xMidYMid meet" :viewBox='fmt.Sprintf("%f %f %f %f",-c.radius(3), -c.radius(15), 2*c.radius(3), 2*c.radius(21))' vg-attr="c.AttrMap">
     <defs>
-        <path vg-for="barIndex:=-20;barIndex<20;barIndex++" :id='fmt.Sprintf("throughput-path%d",barIndex)' :d="c.textPath(barIndex)" fill="none"/>
+        <path vg-for="barIndex:=0;barIndex<5*40;barIndex++" :id='fmt.Sprintf("throughput-path-%d-%d",barIndex/40-2, (barIndex%40)-20)' :d="c.textPath(barIndex/40-2, (barIndex%40)-20)" fill="none"/>
     </defs>
-    <path vg-for="_, bar := range c.packBars()" :d="c.sectorPath(bar.index, 0, 1)" fill="black" fill-opacity="0.3" stroke="none"/>
-    <path vg-for="_, sector := range c.packSectors()" :d="c.sectorPath(sector.barIndex, sector.arcStart, sector.arcEnd)" stroke="none" :fill="sector.color" fill-opacity="0.5" />
+    <path vg-for="_, bar := range c.packBars()" :d="c.sectorPath(bar.display, bar.index, 0, 1)" fill="black" fill-opacity="0.3" stroke="none"/>
+    <path vg-for="_, sector := range c.packSectors()" :d="c.sectorPath(sector.displayIndex, sector.barIndex, sector.arcStart, sector.arcEnd)" stroke="none" :fill="sector.color" fill-opacity="0.5" />
     <text vg-for="_, bar := range c.packBars()" text-anchor="start" vg-if='bar.bar.LeftText!=""' :style='fmt.Sprintf("fill: %s; fill-opacity: 0.6; font-size: %s;", c.TextColor, c.TextSize)'>
-        <textPath :href='fmt.Sprintf("#throughput-path%d",bar.index)' startOffset="0%" vg-content="bar.bar.LeftText"></textPath>
+        <textPath :href='fmt.Sprintf("#throughput-path-%d-%d",bar.display,bar.index)' startOffset="0%" vg-content="bar.bar.LeftText"></textPath>
     </text>
     <text vg-for="_, bar := range c.packBars()" text-anchor="middle" vg-if='bar.bar.CenterText!=""' :style='fmt.Sprintf("fill: %s; fill-opacity: 0.6; font-size: %s;", c.TextColor, c.TextSize)'>
-        <textPath :href='fmt.Sprintf("#throughput-path%d",bar.index)' startOffset="50%" vg-content="bar.bar.CenterText"></textPath>
+        <textPath :href='fmt.Sprintf("#throughput-path-%d-%d",bar.display,bar.index)' startOffset="50%" vg-content="bar.bar.CenterText"></textPath>
     </text>
     <text vg-for="_, bar := range c.packBars()" text-anchor="end" vg-if='bar.bar.RightText!=""' :style='fmt.Sprintf("fill: %s; fill-opacity: 0.6; font-size: %s;", c.TextColor, c.TextSize)'>
-        <textPath :href='fmt.Sprintf("#throughput-path%d",bar.index)' startOffset="100%" vg-content="bar.bar.RightText"></textPath>
+        <textPath :href='fmt.Sprintf("#throughput-path-%d-%d",bar.display,bar.index)' startOffset="100%" vg-content="bar.bar.RightText"></textPath>
     </text>
 </svg>
 <script type="application/x-go">
