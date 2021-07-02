@@ -8,6 +8,7 @@ import (
 	"github.com/gontikr99/chutzparse/internal/model/iff"
 	"github.com/gontikr99/chutzparse/internal/presenter"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -63,15 +64,15 @@ func listenForFights() {
 			if entry.Meaning!=nil {
 				nr := &nameReader{names: map[string]struct{}{}}
 				entry.Meaning.Visit(nr)
-				for names, _ := range nr.names {
-					if iff.IsFoe(names) {
-						if _, present := activeFights[names]; present {
-							activeFights[names].LastActivity = time.Now()
+				for name, _ := range nr.names {
+					if iff.IsFoe(name) && iff.GetOwner(name)=="" && !strings.HasSuffix(name, " pet") {
+						if _, present := activeFights[name]; present {
+							activeFights[name].LastActivity = time.Now()
 						} else {
-							activeFights[names] = &fight.Fight{
+							activeFights[name] = &fight.Fight{
 								Id:        fightIdGen,
-								Target:    names,
-								Reports:   fight.NewFightReports(names),
+								Target:    name,
+								Reports:   fight.NewFightReports(name),
 								StartTime: time.Now(),
 							}
 							fightIdGen++
