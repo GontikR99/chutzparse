@@ -1,4 +1,4 @@
-package damage
+package heal
 
 import (
 	"bytes"
@@ -8,18 +8,15 @@ import (
 )
 
 type Report struct {
-	Target string
-	LastCharName string
+	Belligerant string
 	Contributions map[string]*Contribution
+	LastCharName string
 }
 
 type Contribution struct {
 	Source string
-	TotalDamage int64
-}
-
-func (c *Contribution) DamageTotal() int64 {
-	return c.TotalDamage
+	TotalHealed int64
+	HealByEpoch map[int]int64
 }
 
 func (r *Report) Serialize() ([]byte, error) {
@@ -28,28 +25,30 @@ func (r *Report) Serialize() ([]byte, error) {
 	return b.Bytes(), err
 }
 
-func (r *Report) Detail(fight *fight.Fight) vugu.Builder {return nil}
-func (r *Report) Finalize() fight.FightReport                {return r}
+func (r *Report) Detail(fight *interface{}) vugu.Builder {
+	// FIXME: implement
+	return nil
+}
+func (r *Report) Finalize() fight.FightReport {return r}
 
 type ReportFactory struct {}
 
-func (r ReportFactory) Type() string {return "Damage"}
+func (r ReportFactory) Type() string {return "Healing"}
 
 func (r ReportFactory) NewEmpty(target string) fight.FightReport {
 	return &Report{
-		Target:        target,
+		Belligerant: target,
 		Contributions: make(map[string]*Contribution),
 	}
 }
 
 func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
 	// FIXME: implement
-	return r.NewEmpty("")
+	return nil
 }
-
 func (r ReportFactory) Deserialize(serialized []byte) (fight.FightReport, error) {
-	var result Report
-	err := gob.NewDecoder(bytes.NewReader(serialized)).Decode(&result)
-	return &result, err
+	var he Report
+	err := gob.NewDecoder(bytes.NewReader(serialized)).Decode(&he)
+	return &he, err
 }
 

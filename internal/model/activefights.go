@@ -113,11 +113,19 @@ func maintainThroughput() {
 			activeUpdated=false
 			var states []presenter.ThroughputState
 			for _, fight := range activeFights {
+				var top []presenter.ThroughputBar
+				var bottom []presenter.ThroughputBar
 				if dmgRep, present := fight.Reports["Damage"]; present {
+					bottom = dmgRep.Throughput(fight)
+				}
+				if dmgRep, present := fight.Reports["Healing"]; present {
+					top = dmgRep.Throughput(fight)
+				}
+				if top!=nil || bottom!=nil {
 					states = append(states, presenter.ThroughputState{
 						FightId:    fight.Id,
-						TopBars:    nil,
-						BottomBars: dmgRep.Throughput(fight),
+						TopBars:    top,
+						BottomBars: bottom,
 					})
 				}
 			}

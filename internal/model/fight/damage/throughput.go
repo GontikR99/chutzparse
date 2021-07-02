@@ -50,6 +50,8 @@ func (c cnpByDamageRev) Len() int {return len(c)}
 func (c cnpByDamageRev) Less(i, j int) bool {return c[i].TotalDamage > c[j].TotalDamage}
 func (c cnpByDamageRev) Swap(i, j int) {c[i],c[j] = c[j],c[i]}
 
+const throughputBarCount=10
+
 func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 	duration := fight.LastActivity.Sub(fight.StartTime)
 	if duration<=0 {duration = 1*time.Second}
@@ -64,9 +66,9 @@ func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 
 	var bars []presenter.ThroughputBar
 	bars = append (bars, presenter.ThroughputBar{
-		LeftText: fmt.Sprintf("%s in %s", r.Target, parsedefs.RenderAmount(durationSec)),
+		LeftText: fmt.Sprintf("[Damage] %s in %ss", r.Target, parsedefs.RenderAmount(durationSec)),
 		RightText:  fmt.Sprintf("%s = %s dps", parsedefs.RenderAmount(float64(totalDamage)), parsedefs.RenderAmount(dps)),
-		Sectors:    []presenter.BarSector{{"green", 1.0}},
+		Sectors:    []presenter.BarSector{{"dimgray", 1.0}},
 	})
 
 	if len(r.Contributions)==0 {
