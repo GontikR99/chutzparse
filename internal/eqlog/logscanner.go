@@ -160,7 +160,7 @@ func tailLog(ctx context.Context, filename string, character string, server stri
 	}
 }
 
-var logterpreter = handleZone(handleHeal(handleDamage(handleDeath(multipattern.New()))))
+var logterpreter = handleChat(handleZone(handleHeal(handleDamage(handleDeath(multipattern.New())))))
 
 type substituteYouHandler struct {
 	charName string
@@ -196,6 +196,13 @@ func (s substituteYouHandler) OnDeath(log *DeathLog) interface{} {
 	}
 	if log.Target == "You" {
 		log.Target = s.charName
+	}
+	return log
+}
+
+func (s substituteYouHandler) OnChat(log *ChatLog) interface{} {
+	if log.Source=="You" {
+		log.Source = s.charName
 	}
 	return log
 }

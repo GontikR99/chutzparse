@@ -157,31 +157,44 @@ type packedBarSector struct {
 func (c *Throughput) packSectors() []packedBarSector {
 	var result []packedBarSector
 	for _, bar := range c.packBars() {
+		var total float64
+		for _, sector := range bar.bar.Sectors {
+			total+=sector.Portion
+		}
 		var accum float64
 		for _, sector := range bar.bar.Sectors {
-			if accum==0 {
-				result = append(result, packedBarSector{
-					barIndex: bar.index,
-					color:    sector.Color,
-					arcStart: 0.5-sector.Portion/2,
-					arcEnd:   0.5+sector.Portion/2,
-				})
-			} else {
-				result = append(result, packedBarSector{
-					barIndex: bar.index,
-					color:    sector.Color,
-					arcStart: 0.5-accum/2-sector.Portion/2,
-					arcEnd:   0.5-accum/2,
-				})
-				result = append(result, packedBarSector{
-					barIndex: bar.index,
-					color:    sector.Color,
-					arcStart: 0.5+accum/2,
-					arcEnd:   0.5+accum/2+sector.Portion/2,
-				})
-			}
-			accum += sector.Portion
+			result = append(result, packedBarSector{
+				barIndex: bar.index,
+				color:    sector.Color,
+				arcStart: (1.0-total)/2+accum,
+				arcEnd:   (1.0-total)/2+accum+sector.Portion,
+			})
+			accum+=sector.Portion
 		}
+		//for _, sector := range bar.bar.Sectors {
+		//	if accum==0 {
+		//		result = append(result, packedBarSector{
+		//			barIndex: bar.index,
+		//			color:    sector.Color,
+		//			arcStart: 0.5-sector.Portion/2,
+		//			arcEnd:   0.5+sector.Portion/2,
+		//		})
+		//	} else {
+		//		result = append(result, packedBarSector{
+		//			barIndex: bar.index,
+		//			color:    sector.Color,
+		//			arcStart: 0.5-accum/2-sector.Portion/2,
+		//			arcEnd:   0.5-accum/2,
+		//		})
+		//		result = append(result, packedBarSector{
+		//			barIndex: bar.index,
+		//			color:    sector.Color,
+		//			arcStart: 0.5+accum/2,
+		//			arcEnd:   0.5+accum/2+sector.Portion/2,
+		//		})
+		//	}
+		//	accum += sector.Portion
+		//}
 	}
 	return result
 }

@@ -5,54 +5,29 @@ package model
 import (
 	"github.com/gontikr99/chutzparse/internal/eqlog"
 	"github.com/gontikr99/chutzparse/internal/model/fight"
+	"github.com/gontikr99/chutzparse/internal/model/iff"
 	"github.com/gontikr99/chutzparse/internal/presenter"
 	"sort"
-	"strings"
 	"time"
 )
 
 var activeFights=map[string]*fight.Fight{}
 var activeUpdated bool
 
-// npcReader determines if an event involves an NPC, and stores the last NPC involved
-type npcReader struct {
-	npcs map[string]struct{}
+// nameReader collects the names of all characters involved in a log message
+type nameReader struct {
+	names map[string]struct{}
 }
 
-func (nr *npcReader) OnDamage(log *eqlog.DamageLog) interface{} {nr.storeNPC(log.Source); nr.storeNPC(log.Target); return nil}
-func (nr *npcReader) OnHeal(log *eqlog.HealLog) interface{} {nr.storeNPC(log.Source); nr.storeNPC(log.Target); return nil}
-func (nr *npcReader) OnDeath(log *eqlog.DeathLog) interface{} {nr.storeNPC(log.Source); nr.storeNPC(log.Target); return nil}
-func (nr *npcReader) OnZone(*eqlog.ZoneLog) interface{} {return nil}
-
-func (nr *npcReader) storeNPC(name string) {
-	// Damage done by "Pain and Suffering", or by "" isn't all that useful
-	if name==eqlog.UnspecifiedName || name == "" {return}
-
-	// Corpses don't count at all
-	if strings.HasSuffix(name, "`s corpse") {
-		return
+func (nr *nameReader) OnDamage(log *eqlog.DamageLog) interface{} {nr.storeName(log.Source); nr.storeName(log.Target); return nil}
+func (nr *nameReader) OnHeal(log *eqlog.HealLog) interface{} {nr.storeName(log.Source); nr.storeName(log.Target); return nil}
+func (nr *nameReader) OnDeath(log *eqlog.DeathLog) interface{} {nr.storeName(log.Source); nr.storeName(log.Target); return nil}
+func (nr *nameReader) OnChat(log *eqlog.ChatLog) interface{} {nr.storeName(log.Source); return nil}
+func (nr *nameReader) OnZone(*eqlog.ZoneLog) interface{} {return nil}
+func (nr *nameReader) storeName(name string) {
+	if name!=eqlog.UnspecifiedName && name!="" {
+		nr.names[name] = struct{}{}
 	}
-
-	// Wards, warders and pets don't count, unless they're NPC warders/pets
-	if strings.HasSuffix(name, "`s ward") {
-		nr.storeNPC(name[:len(name)-7])
-		return
-	}
-	if strings.HasSuffix(name, "`s warder") {
-		nr.storeNPC(name[:len(name)-9])
-		return
-	}
-	if strings.HasSuffix(name, "`s pet") {
-		nr.storeNPC(name[:len(name)-6])
-		return
-	}
-
-	// Heuristic: all NPC names contain spaces
-	// FIXME: maybe enumerate the few NPCs whose names don't contain spaces?
-	if !strings.ContainsRune(name, ' ') {
-		return
-	}
-	nr.npcs[name]=struct{}{}
 }
 
 const inactivityTimeout=12*time.Second
@@ -74,6 +49,8 @@ func listenForFights() {
 		}
 
 		for _, entry := range entries {
+			iff.Update(entry)
+
 			// If we just zoned, retire all active fights.
 			if _, zoned := entry.Meaning.(*eqlog.ZoneLog); zoned {
 				for target, _ := range activeFights {
@@ -84,20 +61,22 @@ func listenForFights() {
 
 			// Create new fights as we encounter new NPCs
 			if entry.Meaning!=nil {
-				nr := &npcReader{npcs: map[string]struct{}{}}
+				nr := &nameReader{names: map[string]struct{}{}}
 				entry.Meaning.Visit(nr)
-				for npc, _ := range nr.npcs {
-					if _, present := activeFights[npc]; present {
-						activeFights[npc].LastActivity = time.Now()
-					} else {
-						activeFights[npc] = &fight.Fight{
-							Id:        fightIdGen,
-							Target:    npc,
-							Reports:   fight.NewFightReports(npc),
-							StartTime: time.Now(),
+				for names, _ := range nr.names {
+					if iff.IsFoe(names) {
+						if _, present := activeFights[names]; present {
+							activeFights[names].LastActivity = time.Now()
+						} else {
+							activeFights[names] = &fight.Fight{
+								Id:        fightIdGen,
+								Target:    names,
+								Reports:   fight.NewFightReports(names),
+								StartTime: time.Now(),
+							}
+							fightIdGen++
+							activeUpdated = true
 						}
-						fightIdGen++
-						activeUpdated=true
 					}
 				}
 			}
