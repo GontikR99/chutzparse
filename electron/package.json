@@ -1,7 +1,7 @@
 {
   "name": "chutzparse",
   "productName": "chutzparse",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An EverQuest log parser and heads-up-display",
   "main": "src/main.js",
   "scripts": {

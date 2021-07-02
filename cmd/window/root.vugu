@@ -44,6 +44,8 @@
     </form>
     <h4>Running ChutzParse</h4>
     <p>Got logs on and your EverQuest directory selected above?  That should be it.  Go play some EverQuest and see the numbers fly!</p>
+    <h4>Pets</h4>
+    <p>Use <tt>/pet leader</tt> to have EverQuest tell ChutzParse who pets belong to.</p>
     <h4>Features</h4>
     <ul>
         <li>Overlay damage meters for active fight</li>
