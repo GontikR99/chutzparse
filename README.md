@@ -7,7 +7,7 @@ need to install:
 * MSYS 2 (Recommended install: `C:\msys64`)
 * Go 1.16+ (make sure the install path doesn't have any spaces in it.  Recommended: `C:\msys64\go`)
 * Node v14.17.2 **32-bit** (make sure the install path doesn't have any spaces in it.  Recommended:
-`C:\msys64\go`)
+`C:\msys64\nodejs`)
 * Python 2.7.17 (Default installation location: `C:\Python27`)
 
 In MSYS 2, edit your `.bashrc` to add node and go to your path.  In the recommended scenario this would
