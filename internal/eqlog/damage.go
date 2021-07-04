@@ -53,7 +53,7 @@ func (ht HitType) String() string {
 	return hitTypeNames[ht]
 }
 
-const UnspecifiedName = "Pain and Suffering"
+const UnspecifiedName = "Unspecified"
 
 type DamageLog struct {
 	Source string

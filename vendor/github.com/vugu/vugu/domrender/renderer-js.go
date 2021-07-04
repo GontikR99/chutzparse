@@ -34,7 +34,7 @@ func New(mountPointSelector string) (*JSRenderer, error) {
 		MountPointSelector: mountPointSelector,
 	}
 
-	ret.instructionBuffer = make([]byte, 262144)
+	ret.instructionBuffer = make([]byte, 1048576)
 	// ret.instructionTypedArray = js.TypedArrayOf(ret.instructionBuffer)
 
 	ret.window = js.Global().Get("window")
@@ -60,7 +60,7 @@ func New(mountPointSelector string) (*JSRenderer, error) {
 	// enable debug logging
 	// ret.instructionList.logWriter = os.Stdout
 
-	ret.eventHandlerBuffer = make([]byte, 262144)
+	ret.eventHandlerBuffer = make([]byte, 1048576)
 	// ret.eventHandlerTypedArray = js.TypedArrayOf(ret.eventHandlerBuffer)
 
 	ret.eventHandlerFunc = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
