@@ -2,12 +2,15 @@ package heal
 
 import (
 	"github.com/gontikr99/chutzparse/internal/model/fight"
+	"time"
 )
 
 type Report struct {
 	Belligerent   string
 	Contributions map[string]*Contribution
 	LastCharName  string
+	StartTime time.Time
+	EndTime time.Time
 }
 
 type Contribution struct {
@@ -16,7 +19,11 @@ type Contribution struct {
 	HealByEpoch map[int]int64
 }
 
-func (r *Report) Finalize() fight.FightReport { return r }
+func (r *Report) Finalize(f *fight.Fight) fight.FightReport {
+	r.StartTime = f.StartTime
+	r.EndTime = f.LastActivity
+	return r
+}
 
 type ReportFactory struct{}
 
@@ -30,7 +37,13 @@ func (r ReportFactory) NewEmpty(target string) fight.FightReport {
 }
 
 func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
-	result := &Report{}
+	result := &Report{
+		Contributions: make(map[string]*Contribution),
+	}
+	if len(reports)>0 {
+		result.StartTime=reports[0].(*Report).StartTime
+		result.EndTime=reports[0].(*Report).EndTime
+	}
 	for _, reportIf := range reports {
 		report := reportIf.(*Report)
 		if result.Belligerent == "" {
@@ -51,6 +64,12 @@ func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
 					update.HealByEpoch[epoch] = healed
 				}
 			}
+		}
+		if report.StartTime.Before(result.StartTime) {
+			result.StartTime = report.StartTime
+		}
+		if report.EndTime.After(result.EndTime) {
+			result.EndTime = report.EndTime
 		}
 	}
 	for _, contrib := range result.Contributions {

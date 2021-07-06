@@ -2,12 +2,15 @@ package damage
 
 import (
 	"github.com/gontikr99/chutzparse/internal/model/fight"
+	"time"
 )
 
 type Report struct {
 	Target        string
 	LastCharName  string
 	Contributions map[string]*Contribution
+	StartTime time.Time
+	EndTime time.Time
 }
 
 type Contribution struct {
@@ -19,7 +22,11 @@ func (c *Contribution) DamageTotal() int64 {
 	return c.TotalDamage
 }
 
-func (r *Report) Finalize() fight.FightReport { return r }
+func (r *Report) Finalize(f *fight.Fight) fight.FightReport {
+	r.StartTime = f.StartTime
+	r.EndTime = f.LastActivity
+	return r
+}
 
 type ReportFactory struct{}
 
@@ -40,6 +47,8 @@ func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
 		return result
 	}
 	result.Target = reports[0].(*Report).Target + " and others"
+	result.StartTime=reports[0].(*Report).StartTime
+	result.EndTime=reports[0].(*Report).EndTime
 	for _, reportIf := range reports {
 		report := reportIf.(*Report)
 		if result.LastCharName == "" {
@@ -52,6 +61,12 @@ func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
 				result.Contributions[name] = update
 			}
 			update.TotalDamage += contrib.TotalDamage
+		}
+		if report.StartTime.Before(result.StartTime) {
+			result.StartTime = report.StartTime
+		}
+		if report.EndTime.After(result.EndTime) {
+			result.EndTime = report.EndTime
 		}
 	}
 	return result

@@ -52,7 +52,7 @@ const inactivityTimeout = 12 * time.Second
 func retireActiveFight(target string) {
 	activeUpdated = true
 	if fightData, present := activeFights[target]; present {
-		fightData.Reports = fightData.Reports.Finalize()
+		fightData.Reports = fightData.Reports.Finalize(fightData)
 		buffer := &bytes.Buffer{}
 		err := gob.NewEncoder(buffer).Encode(fightData)
 		if err == nil {

@@ -26,6 +26,7 @@ const (
 	MethodShout
 	MethodAuction
 	MethodOOC
+	MethodGlobal
 )
 
 func handleChat(mp *multipattern.Multipattern) *multipattern.Multipattern {
@@ -38,4 +39,5 @@ func handleChat(mp *multipattern.Multipattern) *multipattern.Multipattern {
 				Channel: "",
 			}
 		})
+	// FIXME: add group, raid, guild, tell, shout, auction, ooc, global chat.  For both "you" and someone else.
 }

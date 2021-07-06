@@ -17,16 +17,16 @@ type FightReport interface {
 	Offer(entry *eqlog.LogEntry, epoch int) FightReport
 
 	// Finalize the fight, telling it that a fight underway has ended.
-	Finalize() FightReport
+	Finalize(fight *Fight) FightReport
 
 	// Throughput generates a throughput chart as a summary from this fight
 	Throughput(fight *Fight) []presenter.ThroughputBar
 }
 
 // Finalize an entire report set.
-func (s FightReportSet) Finalize() FightReportSet {
+func (s FightReportSet) Finalize(fight *Fight) FightReportSet {
 	for k, v := range s {
-		s[k] = v.Finalize()
+		s[k] = v.Finalize(fight)
 	}
 	return s
 }
