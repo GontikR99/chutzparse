@@ -5,7 +5,6 @@ package fight
 import (
 	"github.com/gontikr99/chutzparse/internal/model/fight"
 	"github.com/gontikr99/chutzparse/internal/ui"
-	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
 	"strconv"

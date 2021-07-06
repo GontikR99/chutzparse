@@ -1,5 +1,8 @@
 <div>
     <vg-comp expr="c.Body"></vg-comp>
+    <br/>
+    <br/>
+    <br/>
     <nav class="navbar fixed-bottom navbar-dark bg-dark navbar-expand-sm">
         <div>
             <ul class="navbar-nav mr-auto">
