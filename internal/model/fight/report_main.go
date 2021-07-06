@@ -22,3 +22,11 @@ type FightReport interface {
 	// Throughput generates a throughput chart as a summary from this fight
 	Throughput(fight *Fight) []presenter.ThroughputBar
 }
+
+// Finalize an entire report set.
+func (s FightReportSet) Finalize() FightReportSet {
+	for k, v := range s {
+		s[k] = v.Finalize()
+	}
+	return s
+}

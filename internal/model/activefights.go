@@ -3,10 +3,14 @@
 package model
 
 import (
+	"bytes"
+	"encoding/gob"
 	"github.com/gontikr99/chutzparse/internal/eqlog"
 	"github.com/gontikr99/chutzparse/internal/model/fight"
 	"github.com/gontikr99/chutzparse/internal/model/iff"
 	"github.com/gontikr99/chutzparse/internal/presenter"
+	"github.com/gontikr99/chutzparse/pkg/console"
+	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
 	"sort"
 	"strings"
 	"time"
@@ -47,6 +51,16 @@ const inactivityTimeout = 12 * time.Second
 
 func retireActiveFight(target string) {
 	activeUpdated = true
+	if fightData, present := activeFights[target]; present {
+		fightData.Reports = fightData.Reports.Finalize()
+		buffer := &bytes.Buffer{}
+		err := gob.NewEncoder(buffer).Encode(fightData)
+		if err == nil {
+			browserwindow.Broadcast(fight.ChannelFinishedFights, buffer.Bytes())
+		} else {
+			console.Log(err)
+		}
+	}
 	delete(activeFights, target)
 }
 

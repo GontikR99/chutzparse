@@ -6,8 +6,7 @@ import (
 	"github.com/gontikr99/chutzparse/internal/model/fight/heal"
 )
 
-// Start starts th
-func init() {
+func RegisterReports() {
 	fight.RegisterReport(damage.ReportFactory{})
 	fight.RegisterReport(heal.ReportFactory{})
 }

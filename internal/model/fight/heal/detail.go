@@ -2,9 +2,11 @@
 
 package heal
 
-import "github.com/vugu/vugu"
+import (
+	"github.com/vugu/vugu"
+)
 
-func (r *Report) Detail(fight *interface{}) vugu.Builder {
+func (r *Report) Detail() vugu.Builder {
 	// FIXME: implement
 	return nil
 }

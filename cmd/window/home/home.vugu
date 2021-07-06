@@ -1,0 +1,72 @@
+<div class="container">
+    <h1>Welcome to the ChutzParse pre-alpha</h1>
+    <p>
+        This is very much a work in progress. The goal is to make an open source EverQuest log parser with functionality
+        similar to GamParse, but with a few other features
+    </p>
+    <h4>System setup</h4>
+    <p>
+        Antivirus programs don't interact well with EverQuest's logging: they can cause significant frame rate drops.
+        Configure your antivirus program not to scan EverQuest's log folder.
+    </p>
+    <p>
+        For Windows 10's built-in "Windows Defender Antivirus":
+    </p>
+    <ul>
+        <li>Tap the Windows key, and type in "Virus & threat protection" to open the configuration dialog.</li>
+        <li>Under "Virus & threat protection settings", click "Manage settings"</li>
+        <li>In the "Exclusions" section, click "Add or remove exclusions"</li>
+        <li>Click "+ Add an exclusion", and select "Folder" from the menu.</li>
+        <li>Navigate to your EverQuest folder's Logs directory. The usual location is
+            <tt>This PC > Local Disk (C:) > Users > Public > Daybreak Game Company > Installed Games > EverQuest >
+                Logs</tt>.
+        </li>
+        <li>Click "Select Folder"</li>
+    </ul>
+    <h4>EverQuest setup</h4>
+    <p>EverQuest needs some setup for ChutzParse to work.</p>
+    <ul>
+        <li><b>ChutzParse's overlay requires windowed mode.</b> If you're running EverQuest in full screen mode, the
+            overlay will not show.
+        </li>
+        <li>ChutzParse is a log parser, and so requires logs be running. If you haven't turned them on in the past, turn
+            them on now: <tt>/log on</tt></li>
+        <li>If you have a reasonably fast system, you should instruct EverQuest to write log messages immediately to
+            disk, rather than in chunks: <tt>/loginterval 0</tt></li>
+    </ul>
+    <h4>ChutzParse setup</h4>
+    <p>If you've squirreled EverQuest into some unusual location, please tell me where:</p>
+    <form @submit="event.PreventDefault()">
+        <div class="form-group row">
+            <label class="col-form-label col-sm-2">EverQuest directory</label>
+            <div class="col-8">
+                <vgform:Input type="text" class="form-control" :Value="c.EqDir"/>
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-primary" @click="c.BrowseEqDir(event)">&#x1F4C1; Browse...</button>
+            </div>
+        </div>
+    </form>
+    <h4>Running ChutzParse</h4>
+    <p>Got logs on and your EverQuest directory selected above? That should be it. Go play some EverQuest and see the
+        numbers fly!</p>
+    <h4>Pets</h4>
+    <p>Use <tt>/pet leader</tt> to have EverQuest tell ChutzParse who pets belong to.</p>
+    <h4>Features</h4>
+    <ul>
+        <li>Overlay damage meters for active fight</li>
+        <li>Overlay strike text for your melee and spell damage.
+            <ul>
+                <li><b style="color: white;">White</b> text for your melee damage.</li>
+                <li><b style="color: yellow;">Yellow</b> text for your spell damage and procs.</li>
+                <li><b style="color: gray;">Gray</b> for your damage shields.</li>
+                <li><b style="color: cyan;">Cyan</b> for heals you cast.</li>
+                <li><b style="color: #32CD32;">Green</b> for heals you receive.</li>
+                <li><b style="color: red;">Red</b> for damage done to you.</li>
+            </ul>
+        </li>
+    </ul>
+</div>
+<script type="application/x-go">
+    import "github.com/vugu/vugu/vgform"
+</script>

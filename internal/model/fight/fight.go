@@ -21,3 +21,5 @@ type Fight struct {
 	// LastActivity is the last time we noticed a log message involving this fight
 	LastActivity time.Time
 }
+
+const ChannelFinishedFights = "finishedFights"

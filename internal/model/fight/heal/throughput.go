@@ -1,3 +1,5 @@
+// +build wasm,electron
+
 package heal
 
 import (

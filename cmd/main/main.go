@@ -31,6 +31,7 @@ func main() {
 	appCtx, exitApp := context.WithCancel(context.Background())
 	application.OnWindowAllClosed(exitApp)
 
+	model.RegisterReports()
 	model.StartMain()
 	eqlog.RestartLogScans(appCtx)
 
@@ -54,7 +55,7 @@ func main() {
 	mainWindow.ServeRPC(mainrpc.NewServer())
 
 	mainWindow.Once("ready-to-show", func() {
-		mainWindow.RemoveMenu()
+		//mainWindow.RemoveMenu()
 		mainWindow.Show()
 	})
 	mainWindow.Once("show", shown)

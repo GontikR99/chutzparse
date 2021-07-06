@@ -1,6 +1,9 @@
 package fight
 
-import "encoding/gob"
+import (
+	"encoding/gob"
+	"sort"
+)
 
 // FightReportSet represents the whole collection of reports for a fight
 type FightReportSet map[string]FightReport
@@ -20,7 +23,23 @@ var reportRegistry = map[string]FightReportFactory{}
 
 func RegisterReport(factory FightReportFactory) {
 	reportRegistry[factory.Type()] = factory
-	gob.RegisterName("FightReport:"+factory.Type(), factory.NewEmpty())
+	gob.RegisterName("FightReport:"+factory.Type(), factory.NewEmpty(""))
+}
+
+type byName []string
+
+func (b byName) Len() int           { return len(b) }
+func (b byName) Less(i, j int) bool { return b[i] < b[j] }
+
+func (b byName) Swap(i, j int) { b[i], b[j] = b[j], b[i] }
+
+func ReportNames() []string {
+	var result []string
+	for _, fac := range reportRegistry {
+		result = append(result, fac.Type())
+	}
+	sort.Sort(byName(result))
+	return result
 }
 
 // NewFightReports create a collection of reports specialized to a fight against the specified target

@@ -30,6 +30,34 @@ func (r ReportFactory) NewEmpty(target string) fight.FightReport {
 }
 
 func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
-	// FIXME: implement
-	return nil
+	result := &Report{}
+	for _, reportIf := range reports {
+		report := reportIf.(*Report)
+		if result.Belligerent == "" {
+			result.Belligerent = report.Belligerent + " and others"
+		}
+		if result.LastCharName == "" {
+			result.LastCharName = ""
+		}
+		for name, contrib := range report.Contributions {
+			update, present := result.Contributions[name]
+			if !present {
+				update = &Contribution{Source: name, HealByEpoch: make(map[int]int64)}
+				result.Contributions[name] = update
+			}
+			for epoch, healed := range contrib.HealByEpoch {
+				resHeal, _ := update.HealByEpoch[epoch]
+				if healed > resHeal {
+					update.HealByEpoch[epoch] = healed
+				}
+			}
+		}
+	}
+	for _, contrib := range result.Contributions {
+		contrib.TotalHealed = 0
+		for _, healed := range contrib.HealByEpoch {
+			contrib.TotalHealed += healed
+		}
+	}
+	return result
 }

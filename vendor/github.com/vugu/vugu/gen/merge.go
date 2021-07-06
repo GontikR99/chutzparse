@@ -44,7 +44,9 @@ func mergeGoFiles(dir, out string, in ...string) error {
 	}
 
 	var newPgm bytes.Buffer
-
+	// write the build constraint
+	newPgm.WriteString("// +build wasm,web\n\n")
+	
 	// use the package part from the first one
 	newPgm.WriteString(pkgClause)
 	newPgm.WriteString("\n\n")

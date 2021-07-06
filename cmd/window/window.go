@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/gontikr99/chutzparse/internal/model"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
@@ -10,6 +11,8 @@ import (
 )
 
 func main() {
+	model.RegisterReports()
+
 	renderer, err := domrender.New("#page_root")
 	if err != nil {
 		panic(err)

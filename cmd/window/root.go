@@ -3,67 +3,76 @@
 package main
 
 import (
-	"github.com/gontikr99/chutzparse/internal/rpc"
-	"github.com/gontikr99/chutzparse/internal/settings"
-	"github.com/gontikr99/chutzparse/pkg/console"
-	"github.com/gontikr99/chutzparse/pkg/electron/ipc/ipcrenderer"
+	"github.com/gontikr99/chutzparse/cmd/window/fight"
+	"github.com/gontikr99/chutzparse/cmd/window/home"
+	"github.com/gontikr99/chutzparse/cmd/window/settings"
+	"github.com/gontikr99/chutzparse/internal/place"
+	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
+	"strings"
+	"time"
 )
 
 type Root struct {
-	EqDir *ConfiguredValue
+	vuguutil.BackgroundComponent
+	LastPlace string
+	Body      vugu.Builder
+}
+
+type routeEntry struct {
+	Place       string
+	DisplayName string
+	ShowInNav   func() bool
+	BodyGen     func() vugu.Builder
+}
+
+func (r routeEntry) ClassText() string {
+	if place.GetPlace() == r.Place {
+		return "nav-link active"
+	} else {
+		return "nav-link"
+	}
+}
+
+var neverShow = func() bool { return false }
+var alwaysShow = func() bool { return true }
+
+var routes = []*routeEntry{
+	{"", "Home", alwaysShow, func() vugu.Builder { return &home.Home{} }},
+	{"fight", "Fights", alwaysShow, func() vugu.Builder { return &fight.Display{} }},
+	{"settings", "Settings", alwaysShow, func() vugu.Builder { return &settings.Settings{} }},
 }
 
 func (c *Root) Init(vCtx vugu.InitCtx) {
-	c.EqDir = &ConfiguredValue{
-		Key:      settings.EverQuestDirectory,
-		Callback: func(s string) { rpc.RestartScan(ipcrenderer.Client) },
-	}
-
-	c.EqDir.Init(vCtx)
+	c.Body = &home.Home{}
+	c.InitBackground(vCtx, c)
 }
 
-func (c *Root) BrowseEqDir(event vugu.DOMEvent) {
-	event.PreventDefault()
-	go func() {
-		newDir, err := rpc.DirectoryDialog(ipcrenderer.Client, c.EqDir.Value)
-		if err != nil {
-			console.Log(err.Error())
+func (c *Root) RunInBackground() {
+	lastPlace := place.GetPlace()
+	for {
+		<-time.After(10 * time.Millisecond)
+		curPlace := place.GetPlace()
+		if lastPlace != curPlace {
+			c.Env().Lock()
+			lastPlace = curPlace
+			c.Env().UnlockRender()
+		}
+	}
+}
+
+func (c *Root) Compute(ctx vugu.ComputeCtx) {
+	fullPlace := place.GetPlace()
+	curPlace := strings.Split(fullPlace, ":")[0]
+	if curPlace == c.LastPlace {
+		return
+	}
+	for _, route := range routes {
+		if route.Place == curPlace {
+			c.Body = route.BodyGen()
+			c.LastPlace = curPlace
 			return
 		}
-		event.EventEnv().Lock()
-		c.EqDir.SetStringValue(newDir)
-		event.EventEnv().UnlockRender()
-	}()
-}
-
-type ConfiguredValue struct {
-	Key      string
-	Value    string
-	Callback func(value string)
-}
-
-func (cv *ConfiguredValue) Init(ctx vugu.InitCtx) {
-	go func() {
-		value, present, err := rpc.LookupSetting(ipcrenderer.Client, cv.Key)
-		if err == nil && present {
-			ctx.EventEnv().Lock()
-			cv.Value = value
-			ctx.EventEnv().UnlockRender()
-		}
-	}()
-}
-
-func (cv *ConfiguredValue) StringValue() string {
-	return cv.Value
-}
-
-func (cv *ConfiguredValue) SetStringValue(s string) {
-	cv.Value = s
-	go func() {
-		rpc.SetSetting(ipcrenderer.Client, cv.Key, s)
-		if cv.Callback != nil {
-			cv.Callback(s)
-		}
-	}()
+	}
+	place.NavigateTo(ctx.EventEnv(), "")
 }

@@ -1,8 +1,6 @@
 package damage
 
 import (
-	"bytes"
-	"encoding/gob"
 	"github.com/gontikr99/chutzparse/internal/model/fight"
 )
 
@@ -21,12 +19,6 @@ func (c *Contribution) DamageTotal() int64 {
 	return c.TotalDamage
 }
 
-func (r *Report) Serialize() ([]byte, error) {
-	b := &bytes.Buffer{}
-	err := gob.NewEncoder(b).Encode(r)
-	return b.Bytes(), err
-}
-
 func (r *Report) Finalize() fight.FightReport { return r }
 
 type ReportFactory struct{}
@@ -41,7 +33,9 @@ func (r ReportFactory) NewEmpty(target string) fight.FightReport {
 }
 
 func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
-	result := &Report{}
+	result := &Report{
+		Contributions: make(map[string]*Contribution),
+	}
 	if len(reports) == 0 {
 		return result
 	}
@@ -61,10 +55,4 @@ func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
 		}
 	}
 	return result
-}
-
-func (r ReportFactory) Deserialize(serialized []byte) (fight.FightReport, error) {
-	var result Report
-	err := gob.NewDecoder(bytes.NewReader(serialized)).Decode(&result)
-	return &result, err
 }
