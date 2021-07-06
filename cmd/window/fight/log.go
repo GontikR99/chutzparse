@@ -24,7 +24,10 @@ func init() {
 			if err == nil {
 				finishedFights = append(finishedFights, &fightData)
 				for _, listener := range listeners {
-					listener <- struct{}{}
+					func() {
+						defer func() {recover()}()
+						listener <- struct{}{}
+					}()
 				}
 			} else {
 				console.Log(err)

@@ -18,10 +18,13 @@ func (i Endpoint) Listen(channelName string) (<-chan msgcomm.Message, func()) {
 	recvFunc := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		event := args[0]
 		data, _ := ipc.Decode(args[1])
-		resultChan <- &electronMessage{
-			event:   event,
-			content: data,
-		}
+		func () {
+			defer func() {recover()} ()
+			resultChan <- &electronMessage{
+				event:   event,
+				content: data,
+			}
+		}()
 		return nil
 	})
 	ipcRenderer.Call("on", msgcomm.Prefix+channelName, recvFunc)
