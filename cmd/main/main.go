@@ -19,8 +19,8 @@ import (
 )
 
 func main() {
-	defer func(){
-		if err := recover(); err!=nil {
+	defer func() {
+		if err := recover(); err != nil {
 			console.Log(err)
 			panic(err)
 		}
@@ -59,27 +59,27 @@ func main() {
 	})
 	mainWindow.Once("show", shown)
 	mainWindow.LoadFile(path.Join(application.GetAppPath(), "src/window.html"))
-	<- mainBuilding.Done()
+	<-mainBuilding.Done()
 
 	primaryDisplay := screen.GetPrimaryDisplay()
 	wndRect := electron.Rectangle{
-		X:      primaryDisplay.Bounds.X+100,
-		Y:      primaryDisplay.Bounds.Y+100,
+		X:      primaryDisplay.Bounds.X + 100,
+		Y:      primaryDisplay.Bounds.Y + 100,
 		Width:  100,
 		Height: 100,
 	}
 
 	overlayBuilding, oShown := context.WithCancel(appCtx)
 	overlayWnd := browserwindow.New(&browserwindow.Conf{
-		X:              wndRect.X,
-		Y:              wndRect.Y,
-		Title:          "ChutzParse Overlay",
-		Width:          wndRect.Width,
-		Height:         wndRect.Height,
-		Show:           false,
-		Transparent:    true,
-		Resizable:      false,
-		Frame:          false,
+		X:           wndRect.X,
+		Y:           wndRect.Y,
+		Title:       "ChutzParse Overlay",
+		Width:       wndRect.Width,
+		Height:      wndRect.Height,
+		Show:        false,
+		Transparent: true,
+		Resizable:   false,
+		Frame:       false,
 		WebPreferences: &browserwindow.WebPreferences{
 			Preload:          path.Join(application.GetAppPath(), "src/preload.js"),
 			NodeIntegration:  false,
@@ -99,19 +99,19 @@ func main() {
 		//})
 	})
 	overlayWnd.Once("show", oShown)
-	overlayWnd.LoadFile(path.Join(application.GetAppPath(), "src","overlay.html"))
-	<- overlayBuilding.Done()
+	overlayWnd.LoadFile(path.Join(application.GetAppPath(), "src", "overlay.html"))
+	<-overlayBuilding.Done()
 
 	go func() {
 		for {
 			select {
 			case <-appCtx.Done():
 				return
-			case <-time.After(50*time.Millisecond):
+			case <-time.After(50 * time.Millisecond):
 				break
 			}
 			newLoc, err := eqwnd.GetExtents()
-			if err!=nil {
+			if err != nil {
 				continue
 			}
 			if wndRect != *newLoc {
@@ -121,18 +121,18 @@ func main() {
 				eqDisp := screen.GetDisplayMatching(&wndRect)
 
 				overlayWnd.SetContentBounds(&electron.Rectangle{
-					X:      primaryDisplay.Bounds.X+100,
-					Y:      primaryDisplay.Bounds.Y+100,
+					X:      primaryDisplay.Bounds.X + 100,
+					Y:      primaryDisplay.Bounds.Y + 100,
 					Width:  100,
 					Height: 100,
 				})
-				<- time.After(50*time.Millisecond)
+				<-time.After(50 * time.Millisecond)
 
 				overlayWnd.SetContentBounds(&electron.Rectangle{
-					X:      int(float64(wndRect.X)/primaryDisplay.ScaleFactor),
-					Y:      int(float64(wndRect.Y)/primaryDisplay.ScaleFactor),
-					Width:  int(float64(wndRect.Width)/eqDisp.ScaleFactor),
-					Height: int(float64(wndRect.Height)/eqDisp.ScaleFactor),
+					X:      int(float64(wndRect.X) / primaryDisplay.ScaleFactor),
+					Y:      int(float64(wndRect.Y) / primaryDisplay.ScaleFactor),
+					Width:  int(float64(wndRect.Width) / eqDisp.ScaleFactor),
+					Height: int(float64(wndRect.Height) / eqDisp.ScaleFactor),
 				})
 			}
 		}

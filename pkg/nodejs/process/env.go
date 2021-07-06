@@ -4,8 +4,8 @@ package process
 
 import "syscall/js"
 
-var process=js.Global().Get("process")
-var env= process.Get("env")
+var process = js.Global().Get("process")
+var env = process.Get("env")
 
 func LookupEnv(key string) (string, bool) {
 	v := env.Get(key)

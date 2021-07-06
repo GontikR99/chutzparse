@@ -10,13 +10,13 @@ import (
 var jsModule = nodejs.Require("iohook")
 
 type KeyEvent struct {
-	Type string
-	KeyCode int
-	RawCode int
-	AltKey bool
-	CtrlKey bool
+	Type     string
+	KeyCode  int
+	RawCode  int
+	AltKey   bool
+	CtrlKey  bool
 	ShiftKey bool
-	MetaKey bool
+	MetaKey  bool
 }
 
 func on(eventType string, callback func(arg js.Value)) {
@@ -39,11 +39,11 @@ func newKeyEvent(eventRaw js.Value) *KeyEvent {
 }
 
 func OnKeyDown(callback func(*KeyEvent)) {
-	on("keydown", func(arg js.Value) {callback(newKeyEvent(arg))})
+	on("keydown", func(arg js.Value) { callback(newKeyEvent(arg)) })
 }
 
 func OnKeyUp(callback func(*KeyEvent)) {
-	on("keyup", func(arg js.Value) {callback(newKeyEvent(arg))})
+	on("keyup", func(arg js.Value) { callback(newKeyEvent(arg)) })
 }
 
 func Start() {

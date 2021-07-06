@@ -10,15 +10,15 @@ import (
 	"syscall/js"
 )
 
-var ipcMain= electron.JSValue().Get("ipcMain")
+var ipcMain = electron.JSValue().Get("ipcMain")
 
 func Listen(channelName string) (<-chan msgcomm.Message, func()) {
 	resultChan := make(chan msgcomm.Message)
-	recvFunc := js.FuncOf(func(_ js.Value, args []js.Value)interface{} {
+	recvFunc := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		event := args[0]
 		data, _ := ipc.Decode(args[1])
 		resultChan <- &electronMessage{
-			event: event,
+			event:   event,
 			content: []byte(data),
 		}
 		return nil
@@ -32,7 +32,7 @@ func Listen(channelName string) (<-chan msgcomm.Message, func()) {
 }
 
 type electronMessage struct {
-	event js.Value
+	event   js.Value
 	content []byte
 }
 

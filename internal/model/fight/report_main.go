@@ -19,9 +19,6 @@ type FightReport interface {
 	// Finalize the fight, telling it that a fight underway has ended.
 	Finalize() FightReport
 
-	// Serialize this fight for transmission
-	Serialize() ([]byte, error)
-
 	// Throughput generates a throughput chart as a summary from this fight
 	Throughput(fight *Fight) []presenter.ThroughputBar
 }

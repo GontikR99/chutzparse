@@ -10,6 +10,7 @@ import (
 )
 
 var ipcRenderer = js.Global().Get("ipcRenderer")
+
 type Endpoint struct{}
 
 func (i Endpoint) Listen(channelName string) (<-chan msgcomm.Message, func()) {
@@ -36,7 +37,7 @@ func (i Endpoint) Send(channelName string, content []byte) {
 }
 
 type electronMessage struct {
-	event js.Value
+	event   js.Value
 	content []byte
 }
 

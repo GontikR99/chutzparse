@@ -32,11 +32,11 @@ import (
 //    }
 // }
 type BackgroundComponent struct {
-	Ctx context.Context
-	env vugu.EventEnv
-	renderChan chan struct{}
+	Ctx                  context.Context
+	env                  vugu.EventEnv
+	renderChan           chan struct{}
 	renderCallbackHandle CallbackHandle
-	cancelFunc context.CancelFunc
+	cancelFunc           context.CancelFunc
 }
 
 type BackgroundLooper interface {
@@ -48,15 +48,15 @@ func (c *BackgroundComponent) InitBackground(vCtx vugu.InitCtx, bg BackgroundLoo
 	c.Ctx, c.cancelFunc = context.WithCancel(context.Background())
 	c.env = vCtx.EventEnv()
 	rChan := make(chan struct{})
-	c.renderChan=rChan
+	c.renderChan = rChan
 	go func() {
 		bg.RunInBackground()
 	}()
 }
 
 func (c *BackgroundComponent) ListenForRender() {
-	c.renderCallbackHandle=OnRender(func() {
-		c.renderChan<-struct{}{}
+	c.renderCallbackHandle = OnRender(func() {
+		c.renderChan <- struct{}{}
 	})
 }
 

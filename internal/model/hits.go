@@ -54,9 +54,9 @@ func listenForHits() {
 						Color: "red",
 						Big:   dmgEntry.Flag&eqlog.CriticalFlag != 0,
 					})
-				} else if iff.GetOwner(dmgEntry.Source)==entry.Character {
+				} else if iff.GetOwner(dmgEntry.Source) == entry.Character {
 					// pet doing damage
-					if dmgEntry.SpellName!="" {
+					if dmgEntry.SpellName != "" {
 						presenter.BroadcastHitEvent(presenter.ChannelHitTop, &presenter.HitEvent{
 							Text:  parsedefs.RenderAmount(float64(dmgEntry.Amount)),
 							Color: "khaki",

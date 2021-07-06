@@ -4,17 +4,16 @@ import (
 	"bytes"
 	"encoding/gob"
 	"github.com/gontikr99/chutzparse/internal/model/fight"
-	"github.com/vugu/vugu"
 )
 
 type Report struct {
-	Target string
-	LastCharName string
+	Target        string
+	LastCharName  string
 	Contributions map[string]*Contribution
 }
 
 type Contribution struct {
-	Source string
+	Source      string
 	TotalDamage int64
 }
 
@@ -28,12 +27,11 @@ func (r *Report) Serialize() ([]byte, error) {
 	return b.Bytes(), err
 }
 
-func (r *Report) Detail(fight *fight.Fight) vugu.Builder {return nil}
-func (r *Report) Finalize() fight.FightReport                {return r}
+func (r *Report) Finalize() fight.FightReport { return r }
 
-type ReportFactory struct {}
+type ReportFactory struct{}
 
-func (r ReportFactory) Type() string {return "Damage"}
+func (r ReportFactory) Type() string { return "Damage" }
 
 func (r ReportFactory) NewEmpty(target string) fight.FightReport {
 	return &Report{
@@ -43,8 +41,26 @@ func (r ReportFactory) NewEmpty(target string) fight.FightReport {
 }
 
 func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
-	// FIXME: implement
-	return r.NewEmpty("")
+	result := &Report{}
+	if len(reports) == 0 {
+		return result
+	}
+	result.Target = reports[0].(*Report).Target + " and others"
+	for _, reportIf := range reports {
+		report := reportIf.(*Report)
+		if result.LastCharName == "" {
+			result.LastCharName = report.LastCharName
+		}
+		for name, contrib := range report.Contributions {
+			update, present := result.Contributions[name]
+			if !present {
+				update = &Contribution{Source: name}
+				result.Contributions[name] = update
+			}
+			update.TotalDamage += contrib.TotalDamage
+		}
+	}
+	return result
 }
 
 func (r ReportFactory) Deserialize(serialized []byte) (fight.FightReport, error) {
@@ -52,4 +68,3 @@ func (r ReportFactory) Deserialize(serialized []byte) (fight.FightReport, error)
 	err := gob.NewDecoder(bytes.NewReader(serialized)).Decode(&result)
 	return &result, err
 }
-

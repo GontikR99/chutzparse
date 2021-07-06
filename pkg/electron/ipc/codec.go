@@ -11,6 +11,6 @@ func Encode(data []byte) js.Value {
 	return jsbinding.MakeArrayBuffer(data)
 }
 
-func Decode(encoded js.Value) ([]byte,error) {
+func Decode(encoded js.Value) ([]byte, error) {
 	return jsbinding.ReadArrayBuffer(encoded), nil
 }

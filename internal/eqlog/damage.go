@@ -69,7 +69,7 @@ type DamageLog struct {
 func (d *DamageLog) Visit(handler ParsedLogHandler) interface{} { return handler.OnDamage(d) }
 
 func (d *DamageLog) String() string {
-	return "Damage: "+d.Source + ": " + strconv.FormatInt(d.Amount, 10) + " (" + d.Type.String() + "/" + d.Element.String() + ") -> " +
+	return "Damage: " + d.Source + ": " + strconv.FormatInt(d.Amount, 10) + " (" + d.Type.String() + "/" + d.Element.String() + ") -> " +
 		d.Target + " [" + d.Flag.String() + "] " + d.SpellName
 }
 

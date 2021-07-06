@@ -4,11 +4,11 @@ package nodejs
 
 import "syscall/js"
 
-var requireRoot=js.Undefined()
+var requireRoot = js.Undefined()
 
 func init() {
 	if !js.Global().Get("require").IsUndefined() {
-		requireRoot =js.Global()
+		requireRoot = js.Global()
 	}
 }
 
@@ -19,4 +19,3 @@ func Require(path string) js.Value {
 		return requireRoot.Call("require", path)
 	}
 }
-

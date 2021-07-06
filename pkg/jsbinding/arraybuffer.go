@@ -16,9 +16,9 @@ func MakeArrayBuffer(data []byte) js.Value {
 
 func ReadArrayBuffer(buffer js.Value) (data []byte) {
 	defer func() {
-		if r:=recover(); r!=nil {
+		if r := recover(); r != nil {
 			console.Log(r)
-			data=nil
+			data = nil
 			return
 		}
 	}()

@@ -2,4 +2,4 @@
 
 package settings
 
-const EverQuestDirectory="EverQuestDirectory"
+const EverQuestDirectory = "EverQuestDirectory"

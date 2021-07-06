@@ -1,4 +1,4 @@
-(function() {
+(function () {
     const {app} = require('electron');
 
     app.commandLine.appendSwitch("high-dpi-support", 1)

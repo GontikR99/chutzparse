@@ -22,7 +22,7 @@ func (c *HitDisplay) Run() {
 	rand.Seed(time.Now().Unix())
 	c.allocated = make([]int, pathCount)
 	defsElem := document.GetElementById("hitDefs")
-	for i:=0;i<pathCount;i++ {
+	for i := 0; i < pathCount; i++ {
 		pathElem := document.CreateElementNS(namespaceSvg, "path")
 		pathElem.SetAttribute("id", fmt.Sprintf("hit-path%d", i))
 		pathElem.SetAttribute("fill", "none")
@@ -37,22 +37,21 @@ func (c *HitDisplay) Run() {
 func (c *HitDisplay) RunInBackground() {
 	topEvent := presenter.HitDisplayListen(context.Background(), presenter.ChannelHitTop)
 	bottomEvent := presenter.HitDisplayListen(context.Background(), presenter.ChannelHitBottom)
-	topSide:=0
-	bottomSide:=0
+	topSide := 0
+	bottomSide := 0
 	for {
 		select {
-		case hde := <- topEvent:
+		case hde := <-topEvent:
 			c.drawRandomRange(hde.Text, hde.Color, hde.Big, (0+topSide)*pathCount/4, (1+topSide)*pathCount/4)
 			topSide = 1 - topSide
-		case hde:= <-bottomEvent:
+		case hde := <-bottomEvent:
 			c.drawRandomRange(hde.Text, hde.Color, hde.Big, (2+bottomSide)*pathCount/4, (3+bottomSide)*pathCount/4)
 			bottomSide = 1 - bottomSide
 		}
 	}
 }
 
-
-const pathCount = 32 // number of text paths to reserve
+const pathCount = 32    // number of text paths to reserve
 const screenSeconds = 3 // how long a hit text remains on screen
 
 // drawRandomRange draws a given text string with a given color into one of the text paths of the hit display.
@@ -64,7 +63,7 @@ const screenSeconds = 3 // how long a hit text remains on screen
 func (c *HitDisplay) drawRandomRange(text string, color string, big bool, rangeBegin int, rangeEnd int) {
 	options := []int{}
 	for i := rangeBegin; i < rangeEnd; i++ {
-		if c.allocated[(i+pathCount)%pathCount]==0 {
+		if c.allocated[(i+pathCount)%pathCount] == 0 {
 			options = append(options, i)
 		}
 	}
@@ -193,6 +192,7 @@ func (c *HitDisplay) draw(pathIndex int, text string, color string, big bool) {
 		c.allocated[pathIndex]--
 	}()
 }
+
 var keyTimes = (func() string {
 	sb := strings.Builder{}
 	needSep := false
@@ -208,7 +208,7 @@ var keyTimes = (func() string {
 	return sb.String()
 })()
 
-var keyPoints = (func () string {
+var keyPoints = (func() string {
 	sb := strings.Builder{}
 	needSep := false
 	for i := 0; i < strokeSegments+1; i++ {

@@ -9,14 +9,14 @@ import (
 	"syscall/js"
 )
 
-var win32api=nodejs.Require("win32-api")
-var user32=win32api.Get("U").Call("load")
-var buffer=js.Global().Get("Buffer")
+var win32api = nodejs.Require("win32-api")
+var user32 = win32api.Get("U").Call("load")
+var buffer = js.Global().Get("Buffer")
 
 func findWindow() (uint32, error) {
 	nameBuf := buffer.Call("from", "EverQuest\x00", "ucs2")
 	resultInt := user32.Call("FindWindowExW", 0, 0, js.Null(), nameBuf).Int()
-	if resultInt==0 {
+	if resultInt == 0 {
 		return 0, errors.New("window not found")
 	} else {
 		return uint32(resultInt), nil
@@ -25,20 +25,22 @@ func findWindow() (uint32, error) {
 
 func IsTop() bool {
 	hwnd, err := findWindow()
-	if err!=nil {
+	if err != nil {
 		return false
 	}
 	topHwnd := uint32(user32.Call("GetForegroundWindow").Int())
-	return hwnd==topHwnd
+	return hwnd == topHwnd
 }
 
 func GetExtents() (*electron.Rectangle, error) {
 	hwnd, err := findWindow()
-	if err!=nil {return nil, err}
+	if err != nil {
+		return nil, err
+	}
 
 	rectRef := buffer.Call("alloc", 16)
 	success := user32.Call("GetWindowRect", hwnd, rectRef).Int()
-	if success==0 {
+	if success == 0 {
 		return nil, errors.New("failed to get window extents")
 	}
 	left := rectRef.Call("readInt32LE", 0).Int()
@@ -49,7 +51,7 @@ func GetExtents() (*electron.Rectangle, error) {
 	return &electron.Rectangle{
 		X:      left,
 		Y:      top,
-		Width:  right-left,
-		Height: bottom-top,
+		Width:  right - left,
+		Height: bottom - top,
 	}, nil
 }

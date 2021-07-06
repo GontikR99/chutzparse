@@ -10,7 +10,7 @@ import (
 
 type fauxVuguEvent struct {
 	event js.Value
-	env vugu.EventEnv
+	env   vugu.EventEnv
 }
 
 func NewVuguEvent(event js2.Value, env vugu.EventEnv) vugu.DOMEvent {
@@ -20,7 +20,7 @@ func NewVuguEvent(event js2.Value, env vugu.EventEnv) vugu.DOMEvent {
 func (f *fauxVuguEvent) Prop(keys ...string) interface{} {
 	cv := f.event
 	for _, k := range keys {
-		cv=cv.Get(k)
+		cv = cv.Get(k)
 		if cv.IsNull() || cv.IsUndefined() {
 			return nil
 		}
@@ -30,7 +30,7 @@ func (f *fauxVuguEvent) Prop(keys ...string) interface{} {
 
 func (f *fauxVuguEvent) PropString(keys ...string) string {
 	sv := f.Prop(keys...)
-	if sv==nil {
+	if sv == nil {
 		return ""
 	} else {
 		return sv.(js.Value).String()
@@ -39,7 +39,7 @@ func (f *fauxVuguEvent) PropString(keys ...string) string {
 
 func (f *fauxVuguEvent) PropFloat64(keys ...string) float64 {
 	sv := f.Prop(keys...)
-	if sv==nil {
+	if sv == nil {
 		return 0
 	} else {
 		return sv.(js.Value).Float()
@@ -48,7 +48,7 @@ func (f *fauxVuguEvent) PropFloat64(keys ...string) float64 {
 
 func (f *fauxVuguEvent) PropBool(keys ...string) bool {
 	sv := f.Prop(keys...)
-	if sv==nil {
+	if sv == nil {
 		return false
 	} else {
 		return sv.(js.Value).Bool()
@@ -82,4 +82,3 @@ func (f *fauxVuguEvent) PreventDefault() {
 func (f *fauxVuguEvent) StopPropagation() {
 	f.event.Call("stopPropagation")
 }
-

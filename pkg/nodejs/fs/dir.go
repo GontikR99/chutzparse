@@ -13,11 +13,11 @@ import (
 func ReadDir(path string) ([]os.FileInfo, error) {
 	successChan, errorChan := nodejs.FromPromise(fsPromises.Call("readdir", path, map[string]interface{}{"withFileTypes": true}))
 	select {
-	case errJs:=<-errorChan:
+	case errJs := <-errorChan:
 		return nil, errors.New(errJs[0].String())
-	case succObj:=<-successChan:
+	case succObj := <-successChan:
 		var files []os.FileInfo
-		for i:=0;i<succObj[0].Length();i++ {
+		for i := 0; i < succObj[0].Length(); i++ {
 			jsEnt := succObj[0].Index(i)
 			files = append(files, &jsDirEnt{jsEnt})
 		}
@@ -61,7 +61,7 @@ func (j *jsDirEnt) Mode() os.FileMode {
 }
 
 func (j *jsDirEnt) ModTime() time.Time {
-	return time.Unix(0,0)
+	return time.Unix(0, 0)
 }
 
 func (j *jsDirEnt) IsDir() bool {

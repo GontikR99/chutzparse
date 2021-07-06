@@ -2,7 +2,7 @@
     <throughput:Throughput class="fullscreen"></throughput:Throughput>
 </div>
 <script type="application/x-go">
-import (
+    import (
     "github.com/gontikr99/chutzparse/cmd/overlay/throughput"
-)
+    )
 </script>

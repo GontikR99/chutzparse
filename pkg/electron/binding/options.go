@@ -6,17 +6,17 @@ import "encoding/json"
 
 func trimOptions(prefMap *map[string]interface{}) {
 	var trimKeys []string
-	for k,v := range *prefMap {
-		if v==nil {
+	for k, v := range *prefMap {
+		if v == nil {
 			trimKeys = append(trimKeys, k)
 		}
-		if submap, ok :=v.(map[string]interface{}); ok {
+		if submap, ok := v.(map[string]interface{}); ok {
 			trimOptions(&submap)
-			(*prefMap)[k]=submap
+			(*prefMap)[k] = submap
 		}
-		if subarr, ok:=v.([]interface{}); ok {
+		if subarr, ok := v.([]interface{}); ok {
 			var newArr []interface{}
-			for _, v2:=range subarr {
+			for _, v2 := range subarr {
 				if submap, ok := v2.(map[string]interface{}); ok {
 					trimOptions(&submap)
 					newArr = append(newArr, submap)
@@ -24,7 +24,7 @@ func trimOptions(prefMap *map[string]interface{}) {
 					newArr = append(newArr, v2)
 				}
 			}
-			(*prefMap)[k]=newArr
+			(*prefMap)[k] = newArr
 		}
 	}
 
@@ -38,7 +38,7 @@ func JsonifyOptions(options interface{}) map[string]interface{} {
 	if err != nil {
 		panic(err)
 	}
-	parsed:=make(map[string]interface{})
+	parsed := make(map[string]interface{})
 	err = json.Unmarshal(data, &parsed)
 	if err != nil {
 		panic(err)

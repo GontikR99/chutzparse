@@ -7,7 +7,7 @@ import (
 	"syscall/js"
 )
 
-var app= electron.JSValue().Get("app")
+var app = electron.JSValue().Get("app")
 
 func JSValue() js.Value {
 	return app
@@ -26,14 +26,14 @@ func GetAppPath() string {
 }
 
 func On(eventName string, handler func(event js.Value)) {
-	app.Call("on", eventName, js.FuncOf(func(_ js.Value, args []js.Value)interface{} {
+	app.Call("on", eventName, js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		handler(args[0])
 		return nil
 	}))
 }
 
 func OnWindowAllClosed(handler func()) {
-	On("window-all-closed", func(event js.Value){
+	On("window-all-closed", func(event js.Value) {
 		handler()
 	})
 }

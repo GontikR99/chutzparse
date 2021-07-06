@@ -127,11 +127,11 @@ func tailLog(ctx context.Context, filename string, character string, server stri
 				interpRaw := logterpreter.Dispatch(parts[2])
 				var interp ParsedLog
 				var ok bool
-				if interp, ok = interpRaw.(ParsedLog); interp!=nil && ok {
+				if interp, ok = interpRaw.(ParsedLog); interp != nil && ok {
 					interp = interp.Visit(substituteYouHandler{charName: character}).(ParsedLog)
 				}
 				entry := &LogEntry{
-					Id: logIdGen,
+					Id:        logIdGen,
 					Character: character,
 					Server:    server,
 					Timestamp: parsedTime,
@@ -201,7 +201,7 @@ func (s substituteYouHandler) OnDeath(log *DeathLog) interface{} {
 }
 
 func (s substituteYouHandler) OnChat(log *ChatLog) interface{} {
-	if log.Source=="You" {
+	if log.Source == "You" {
 		log.Source = s.charName
 	}
 	return log

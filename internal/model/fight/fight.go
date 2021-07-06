@@ -7,10 +7,10 @@ import (
 // Fight is a collection of reports about an encounter with a specific NPC
 type Fight struct {
 	// Id is a unique identifier for the fight
-	Id        int
+	Id int
 
 	// Target is the NPC that the fight is with
-	Target    string
+	Target string
 
 	// Reports collect all of the information involved in the fight
 	Reports FightReportSet

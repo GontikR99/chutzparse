@@ -51,40 +51,39 @@ type BrowserWindow interface {
 
 type electronBrowserWindow struct {
 	browserWindow js.Value
-	webContents js.Value
+	webContents   js.Value
 
 	windowId int
 
 	closedCallbacks []func()
-	callbacks     map[int]js.Func
-	nextCallback  int
+	callbacks       map[int]js.Func
+	nextCallback    int
 }
 
-var nextWindowId=0
-var openWindows=make(map[int]*electronBrowserWindow)
-
+var nextWindowId = 0
+var openWindows = make(map[int]*electronBrowserWindow)
 
 type WebPreferences struct {
-	Preload interface{} `json:"preload"`
+	Preload          interface{} `json:"preload"`
 	ContextIsolation interface{} `json:"contextIsolation"`
-	NodeIntegration interface{} `json:"nodeIntegration"`
+	NodeIntegration  interface{} `json:"nodeIntegration"`
 }
 
 type Conf struct {
-	X interface{}                  `json:"x"`
-	Y interface{}                  `json:"y"`
-	Title       interface{}        `json:"title"`
-	Width       interface{}        `json:"width"`
-	Height      interface{}        `json:"height"`
-	Show        interface{}        `json:"show"`
-	Transparent interface{}        `json:"transparent"`
-	Resizable   interface{}        `json:"resizable"`
-	Frame       interface{}        `json:"frame"`
+	X              interface{}     `json:"x"`
+	Y              interface{}     `json:"y"`
+	Title          interface{}     `json:"title"`
+	Width          interface{}     `json:"width"`
+	Height         interface{}     `json:"height"`
+	Show           interface{}     `json:"show"`
+	Transparent    interface{}     `json:"transparent"`
+	Resizable      interface{}     `json:"resizable"`
+	Frame          interface{}     `json:"frame"`
 	WebPreferences *WebPreferences `json:"webPreferences"`
 }
 
 func New(conf *Conf) BrowserWindow {
-	if nextWindowId<0 {
+	if nextWindowId < 0 {
 		console.Log("All windows should be closed")
 		return nil
 	}
@@ -98,11 +97,11 @@ func New(conf *Conf) BrowserWindow {
 		windowId:      nextWindowId,
 	}
 	nextWindowId++
-	openWindows[nextWindowId]=browserWindowInstance
+	openWindows[nextWindowId] = browserWindowInstance
 
 	var handleClosedFunc js.Func
-	handleClosedFuncAddr :=&handleClosedFunc
-	*handleClosedFuncAddr = js.FuncOf(func(_ js.Value, _ []js.Value)interface{} {
+	handleClosedFuncAddr := &handleClosedFunc
+	*handleClosedFuncAddr = js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
 		browserWindowInstance.handleClosed()
 		(*handleClosedFuncAddr).Release()
 		return nil
@@ -113,7 +112,7 @@ func New(conf *Conf) BrowserWindow {
 }
 
 func CloseAll() {
-	nextWindowId=-1
+	nextWindowId = -1
 	for _, v := range openWindows {
 		v.Destroy()
 	}
@@ -145,7 +144,7 @@ func (bw *electronBrowserWindow) singleshotCallback(callback func()) js.Func {
 
 // On window closed, call all of our queued close callbacks, then release any outstanding callbacks
 func (bw *electronBrowserWindow) handleClosed() {
-	for i:=len(bw.closedCallbacks)-1; i>=0;i-- {
+	for i := len(bw.closedCallbacks) - 1; i >= 0; i-- {
 		bw.closedCallbacks[i]()
 	}
 	for _, w := range bw.callbacks {
@@ -192,8 +191,8 @@ func (bw *electronBrowserWindow) LoadFile(path string) {
 
 // Register a callback to be called once
 func (bw *electronBrowserWindow) Once(eventName string, action func()) {
-	if eventName=="closed" {
-		bw.closedCallbacks=append(bw.closedCallbacks, action)
+	if eventName == "closed" {
+		bw.closedCallbacks = append(bw.closedCallbacks, action)
 	} else {
 		bw.browserWindow.Call("once", eventName, bw.singleshotCallback(action))
 	}
@@ -201,8 +200,8 @@ func (bw *electronBrowserWindow) Once(eventName string, action func()) {
 
 // Register a callback to be called repeatedly
 func (bw *electronBrowserWindow) On(eventName string, action func()) {
-	if eventName=="closed" {
-		bw.closedCallbacks=append(bw.closedCallbacks, action)
+	if eventName == "closed" {
+		bw.closedCallbacks = append(bw.closedCallbacks, action)
 	} else {
 		_, wrapped := bw.registerCallback(action)
 		bw.browserWindow.Call("on", eventName, wrapped)
@@ -216,7 +215,7 @@ func (bw *electronBrowserWindow) SetAlwaysOnTop(b bool) {
 // Send a message to this window on the specified channel
 func (bw *electronBrowserWindow) Send(channelName string, content []byte) {
 	defer func() {
-		if r := recover(); r!=nil {
+		if r := recover(); r != nil {
 			// ignore errors sending
 		}
 	}()
@@ -240,8 +239,8 @@ func (bw *electronBrowserWindow) Listen(channelName string) (<-chan msgcomm.Mess
 	go func() {
 		for {
 			select {
-			case inMsg := <- inChan:
-				if inMsg==nil {
+			case inMsg := <-inChan:
+				if inMsg == nil {
 					return
 				}
 				if inMsg.Sender() == strconv.Itoa(bw.Id()) {

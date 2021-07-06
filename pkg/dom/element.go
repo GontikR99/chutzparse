@@ -35,7 +35,7 @@ func (j *jsDOMElement) AddEventListener(name string, jsFunc js.Func) {
 }
 
 func (j *jsDOMElement) AppendChild(child Element) {
-	if child!=nil {
+	if child != nil {
 		j.JSValue().Call("appendChild", child.JSValue())
 	}
 }

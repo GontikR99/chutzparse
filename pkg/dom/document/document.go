@@ -7,7 +7,7 @@ import (
 	"syscall/js"
 )
 
-var doc=js.Global().Get("document")
+var doc = js.Global().Get("document")
 
 func QuerySelector(selector string) dom.Element {
 	jsv := doc.Call("querySelector", selector)
@@ -30,8 +30,8 @@ func GetElementById(id string) dom.Element {
 func GetElementsByTagName(tag string) []dom.Element {
 	jsv := doc.Call("getElementsByTagName", tag)
 	var result []dom.Element
-	for i:=0;i<jsv.Length();i++ {
-		result=append(result, dom.WrapElement(jsv.Index(i)))
+	for i := 0; i < jsv.Length(); i++ {
+		result = append(result, dom.WrapElement(jsv.Index(i)))
 	}
 	return result
 }

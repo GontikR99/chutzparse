@@ -9,8 +9,8 @@ type Point struct {
 
 func (p *Point) JSValue() js.Value {
 	return js.ValueOf(map[string]interface{}{
-		"x":p.X,
-		"y":p.Y,
+		"x": p.X,
+		"y": p.Y,
 	})
 }
 
@@ -22,20 +22,20 @@ func JSValueToPoint(value js.Value) *Point {
 }
 
 type Size struct {
-	Width int
+	Width  int
 	Height int
 }
 
 func (s *Size) JSValue() js.Value {
 	return js.ValueOf(map[string]interface{}{
-		"width":s.Width,
-		"height":s.Height,
+		"width":  s.Width,
+		"height": s.Height,
 	})
 }
 
 func JSValueToSize(value js.Value) *Size {
 	return &Size{
-		Width: value.Get("width").Int(),
+		Width:  value.Get("width").Int(),
 		Height: value.Get("height").Int(),
 	}
 }
@@ -66,21 +66,21 @@ func JSValueToRectangle(value js.Value) *Rectangle {
 }
 
 type Display struct {
-	Id int
-	Rotation int
-	ScaleFactor float64
-	TouchSupport string
-	Monochrome bool
+	Id                   int
+	Rotation             int
+	ScaleFactor          float64
+	TouchSupport         string
+	Monochrome           bool
 	AccelerometerSupport string
-	ColorSpace string
-	ColorDepth int
-	DepthPerComponent int
-	DisplayFrequency int
-	Bounds *Rectangle
-	Size *Size
-	WorkArea *Rectangle
-	WorkAreaSize *Size
-	Internal bool
+	ColorSpace           string
+	ColorDepth           int
+	DepthPerComponent    int
+	DisplayFrequency     int
+	Bounds               *Rectangle
+	Size                 *Size
+	WorkArea             *Rectangle
+	WorkAreaSize         *Size
+	Internal             bool
 }
 
 func JSValueToDisplay(value js.Value) *Display {

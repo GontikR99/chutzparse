@@ -34,4 +34,3 @@ type BarSector struct {
 	Color   string
 	Portion float64
 }
-

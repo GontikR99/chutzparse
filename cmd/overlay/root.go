@@ -10,7 +10,6 @@ import (
 type Root struct {
 }
 
-
 func (c *Root) Init(ctx vugu.InitCtx) {
 	console.Log("Init root")
 }

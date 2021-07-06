@@ -12,7 +12,7 @@ type HealLog struct {
 	Total  int64
 	Actual int64
 
-	Flag HitFlag
+	Flag      HitFlag
 	SpellName string
 }
 
@@ -23,7 +23,7 @@ func (h *HealLog) Visit(handler ParsedLogHandler) interface{} {
 func (h *HealLog) String() string {
 	return fmt.Sprintf("Heal: %s -> %s Total: %d Actual: %d [%s] %s",
 		h.Source, h.Target, h.Total, h.Actual, h.Flag, h.SpellName,
-		)
+	)
 }
 
 func handleHeal(mp *multipattern.Multipattern) *multipattern.Multipattern {
@@ -31,48 +31,48 @@ func handleHeal(mp *multipattern.Multipattern) *multipattern.Multipattern {
 		On("(.+) has been healed over time for (@num@) (?:\\((@num@)\\) )?hit points(?: by (.+))?[.](@hflag@)?", func(parts []string) interface{} {
 			var actual int64
 			var total int64
-			actual=amount(parts[2])
-			if parts[3]=="" {
+			actual = amount(parts[2])
+			if parts[3] == "" {
 				total = actual
 			} else {
 				total = amount(parts[3])
 			}
 			res := &HealLog{
-				Source: UnspecifiedName,
-				Target: normalizeName(parts[1]),
-				Total:  total,
-				Actual: actual,
-				Flag:   hitFlags(parts[5]),
+				Source:    UnspecifiedName,
+				Target:    normalizeName(parts[1]),
+				Total:     total,
+				Actual:    actual,
+				Flag:      hitFlags(parts[5]),
 				SpellName: parts[4],
 			}
 
-			if res.Target=="Yourself" || res.Target == "Himself" || res.Target == "Herself" || res.Target == "Itself" {
+			if res.Target == "Yourself" || res.Target == "Himself" || res.Target == "Herself" || res.Target == "Itself" {
 				res.Target = res.Source
 			}
 			return res
-	}).
+		}).
 		On("(.*) healed (.*) for (@num@) (?:\\((@num@)\\) )?hit points(?: by (.*))?[.](@hflag@)?", func(parts []string) interface{} {
 			if strings.HasSuffix(parts[2], " over time") {
-				parts[2]=parts[2][:len(parts[2])-10]
+				parts[2] = parts[2][:len(parts[2])-10]
 			}
 			var actual int64
 			var total int64
-			actual=amount(parts[3])
-			if parts[4]=="" {
+			actual = amount(parts[3])
+			if parts[4] == "" {
 				total = actual
 			} else {
 				total = amount(parts[4])
 			}
 			res := &HealLog{
-				Source: normalizeName(parts[1]),
-				Target: normalizeName(parts[2]),
-				Total:  total,
-				Actual: actual,
-				Flag:   hitFlags(parts[6]),
+				Source:    normalizeName(parts[1]),
+				Target:    normalizeName(parts[2]),
+				Total:     total,
+				Actual:    actual,
+				Flag:      hitFlags(parts[6]),
 				SpellName: parts[5],
 			}
 
-			if res.Target=="Yourself" || res.Target == "Himself" || res.Target == "Herself" || res.Target == "Itself" {
+			if res.Target == "Yourself" || res.Target == "Himself" || res.Target == "Herself" || res.Target == "Itself" {
 				res.Target = res.Source
 			}
 			return res

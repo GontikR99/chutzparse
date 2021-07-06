@@ -4,7 +4,7 @@ package path
 
 import "github.com/gontikr99/chutzparse/pkg/nodejs"
 
-var path= nodejs.Require("path")
+var path = nodejs.Require("path")
 
 func Join(args ...string) string {
 	var argArray []interface{}

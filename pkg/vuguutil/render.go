@@ -4,12 +4,12 @@ package vuguutil
 
 type CallbackHandle int
 
-var callbackHandleGen=CallbackHandle(0)
-var renderCallbacks=make(map[CallbackHandle]func())
+var callbackHandleGen = CallbackHandle(0)
+var renderCallbacks = make(map[CallbackHandle]func())
 
 func OnRender(callback func()) CallbackHandle {
 	callbackHandleGen++
-	renderCallbacks[callbackHandleGen]=callback
+	renderCallbacks[callbackHandleGen] = callback
 	return callbackHandleGen
 }
 

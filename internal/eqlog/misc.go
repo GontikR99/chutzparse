@@ -27,11 +27,11 @@ func normalizeName(name string) string {
 		return UnspecifiedName
 	}
 	// Handle names like "Mayong Mistmoore (Vulnerable)" or "Kessdona (Frozen Aura)"
-	if m := statusRE.FindStringSubmatch(name); m!=nil {
+	if m := statusRE.FindStringSubmatch(name); m != nil {
 		name = m[1]
 	}
-	if name!="" {
-		name = strings.ToUpper(name[:1])+name[1:]
+	if name != "" {
+		name = strings.ToUpper(name[:1]) + name[1:]
 	}
 	return name
 }

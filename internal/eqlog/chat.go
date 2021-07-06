@@ -7,15 +7,16 @@ import (
 )
 
 type ChatLog struct {
-	Source string
-	Text string
-	Method ChatMethod
+	Source  string
+	Text    string
+	Method  ChatMethod
 	Channel string
 }
 
-func (c *ChatLog) Visit(handler ParsedLogHandler) interface{} {return handler.OnChat(c)}
+func (c *ChatLog) Visit(handler ParsedLogHandler) interface{} { return handler.OnChat(c) }
 
 type ChatMethod int
+
 const (
 	MethodSay = ChatMethod(iota)
 	MethodGroup

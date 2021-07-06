@@ -18,7 +18,7 @@ var dbFilename = path.Join(dbDir, "settings.json")
 // Set a setting value, but only if there's not one currently presenter
 func DefaultSetting(key string, value string) {
 	_, p, err := LookupSetting(key)
-	if err==nil && !p {
+	if err == nil && !p {
 		SetSetting(key, value)
 	}
 }
@@ -31,7 +31,7 @@ func LookupSetting(key string) (string, bool, error) {
 
 // Upsert a value into a setting
 func SetSetting(key string, value string) error {
-	memoizedSettings[key]=value
+	memoizedSettings[key] = value
 	return sync()
 }
 
@@ -44,11 +44,11 @@ func ClearSetting(key string) error {
 // Write the settings to disk
 func sync() error {
 	data, err := json.Marshal(&memoizedSettings)
-	if err!=nil {
+	if err != nil {
 		return err
 	}
 	err = ioutil.WriteFile(dbFilename+".tmp", data, 0600)
-	if err!=nil {
+	if err != nil {
 		return err
 	}
 	err = os.Rename(dbFilename+".tmp", dbFilename)
@@ -56,15 +56,15 @@ func sync() error {
 }
 
 func init() {
-	memoizedSettings=make(map[string]string)
+	memoizedSettings = make(map[string]string)
 	err := os.Mkdir(dbDir, 0700)
-	if err!=nil && !os.IsExist(err) {
+	if err != nil && !os.IsExist(err) {
 		console.Logf("Failed to create directory: %v", err)
 		return
 	}
 
 	data, err := ioutil.ReadFile(dbFilename)
-	if err!=nil {
+	if err != nil {
 		if os.IsNotExist(err) {
 			return
 		} else {
@@ -72,7 +72,7 @@ func init() {
 		}
 	}
 	err = json.Unmarshal(data, &memoizedSettings)
-	if err!=nil {
+	if err != nil {
 		console.Logf("Failed to unmarshal settings file: %v", err)
 	}
 }

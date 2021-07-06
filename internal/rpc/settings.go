@@ -71,4 +71,3 @@ func HandleSetting(setting SettingsServer) func(*rpc.Server) {
 		server.Register(ss)
 	}
 }
-
