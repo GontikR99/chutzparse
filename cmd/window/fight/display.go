@@ -87,9 +87,9 @@ func (c *Display) FightNames() []ui.SelectBoxOption {
 			Value: strconv.FormatInt(int64(fgt.Id), 10),
 		})
 	}
-	i:=0
-	j:=len(opts)-1
-	for i<j {
+	i := 0
+	j := len(opts) - 1
+	for i < j {
 		opts[i], opts[j] = opts[j], opts[i]
 		i++
 		j--

@@ -25,7 +25,7 @@ func init() {
 				finishedFights = append(finishedFights, &fightData)
 				for _, listener := range listeners {
 					func() {
-						defer func() {recover()}()
+						defer func() { recover() }()
 						listener <- struct{}{}
 					}()
 				}

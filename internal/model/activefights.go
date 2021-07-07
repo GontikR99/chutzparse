@@ -80,7 +80,7 @@ func listenForFights() {
 
 			// If we just zoned, retire all active fights.
 			if _, zoned := entry.Meaning.(*eqlog.ZoneLog); zoned {
-				for target, _ := range activeFights {
+				for target := range activeFights {
 					retireActiveFight(target)
 				}
 				continue
@@ -90,7 +90,7 @@ func listenForFights() {
 			if entry.Meaning != nil {
 				nr := &nameReader{names: map[string]struct{}{}}
 				entry.Meaning.Visit(nr)
-				for name, _ := range nr.names {
+				for name := range nr.names {
 					if iff.IsFoe(name) && iff.GetOwner(name) == "" && !strings.HasSuffix(name, " pet") {
 						if _, present := activeFights[name]; present {
 							activeFights[name].LastActivity = time.Now()

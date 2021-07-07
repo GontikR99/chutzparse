@@ -23,7 +23,7 @@ func Update(entry *eqlog.LogEntry) {
 func postUpdate(update IffUpdate) {
 	buf := &bytes.Buffer{}
 	err := gob.NewEncoder(buf).Encode(&IffUpdateHolder{Update: update})
-	if err==nil {
+	if err == nil {
 		browserwindow.Broadcast(channelIffUpdate, buf.Bytes())
 	} else {
 		console.Log(err)
@@ -31,7 +31,7 @@ func postUpdate(update IffUpdate) {
 }
 
 func heuristicId(name string) {
-	if name==eqlog.UnspecifiedName {
+	if name == eqlog.UnspecifiedName {
 
 	} else if strings.HasSuffix(name, "`s pet") {
 		MakePet(name, name[:len(name)-6])
@@ -57,7 +57,9 @@ func (i iffAction) OnDamage(log *eqlog.DamageLog) interface{} {
 	if log.Source == log.Target {
 		return nil
 	}
-	if log.Source==eqlog.UnspecifiedName || log.Target==eqlog.UnspecifiedName {return nil}
+	if log.Source == eqlog.UnspecifiedName || log.Target == eqlog.UnspecifiedName {
+		return nil
+	}
 	heuristicId(log.Source)
 	heuristicId(log.Target)
 
@@ -76,7 +78,9 @@ func (i iffAction) OnHeal(log *eqlog.HealLog) interface{} {
 	if log.Source == log.Target {
 		return nil
 	}
-	if log.Source==eqlog.UnspecifiedName || log.Target==eqlog.UnspecifiedName {return nil}
+	if log.Source == eqlog.UnspecifiedName || log.Target == eqlog.UnspecifiedName {
+		return nil
+	}
 	heuristicId(log.Source)
 	heuristicId(log.Target)
 

@@ -23,7 +23,6 @@ func MakePet(pet string, owner string) {
 	postUpdate(update)
 }
 
-
 const channelIffUpdate = "iffUpdate"
 
 type IffUpdate interface {
@@ -41,11 +40,11 @@ func (i *IffFriend) Apply() {
 	delete(foes, i.Name)
 	friends[i.Name] = time.Now().Add(friendDuration)
 }
-func (i *IffFoe) Apply()    {
+func (i *IffFoe) Apply() {
 	delete(friends, i.Name)
 	foes[i.Name] = time.Now().Add(foeDuration)
 }
-func (i *IffPet) Apply()    {
+func (i *IffPet) Apply() {
 	pets[i.Pet] = i.Owner
 }
 
@@ -58,4 +57,3 @@ func init() {
 	gob.RegisterName("iff:foe", &IffFoe{})
 	gob.RegisterName("iff:pet", &IffPet{})
 }
-

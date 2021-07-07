@@ -10,8 +10,8 @@ type Report struct {
 	Target        string
 	LastCharName  string
 	Contributions map[string]*Contribution
-	StartTime time.Time
-	EndTime time.Time
+	StartTime     time.Time
+	EndTime       time.Time
 }
 
 func (r *Report) Finalize(f *fight.Fight) fight.FightReport {
@@ -31,7 +31,7 @@ func (r *Report) ContributionOf(source string) *Contribution {
 	update, ok := r.Contributions[source]
 	if !ok {
 		update = NewContribution(source)
-		r.Contributions[source]=update
+		r.Contributions[source] = update
 	}
 	return update
 }
@@ -50,21 +50,21 @@ func (c *Contribution) CategoryOf(displayName string) *Category {
 	update, ok := c.Categorized[displayName]
 	if !ok {
 		update = NewCategory(displayName)
-		c.Categorized[displayName]=update
+		c.Categorized[displayName] = update
 	}
 	return update
 }
 
 type contribByDamageRev []*Contribution
 
-func (c contribByDamageRev) Len() int {return len(c)}
-func (c contribByDamageRev) Less(i, j int) bool {return c[i].TotalDamage > c[j].TotalDamage}
-func (c contribByDamageRev) Swap(i, j int) {c[i],c[j] = c[j],c[i]}
+func (c contribByDamageRev) Len() int           { return len(c) }
+func (c contribByDamageRev) Less(i, j int) bool { return c[i].TotalDamage > c[j].TotalDamage }
+func (c contribByDamageRev) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
 
 type Category struct {
 	DisplayName string
-	Success int
-	Failure int
+	Success     int
+	Failure     int
 	TotalDamage int64
 }
 
@@ -73,9 +73,10 @@ func NewCategory(displayName string) *Category {
 }
 
 type catByDamageRev []*Category
-func (c catByDamageRev) Len() int {return len(c)}
-func (c catByDamageRev) Less(i, j int) bool {return c[i].TotalDamage > c[j].TotalDamage}
-func (c catByDamageRev) Swap(i, j int) {c[i],c[j] = c[j], c[i]}
+
+func (c catByDamageRev) Len() int           { return len(c) }
+func (c catByDamageRev) Less(i, j int) bool { return c[i].TotalDamage > c[j].TotalDamage }
+func (c catByDamageRev) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
 
 type ReportFactory struct{}
 
@@ -86,12 +87,16 @@ func (r ReportFactory) NewEmpty(target string) fight.FightReport {
 }
 
 func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
-	if len(reports) == 0 {return nil}
-	if len(reports) == 1 {return reports[0]}
+	if len(reports) == 0 {
+		return nil
+	}
+	if len(reports) == 1 {
+		return reports[0]
+	}
 
 	result := NewReport(reports[0].(*Report).Target + " and others")
-	result.StartTime=reports[0].(*Report).StartTime
-	result.EndTime=reports[0].(*Report).EndTime
+	result.StartTime = reports[0].(*Report).StartTime
+	result.EndTime = reports[0].(*Report).EndTime
 	for _, reportIf := range reports {
 		report := reportIf.(*Report)
 		if result.LastCharName == "" {

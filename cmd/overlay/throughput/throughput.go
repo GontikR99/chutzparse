@@ -145,10 +145,10 @@ func (c *Throughput) displaysOffset() int {
 func (c *Throughput) packBars() []packedBar {
 	var result []packedBar
 	for displayNum, display := range c.Displays {
-		for pathIdx, _ := range display.TopBars {
+		for pathIdx := range display.TopBars {
 			result = append(result, packedBar{2*displayNum + c.displaysOffset(), -1 - pathIdx, &c.Displays[displayNum].TopBars[pathIdx]})
 		}
-		for pathIdx, _ := range display.BottomBars {
+		for pathIdx := range display.BottomBars {
 			result = append(result, packedBar{2*displayNum + c.displaysOffset(), pathIdx, &c.Displays[displayNum].BottomBars[pathIdx]})
 		}
 	}

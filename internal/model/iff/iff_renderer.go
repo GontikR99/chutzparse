@@ -16,10 +16,10 @@ func init() {
 	go func() {
 		inChan, _ := ipcrenderer.Endpoint{}.Listen(channelIffUpdate)
 		for {
-			updateMsg := <- inChan
+			updateMsg := <-inChan
 			var holder IffUpdateHolder
 			err := gob.NewDecoder(bytes.NewReader(updateMsg.Content())).Decode(&holder)
-			if err==nil {
+			if err == nil {
 				holder.Update.Apply()
 			} else {
 				console.Log(err)

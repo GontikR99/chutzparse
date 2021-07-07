@@ -9,8 +9,8 @@ type Report struct {
 	Belligerent   string
 	Contributions map[string]*Contribution
 	LastCharName  string
-	StartTime time.Time
-	EndTime time.Time
+	StartTime     time.Time
+	EndTime       time.Time
 }
 
 type Contribution struct {
@@ -40,9 +40,9 @@ func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
 	result := &Report{
 		Contributions: make(map[string]*Contribution),
 	}
-	if len(reports)>0 {
-		result.StartTime=reports[0].(*Report).StartTime
-		result.EndTime=reports[0].(*Report).EndTime
+	if len(reports) > 0 {
+		result.StartTime = reports[0].(*Report).StartTime
+		result.EndTime = reports[0].(*Report).EndTime
 	}
 	for _, reportIf := range reports {
 		report := reportIf.(*Report)

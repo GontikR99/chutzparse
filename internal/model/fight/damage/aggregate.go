@@ -38,7 +38,7 @@ func newAggregatedReport(target string) *aggregatedReport {
 
 func (ar *aggregatedReport) ContributionOf(source string) *aggregateContributor {
 	attributedSource := source
-	if owner := iff.GetOwner(source); owner!="" {
+	if owner := iff.GetOwner(source); owner != "" {
 		attributedSource = owner
 	}
 	update, ok := ar.Contributions[attributedSource]
@@ -46,7 +46,7 @@ func (ar *aggregatedReport) ContributionOf(source string) *aggregateContributor 
 		update = newAggregateContributor(attributedSource)
 		ar.Contributions[attributedSource] = update
 	}
-	update.Sources[source]=struct{}{}
+	update.Sources[source] = struct{}{}
 	return update
 }
 
@@ -62,25 +62,25 @@ func (ar *aggregatedReport) SortedContributors() []*aggregateContributor {
 
 type aggregateContributor struct {
 	AttributedSource string
-	Sources map[string]struct{}
-	TotalDamage int64
-	Categorized map[string]*Category
+	Sources          map[string]struct{}
+	TotalDamage      int64
+	Categorized      map[string]*Category
 	RawContributions []*Contribution
 }
 
 func newAggregateContributor(attributedSource string) *aggregateContributor {
 	return &aggregateContributor{
 		AttributedSource: attributedSource,
-		Sources: map[string]struct{}{attributedSource:struct{}{}},
-		Categorized: map[string]*Category{},
+		Sources:          map[string]struct{}{attributedSource: {}},
+		Categorized:      map[string]*Category{},
 	}
 }
 
 // DisplayName returns the name we should display for this contributor.  Usually that's
 // the character's name, but if only one of the character's pet has been detected, show the pet instead.
 func (ac *aggregateContributor) DisplayName() string {
-	if len(ac.Sources)==1 {
-		for name, _ := range ac.Sources {
+	if len(ac.Sources) == 1 {
+		for name := range ac.Sources {
 			return name
 		}
 	} else {
@@ -90,13 +90,13 @@ func (ac *aggregateContributor) DisplayName() string {
 }
 
 func (ac *aggregateContributor) CategoryOf(source string, displayName string) *Category {
-	if owner := iff.GetOwner(source); owner!="" {
-		displayName = source+": "+displayName
+	if owner := iff.GetOwner(source); owner != "" {
+		displayName = source + ": " + displayName
 	}
 	update, ok := ac.Categorized[displayName]
 	if !ok {
 		update = NewCategory(displayName)
-		ac.Categorized[displayName]=update
+		ac.Categorized[displayName] = update
 	}
 	return update
 }
@@ -112,6 +112,6 @@ func (ac *aggregateContributor) SortedCategories() []*Category {
 
 type acByDamageRev []*aggregateContributor
 
-func (a acByDamageRev) Len() int {return len(a)}
-func (a acByDamageRev) Less(i, j int) bool {return a[i].TotalDamage > a[j].TotalDamage}
-func (a acByDamageRev) Swap(i, j int) {a[i], a[j] = a[j], a[i]}
+func (a acByDamageRev) Len() int           { return len(a) }
+func (a acByDamageRev) Less(i, j int) bool { return a[i].TotalDamage > a[j].TotalDamage }
+func (a acByDamageRev) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }

@@ -54,12 +54,12 @@ func NewFightReports(target string) FightReportSet {
 func MergeFightReports(sets []FightReportSet) FightReportSet {
 	reportNames := map[string]struct{}{}
 	for _, set := range sets {
-		for repName, _ := range set {
+		for repName := range set {
 			reportNames[repName] = struct{}{}
 		}
 	}
 	result := FightReportSet{}
-	for repName, _ := range reportNames {
+	for repName := range reportNames {
 		var reps []FightReport
 		for _, set := range sets {
 			if report, ok := set[repName]; ok {

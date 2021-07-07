@@ -87,7 +87,7 @@ func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 			attr = owner
 		}
 		var update *characterAndWards
-		for i, _ := range cnps {
+		for i := range cnps {
 			if cnps[i].Attribution == attr {
 				update = cnps[i]
 			}
