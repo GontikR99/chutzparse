@@ -15,7 +15,7 @@ clean:
 
 # Clean up everything, including electron/node modules
 full-clean: clean
-	rm -rf electron/node_modules/* build/npm-installed
+	rm -rf electron/node_modules/* build/npm-installed electron/package-lock.json
 
 ##
 ## ChutzParse main build steps
