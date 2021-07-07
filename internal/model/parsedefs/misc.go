@@ -4,9 +4,9 @@ import "strconv"
 
 // RenderAmount converts an amount into a brief string representation with at most 3 significant digits
 func RenderAmount(amount float64) string {
-	if amount < 1000 {
+	if amount < 999.5 {
 		return strconv.FormatFloat(amount, 'g', 3, 64)
-	} else if amount < 1000000 {
+	} else if amount < 9999500 {
 		amtFlt := float64(amount) / 1000.0
 		return strconv.FormatFloat(amtFlt, 'g', 3, 64) + "k"
 	} else {

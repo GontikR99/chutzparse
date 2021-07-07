@@ -43,7 +43,7 @@ func (c *Detail) rows() []*detailRow {
 	for _, contrib := range c.report.Contributions {
 		result = append(result, &detailRow{
 			Source:     contrib.Source,
-			Percent:    fmt.Sprintf("%.3f%%", float64(100*contrib.DamageTotal())/float64(c.totalDamage)),
+			Percent:    fmt.Sprintf("%.3g%%", float64(100*contrib.DamageTotal())/float64(c.totalDamage)),
 			Amount:     fmt.Sprintf("%d", contrib.DamageTotal()),
 			DPS:        parsedefs.RenderAmount(float64(contrib.DamageTotal())/float64(duration)*float64(time.Second)),
 			damageDone: contrib.DamageTotal(),

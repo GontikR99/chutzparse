@@ -31,7 +31,9 @@ func postUpdate(update IffUpdate) {
 }
 
 func heuristicId(name string) {
-	if strings.HasSuffix(name, "`s pet") {
+	if name==eqlog.UnspecifiedName {
+
+	} else if strings.HasSuffix(name, "`s pet") {
 		MakePet(name, name[:len(name)-6])
 	} else if strings.HasSuffix(name, "`s warder") {
 		MakePet(name, name[:len(name)-9])
@@ -55,7 +57,7 @@ func (i iffAction) OnDamage(log *eqlog.DamageLog) interface{} {
 	if log.Source == log.Target {
 		return nil
 	}
-
+	if log.Source==eqlog.UnspecifiedName || log.Target==eqlog.UnspecifiedName {return nil}
 	heuristicId(log.Source)
 	heuristicId(log.Target)
 
@@ -74,6 +76,7 @@ func (i iffAction) OnHeal(log *eqlog.HealLog) interface{} {
 	if log.Source == log.Target {
 		return nil
 	}
+	if log.Source==eqlog.UnspecifiedName || log.Target==eqlog.UnspecifiedName {return nil}
 	heuristicId(log.Source)
 	heuristicId(log.Target)
 
