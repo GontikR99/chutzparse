@@ -9,16 +9,15 @@ import (
 
 func (r *Report) Offer(entry *eqlog.LogEntry, epoch int) fight.FightReport {
 	r.LastCharName = entry.Character
-	dmg, ok := entry.Meaning.(*eqlog.DamageLog)
-	if !ok {
-		return r
+	if dmg, ok := entry.Meaning.(*eqlog.DamageLog); ok {
+		if dmg.Target != r.Target && dmg.Target != r.Target+"`s pet" && dmg.Target != r.Target+"`s warder" {
+			return r
+		}
+		contrib := r.ContributionOf(dmg.Source)
+		contrib.TotalDamage += dmg.Amount
+		cat := contrib.CategoryOf(dmg.DisplayCategory())
+		cat.TotalDamage += dmg.Amount
+		cat.Success++
 	}
-	if dmg.Target != r.Target && dmg.Target != r.Target+"`s pet" && dmg.Target != r.Target+"`s warder" {
-		return r
-	}
-	if _, ok := r.Contributions[dmg.Source]; !ok {
-		r.Contributions[dmg.Source] = &Contribution{Source: dmg.Source}
-	}
-	r.Contributions[dmg.Source].TotalDamage += dmg.Amount
 	return r
 }

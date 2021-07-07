@@ -1,3 +1,5 @@
+// +build wasm,electron
+
 package eqlog
 
 import "github.com/gontikr99/chutzparse/pkg/multipattern"

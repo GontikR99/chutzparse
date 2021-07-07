@@ -1,3 +1,5 @@
+// +build wasm,electron
+
 package eqlog
 
 import (
@@ -31,6 +33,7 @@ type HitType int
 const (
 	BackstabHit = HitType(iota)
 	BashHit
+	BiteHit
 	BluntHit
 	BowHit
 	FrenzyHit
@@ -46,8 +49,8 @@ const (
 	SpellHit
 )
 
-var hitTypeNames = []string{"backstab", "bash", "blunt", "bow", "frenzy", "hand", "kick", "pierce", "slash", "other",
-	"damage_shield", "dot", "environ", "spell"}
+var hitTypeNames = []string{"backstab", "bash", "bite", "crush", "shoot", "frenzy", "hand to hand", "kick", "pierce", "slash", "other melee",
+	"damage shield", "unspecified DoT", "environmental", "unspecified spell"}
 
 func (ht HitType) String() string {
 	return hitTypeNames[ht]
@@ -73,6 +76,14 @@ func (d *DamageLog) String() string {
 		d.Target + " [" + d.Flag.String() + "] " + d.SpellName
 }
 
+func (d *DamageLog) DisplayCategory() string {
+	if d.SpellName != "" {
+		return d.SpellName
+	} else {
+		return d.Type.String()
+	}
+}
+
 var splitDotRE = regexp.MustCompile("^(.*) by (.*)$")
 
 func handleDamage(mp *multipattern.Multipattern) *multipattern.Multipattern {
@@ -86,6 +97,10 @@ func handleDamage(mp *multipattern.Multipattern) *multipattern.Multipattern {
 		On("(.*) (@mhit@) (.*) for (@num@) points? of damage.(@hflag@)?", func(parts []string) interface{} {
 			var hitType HitType
 			switch parts[2] {
+			case "bites":
+				hitType = BiteHit
+			case "bite":
+				hitType = BiteHit
 			case "backstabs":
 				hitType = BackstabHit
 			case "backstab":
