@@ -43,7 +43,7 @@ func (ar *aggregatedReport) ContributionOf(source string) *aggregateContributor 
 	}
 	update, ok := ar.Contributions[attributedSource]
 	if !ok {
-		update = newAggregateContributor(attributedSource)
+		update = newAggregateContributor(attributedSource, source)
 		ar.Contributions[attributedSource] = update
 	}
 	update.Sources[source] = struct{}{}
@@ -68,10 +68,10 @@ type aggregateContributor struct {
 	RawContributions []*Contribution
 }
 
-func newAggregateContributor(attributedSource string) *aggregateContributor {
+func newAggregateContributor(attributedSource string, source string) *aggregateContributor {
 	return &aggregateContributor{
 		AttributedSource: attributedSource,
-		Sources:          map[string]struct{}{attributedSource: {}},
+		Sources:          map[string]struct{}{source: {}},
 		Categorized:      map[string]*Category{},
 	}
 }
@@ -91,7 +91,7 @@ func (ac *aggregateContributor) DisplayName() string {
 
 func (ac *aggregateContributor) CategoryOf(source string, displayName string) *Category {
 	if owner := iff.GetOwner(source); owner != "" {
-		displayName = source + ": " + displayName
+		displayName = displayName + " (" + source + ")"
 	}
 	update, ok := ac.Categorized[displayName]
 	if !ok {

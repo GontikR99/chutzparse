@@ -53,12 +53,14 @@ func retireActiveFight(target string) {
 	activeUpdated = true
 	if fightData, present := activeFights[target]; present {
 		fightData.Reports = fightData.Reports.Finalize(fightData)
-		buffer := &bytes.Buffer{}
-		err := gob.NewEncoder(buffer).Encode(fightData)
-		if err == nil {
-			browserwindow.Broadcast(fight.ChannelFinishedFights, buffer.Bytes())
-		} else {
-			console.Log(err)
+		if fightData.Reports.Interesting() {
+			buffer := &bytes.Buffer{}
+			err := gob.NewEncoder(buffer).Encode(fightData)
+			if err == nil {
+				browserwindow.Broadcast(fight.ChannelFinishedFights, buffer.Bytes())
+			} else {
+				console.Log(err)
+			}
 		}
 	}
 	delete(activeFights, target)
@@ -142,6 +144,9 @@ func maintainThroughput() {
 			activeUpdated = false
 			var states []presenter.ThroughputState
 			for _, fight := range activeFights {
+				if !fight.Reports.Interesting() {
+					continue
+				}
 				var top []presenter.ThroughputBar
 				var bottom []presenter.ThroughputBar
 				if dmgRep, present := fight.Reports["Damage"]; present {

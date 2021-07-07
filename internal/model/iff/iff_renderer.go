@@ -9,6 +9,7 @@ import (
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc/ipcrenderer"
 )
 
+// postUpdate sends a change made in a renderer to the main process.
 func postUpdate(update IffUpdate) {
 }
 

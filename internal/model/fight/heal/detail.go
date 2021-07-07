@@ -8,5 +8,8 @@ import (
 
 func (r *Report) Detail() vugu.Builder {
 	// FIXME: implement
-	return nil
+	return &Detail{}
+}
+
+type Detail struct {
 }

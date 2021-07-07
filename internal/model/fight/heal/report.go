@@ -13,16 +13,20 @@ type Report struct {
 	EndTime       time.Time
 }
 
-type Contribution struct {
-	Source      string
-	TotalHealed int64
-	HealByEpoch map[int]int64
+func (r *Report) Interesting() bool {
+	return false
 }
 
 func (r *Report) Finalize(f *fight.Fight) fight.FightReport {
 	r.StartTime = f.StartTime
 	r.EndTime = f.LastActivity
 	return r
+}
+
+type Contribution struct {
+	Source      string
+	TotalHealed int64
+	HealByEpoch map[int]int64
 }
 
 type ReportFactory struct{}

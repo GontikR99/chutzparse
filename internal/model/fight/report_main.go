@@ -21,6 +21,18 @@ type FightReport interface {
 
 	// Throughput generates a throughput chart as a summary from this fight
 	Throughput(fight *Fight) []presenter.ThroughputBar
+
+	// Interesting tells us whether this report has enough information to bother reporting the fight
+	Interesting() bool
+}
+
+func (s FightReportSet) Interesting() bool {
+	for _, report := range s {
+		if report.Interesting() {
+			return true
+		}
+	}
+	return false
 }
 
 // Finalize an entire report set.

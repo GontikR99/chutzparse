@@ -20,6 +20,7 @@ func Update(entry *eqlog.LogEntry) {
 	}
 }
 
+// postUpdate sends an IFF change made in the main process to the renderer(s)
 func postUpdate(update IffUpdate) {
 	buf := &bytes.Buffer{}
 	err := gob.NewEncoder(buf).Encode(&IffUpdateHolder{Update: update})

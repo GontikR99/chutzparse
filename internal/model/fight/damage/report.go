@@ -20,6 +20,10 @@ func (r *Report) Finalize(f *fight.Fight) fight.FightReport {
 	return r
 }
 
+func (r *Report) Interesting() bool {
+	return len(r.Contributions)!=0
+}
+
 // NewReport creates a new empty report with the specified target
 func NewReport(target string) *Report {
 	return &Report{Target: target, Contributions: make(map[string]*Contribution)}
