@@ -2,7 +2,7 @@ package damage
 
 import (
 	"github.com/gontikr99/chutzparse/internal/model/fight"
-	"time"
+	"github.com/gontikr99/chutzparse/pkg/algorithm"
 )
 
 // Report is the damage dealt/DPS report
@@ -10,13 +10,11 @@ type Report struct {
 	Target        string
 	LastCharName  string
 	Contributions map[string]*Contribution
-	StartTime     time.Time
-	EndTime       time.Time
+	ActivitySet   algorithm.TimeIntervalSet
 }
 
 func (r *Report) Finalize(f *fight.Fight) fight.FightReport {
-	r.StartTime = f.StartTime
-	r.EndTime = f.LastActivity
+	r.ActivitySet = algorithm.NewTimeInterval(f.StartTime, f.LastActivity)
 	return r
 }
 
@@ -99,19 +97,13 @@ func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
 	}
 
 	result := NewReport(reports[0].(*Report).Target + " and others")
-	result.StartTime = reports[0].(*Report).StartTime
-	result.EndTime = reports[0].(*Report).EndTime
+	result.ActivitySet = reports[0].(*Report).ActivitySet
 	for _, reportIf := range reports {
 		report := reportIf.(*Report)
 		if result.LastCharName == "" {
 			result.LastCharName = report.LastCharName
 		}
-		if report.StartTime.Before(result.StartTime) {
-			result.StartTime = report.StartTime
-		}
-		if report.EndTime.After(result.EndTime) {
-			result.EndTime = report.EndTime
-		}
+		result.ActivitySet = algorithm.UnionTimeIntervalSets(result.ActivitySet, report.ActivitySet)
 		for name, contrib := range report.Contributions {
 			resContrib := result.ContributionOf(name)
 			resContrib.TotalDamage += contrib.TotalDamage

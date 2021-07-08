@@ -57,7 +57,7 @@ type detailRow struct {
 }
 
 func (c *Detail) rows() []*detailRow {
-	duration := c.report.EndTime.Sub(c.report.StartTime)
+	duration := c.report.ActivitySet.TotalDuration()
 	if duration < time.Second {
 		duration = time.Second
 	}
