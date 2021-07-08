@@ -38,6 +38,7 @@ const (
 	BowHit
 	FrenzyHit
 	HandHit
+	HitHit
 	KickHit
 	PierceHit
 	SlashHit
@@ -49,7 +50,8 @@ const (
 	SpellHit
 )
 
-var hitTypeNames = []string{"backstab", "bash", "bite", "crush", "shoot", "frenzy", "hand to hand", "kick", "pierce", "slash", "other melee",
+var hitTypeNames = []string{"backstab", "bash", "bite", "crush", "shoot", "frenzy", "hand to hand", "hit",
+	"kick", "pierce", "slash", "other melee",
 	"damage shield", "unspecified DoT", "environmental", "unspecified spell"}
 
 func (ht HitType) String() string {
@@ -97,54 +99,58 @@ func handleDamage(mp *multipattern.Multipattern) *multipattern.Multipattern {
 		On("(.*) (@mhit@) (.*) for (@num@) points? of damage.(@hflag@)?", func(parts []string) interface{} {
 			var hitType HitType
 			switch parts[2] {
-			case "bites":
-				hitType = BiteHit
-			case "bite":
-				hitType = BiteHit
-			case "backstabs":
-				hitType = BackstabHit
 			case "backstab":
 				hitType = BackstabHit
-			case "crushes":
-				hitType = BluntHit
+			case "backstabs":
+				hitType = BackstabHit
+			case "bash":
+				hitType = BashHit
+			case "bashes":
+				hitType = BashHit
+			case "bite":
+				hitType = BiteHit
+			case "bites":
+				hitType = BiteHit
 			case "crush":
 				hitType = BluntHit
-			case "slashes":
-				hitType = SlashHit
-			case "slash":
-				hitType = SlashHit
-			case "strikes":
-				hitType = HandHit
-			case "strike":
-				hitType = HandHit
-			case "punches":
-				hitType = HandHit
-			case "punch":
-				hitType = HandHit
-			case "shoots":
-				hitType = BowHit
-			case "shoot":
-				hitType = BowHit
-			case "pierces":
-				hitType = PierceHit
-			case "pierce":
-				hitType = PierceHit
+			case "crushes":
+				hitType = BluntHit
 			case "frenzies on":
 				hitType = FrenzyHit
 			case "frenzy on":
 				hitType = FrenzyHit
-			case "kicks":
-				hitType = KickHit
+			case "hit":
+				hitType = HitHit
+			case "hits":
+				hitType = HitHit
 			case "kick":
 				hitType = KickHit
-			case "bashes":
-				hitType = BashHit
-			case "bash":
+			case "kicks":
+				hitType = KickHit
+			case "pierce":
+				hitType = PierceHit
+			case "pierces":
+				hitType = PierceHit
+			case "punch":
+				hitType = HandHit
+			case "punches":
+				hitType = HandHit
+			case "shoot":
+				hitType = BowHit
+			case "shoots":
+				hitType = BowHit
+			case "slash":
+				hitType = SlashHit
+			case "slashes":
+				hitType = SlashHit
+			case "slam":
 				hitType = BashHit
 			case "slams":
 				hitType = BashHit
-			case "slam":
-				hitType = BashHit
+			case "strike":
+				hitType = HandHit
+			case "strikes":
+				hitType = HandHit
 			default:
 				hitType = OtherMeleeHit
 			}
