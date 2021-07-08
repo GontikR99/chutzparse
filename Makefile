@@ -1,4 +1,13 @@
-.PHONY: all clean full-clean start package npm-install
+.PHONY: all clean full-clean start package npm-install test help
+
+help:
+	@echo "Supported targets are:"
+	@echo "    help        Display this help message"
+	@echo "    clean       Remove built go artifacts (wasm and vugu stuff)"
+	@echo "    full-clean  Remove all built artifacts, including node_modules"
+	@echo "    package     Create a redistributable package in bin/"
+	@echo "    start       Build and start in development mode"
+	@echo "    test        Run go unit tests"
 
 # Build a package for distribution
 package: build/electron-built build/npm-installed
@@ -16,6 +25,9 @@ clean:
 # Clean up everything, including electron/node modules
 full-clean: clean
 	rm -rf electron/node_modules/* build/npm-installed electron/package-lock.json
+
+test:
+	go test $$(dirname $$(find . -name \*_test.go))
 
 ##
 ## ChutzParse main build steps
