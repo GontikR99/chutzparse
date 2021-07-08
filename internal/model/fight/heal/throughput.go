@@ -15,9 +15,9 @@ func toThroughputBar(c *aggregateContributor, index int, totalHealed int64, maxH
 	result := presenter.ThroughputBar{
 		LeftText:   fmt.Sprintf("%d. %s", index+1, c.DisplayName()),
 		CenterText: "",
-		RightText: fmt.Sprintf("%s [%.3g%%] = %s hps",
+		RightText: fmt.Sprintf("%s [%s] = %s hps",
 			parsedefs.RenderAmount(float64(c.TotalHealed)),
-			float64(100*c.TotalHealed)/float64(totalHealed),
+			parsedefs.RenderPercent(float64(c.TotalHealed)/float64(totalHealed)),
 			parsedefs.RenderAmount(dps)),
 		RightStyle: presenter.MonoStyle,
 		Sectors: nil,

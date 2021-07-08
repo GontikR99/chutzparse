@@ -4,8 +4,12 @@ import "strconv"
 
 // RenderAmount converts an amount into a brief string representation with at most 3 significant digits
 func RenderAmount(amount float64) string {
-	if amount < 0.9995 {
+	if amount < 0.09995 {
 		return "   0 "
+
+	} else if amount < 0.9995 {
+		intRep := strconv.FormatInt(int64(1000*amount+0.5),10)
+		return "."+intRep+" "
 	} else if amount < 9.995 {
 		intRep := strconv.FormatInt(int64(100*amount+0.5),10)
 		return intRep[:1]+"."+intRep[1:]+" "
@@ -20,6 +24,10 @@ func RenderAmount(amount float64) string {
 	} else {
 		return RenderAmount(amount)[:4]+"M"
 	}
+}
+
+func RenderPercent(ratio float64) string {
+	return RenderAmount(100*ratio)[:4]+"%"
 }
 
 const ColorLimeGreen = "#32CD32"
