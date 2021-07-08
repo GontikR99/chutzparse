@@ -5,7 +5,7 @@ import (
 	"github.com/gontikr99/chutzparse/pkg/algorithm"
 )
 
-// Report is the damage dealt/DPS report
+// Report is the damage dealt/HPS report
 type Report struct {
 	Target        string
 	LastCharName  string
@@ -19,12 +19,12 @@ func (r *Report) Finalize(f *fight.Fight) fight.FightReport {
 }
 
 func (r *Report) Interesting() bool {
-	return len(r.Contributions)!=0
+	return len(r.Contributions) != 0
 }
 
 // NewReport creates a new empty report with the specified target
 func NewReport(target string) *Report {
-	return &Report{Target: target, Contributions: make(map[string]*Contribution)}
+	return &Report{Target: target, Contributions: make(map[string]*Contribution), ActivitySet: algorithm.EmptyTimeIntervalSet}
 }
 
 // ContributionOf returns a pointer to the contribution record for a specified source, adding such a record to the
@@ -97,7 +97,6 @@ func (r ReportFactory) Merge(reports []fight.FightReport) fight.FightReport {
 	}
 
 	result := NewReport(reports[0].(*Report).Target + " and others")
-	result.ActivitySet = reports[0].(*Report).ActivitySet
 	for _, reportIf := range reports {
 		report := reportIf.(*Report)
 		if result.LastCharName == "" {

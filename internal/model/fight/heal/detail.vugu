@@ -1,3 +1,35 @@
-<div>
-    Coming soon (tm)!
+<div class="container-fluid p-1" style="height:75vh; overflow:scroll; overflow-x: hidden;">
+    <h2 vg-content="c.report.Belligerent"></h2>
+    <table class="table table-striped table-dark table-sm">
+        <thead class="thead-light">
+        <th scope="col" style="width: 2em;"><!-- toggle arrow --></th>
+        <th scole="col" style="width: 2em;">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">%</th>
+        <th scope="col">Healed</th>
+        <th scope="col">HPS</th>
+        </thead>
+        <tbody>
+        <tr vg-for="idx, dr:=range c.rows()" :style='"background-color:"+dr.BgColor+"; font-size:"+dr.FontSize+";"'>
+            <td style="width: 2em;">
+                <span
+                        vg-if="dr.ToggleState==toggleClosed" @click="c.toggle(event, dr.AttributedSource)"
+                        tabindex="0"
+                        style="cursor: pointer; font-family:Segoe UI Symbol;"
+                >&#x25b6;</span>
+                <span
+                        vg-if="dr.ToggleState==toggleOpen" @click="c.toggle(event, dr.AttributedSource)"
+                        tabindex="0"
+                        style="cursor: pointer; font-family:Segoe UI Symbol;"
+                >&#x25bc;</span>
+            </td>
+            <td style="width: 2em;" vg-content="dr.Rank"></td>
+            <th scope="row" vg-content="dr.Source" vg-if="dr.ToggleState!=toggleAbsent"></th>
+            <td vg-content="dr.Category" vg-if="dr.ToggleState==toggleAbsent"></td>
+            <td vg-content="dr.Percent"></td>
+            <td vg-content="dr.Amount"></td>
+            <td vg-content="dr.HPS"></td>
+        </tr>
+        </tbody>
+    </table>
 </div>

@@ -8,7 +8,7 @@ import (
 func timeList(count int) []time.Time {
 	var result []time.Time
 	result = append(result, time.Now())
-	for i:=1;i<count;i++ {
+	for i := 1; i < count; i++ {
 		result = append(result, result[i-1].Add(time.Second))
 	}
 	return result
@@ -37,7 +37,7 @@ func Test_TimeIntervalSetContains(t *testing.T) {
 	mustNotContain(t, is, times[4], "after")
 
 	// Negate set
-	is.containsNegInf = true
+	is.UnboundedBelow = true
 	mustContain(t, is, times[0], "inv before")
 	mustNotContain(t, is, times[1], "inv start")
 	mustNotContain(t, is, times[2], "inv mid")
@@ -59,7 +59,7 @@ func Test_UnionTimeIntervalSets(t *testing.T) {
 	mustNotContain(t, is, times[7], "U1 end right")
 	mustNotContain(t, is, times[8], "U1 after'")
 
-	if is.TotalDuration()!=4*time.Second {
+	if is.TotalDuration() != 4*time.Second {
 		t.Fatal("U1 Expected 4 seconds")
 	}
 
@@ -72,7 +72,7 @@ func Test_UnionTimeIntervalSets(t *testing.T) {
 	mustNotContain(t, is, times[4], "U2 end right")
 	mustNotContain(t, is, times[5], "U2 after")
 
-	if is.TotalDuration()!=3*time.Second {
+	if is.TotalDuration() != 3*time.Second {
 		t.Fatal("U2 Expected 3 seconds")
 	}
 
@@ -86,8 +86,13 @@ func Test_UnionTimeIntervalSets(t *testing.T) {
 	mustNotContain(t, is, times[5], "U3 end right")
 	mustNotContain(t, is, times[6], "U3 after")
 
-	if is.TotalDuration()!=4*time.Second {
+	if is.TotalDuration() != 4*time.Second {
 		t.Fatal("U3 Expected 4 seconds")
+	}
+
+	is = UnionTimeIntervalSets(EmptyTimeIntervalSet, EmptyTimeIntervalSet)
+	if is.TotalDuration() != 0 {
+		t.Fatal("U4 Expected 0 seconds")
 	}
 }
 
@@ -106,7 +111,7 @@ func TestIntersectTimeIntervalSets(t *testing.T) {
 	mustNotContain(t, is, times[7], "I1 end right")
 	mustNotContain(t, is, times[8], "I1 after'")
 
-	if is.TotalDuration()!=0 {
+	if is.TotalDuration() != 0 {
 		t.Fatal("I1 Expected 0 seconds")
 	}
 
@@ -119,7 +124,7 @@ func TestIntersectTimeIntervalSets(t *testing.T) {
 	mustNotContain(t, is, times[4], "I2 end right")
 	mustNotContain(t, is, times[5], "I2 after")
 
-	if is.TotalDuration()!=1*time.Second {
+	if is.TotalDuration() != 1*time.Second {
 		t.Fatal("I2 Expected 1 seconds")
 	}
 
@@ -133,8 +138,14 @@ func TestIntersectTimeIntervalSets(t *testing.T) {
 	mustNotContain(t, is, times[5], "I3 end right")
 	mustNotContain(t, is, times[6], "I3 after")
 
-	if is.TotalDuration()!=0 {
+	if is.TotalDuration() != 0 {
 		t.Fatal("I3 Expected 0 seconds")
 	}
+}
 
+func TestString(t *testing.T) {
+	is := NewTimeInterval(time.Time{}, time.Time{}.Add(1*time.Second))
+	if "[0001-01-01 00:00:00 +0000 UTC,0001-01-01 00:00:01 +0000 UTC)" != is.String() {
+		t.Fatal("Expected different value in TestString")
+	}
 }

@@ -4,7 +4,6 @@ package damage
 
 import (
 	"fmt"
-	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/vugu/vugu"
 	"strconv"
 	"time"
@@ -26,7 +25,6 @@ type Detail struct {
 
 func (c *Detail) toggle(event vugu.DOMEvent, source string) {
 	event.PreventDefault()
-	console.Log("toggle ", source)
 	if _, present := c.openedSources[source]; present {
 		delete(c.openedSources, source)
 	} else {

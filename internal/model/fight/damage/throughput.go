@@ -30,8 +30,6 @@ func toThroughputBar(c *aggregateContributor, index int, totalDamage int64, maxD
 	return result
 }
 
-const throughputBarCount = 10
-
 var otherColors = []string{"blue", "lightblue"}
 var selfColors = []string{"red", "darksalmon"}
 
@@ -58,14 +56,14 @@ func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 	agContribs := aggRep.SortedContributors()
 	maxDmg := agContribs[0].TotalDamage
 
-	for i := 0; i < throughputBarCount && i < len(agContribs); i++ {
+	for i := 0; i < presenter.ThroughputBarCount && i < len(agContribs); i++ {
 		colors := otherColors
 		if agContribs[i].AttributedSource == r.LastCharName {
 			colors = selfColors
 		}
 		bars = append(bars, toThroughputBar(agContribs[i], i, aggRep.TotalDamage, maxDmg, durationSec, colors))
 	}
-	for i := throughputBarCount; i < len(agContribs); i++ {
+	for i := presenter.ThroughputBarCount; i < len(agContribs); i++ {
 		if agContribs[i].AttributedSource == r.LastCharName {
 			bars = append(bars, toThroughputBar(agContribs[i], i, aggRep.TotalDamage, maxDmg, durationSec, selfColors))
 		}

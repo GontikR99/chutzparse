@@ -34,3 +34,5 @@ type BarSector struct {
 	Color   string
 	Portion float64
 }
+
+const ThroughputBarCount = 10

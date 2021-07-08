@@ -28,6 +28,14 @@ func (h *HealLog) String() string {
 	)
 }
 
+func (h *HealLog) DisplayCategory() string {
+	if h.SpellName != "" {
+		return h.SpellName
+	} else {
+		return "unspecified"
+	}
+}
+
 func handleHeal(mp *multipattern.Multipattern) *multipattern.Multipattern {
 	return commonSubpatterns(mp).
 		On("(.+) has been healed over time for (@num@) (?:\\((@num@)\\) )?hit points(?: by (.+))?[.](@hflag@)?", func(parts []string) interface{} {

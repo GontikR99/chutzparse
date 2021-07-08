@@ -1,39 +1,43 @@
-package damage
+package heal
 
 import (
 	"github.com/gontikr99/chutzparse/internal/model/iff"
 	"sort"
 )
 
-// Aggregate combines the contributions of pets with those of their owners
+// Aggregate combines the contributions of wards with those of their owners
 func (r *Report) Aggregate() *aggregateReport {
-	agRep := newAggregateReport(r.Target)
+	agRep := newAggregateReport(r.Belligerent)
 	for source, contrib := range r.Contributions {
 		agContrib := agRep.ContributionOf(source)
-		agContrib.TotalDamage += contrib.TotalDamage
-		agRep.TotalDamage += contrib.TotalDamage
+		agContrib.TotalHealed += contrib.TotalHealed
+		agRep.TotalHealed += contrib.TotalHealed
 		agContrib.RawContributions = append(agContrib.RawContributions, contrib)
 		for dispName, cat := range contrib.Categorized {
 			agCat := agContrib.CategoryOf(source, dispName)
-			agCat.TotalDamage += cat.TotalDamage
-			agCat.Success += cat.Success
-			agCat.Failure += cat.Failure
+			count, healed := cat.TotalStats()
+			agCat.Count += count
+			agCat.TotalHealed += healed
 		}
 	}
 	for _, agContrib := range agRep.Contributions {
-		sort.Sort(contribByDamageRev(agContrib.RawContributions))
+		sort.Sort(contribByHealingRev(agContrib.RawContributions))
 	}
 	return agRep
 }
 
 type aggregateReport struct {
-	Target        string
-	TotalDamage   int64
+	Belligerent   string
+	TotalHealed   int64
 	Contributions map[string]*aggregateContributor
 }
 
-func newAggregateReport(target string) *aggregateReport {
-	return &aggregateReport{Target: target, Contributions: map[string]*aggregateContributor{}}
+func newAggregateReport(belligerent string) *aggregateReport {
+	return &aggregateReport{
+		Belligerent:   belligerent,
+		TotalHealed:   0,
+		Contributions: map[string]*aggregateContributor{},
+	}
 }
 
 func (ar *aggregateReport) ContributionOf(source string) *aggregateContributor {
@@ -56,15 +60,15 @@ func (ar *aggregateReport) SortedContributors() []*aggregateContributor {
 	for _, contrib := range ar.Contributions {
 		contribs = append(contribs, contrib)
 	}
-	sort.Sort(acByDamageRev(contribs))
+	sort.Sort(acByHealingRev(contribs))
 	return contribs
 }
 
 type aggregateContributor struct {
 	AttributedSource string
 	Sources          map[string]struct{}
-	TotalDamage      int64
-	Categorized      map[string]*Category
+	TotalHealed      int64
+	Categorized      map[string]*aggregateCategory
 	RawContributions []*Contribution
 }
 
@@ -72,7 +76,7 @@ func newAggregateContributor(attributedSource string, source string) *aggregateC
 	return &aggregateContributor{
 		AttributedSource: attributedSource,
 		Sources:          map[string]struct{}{source: {}},
-		Categorized:      map[string]*Category{},
+		Categorized:      map[string]*aggregateCategory{},
 	}
 }
 
@@ -84,34 +88,50 @@ func (ac *aggregateContributor) DisplayName() string {
 			return name
 		}
 	} else {
-		return ac.AttributedSource + " + pets"
+		return ac.AttributedSource + " + wards"
 	}
 	return ac.AttributedSource
 }
 
-func (ac *aggregateContributor) CategoryOf(source string, displayName string) *Category {
+func (ac *aggregateContributor) CategoryOf(source string, displayName string) *aggregateCategory {
 	if owner := iff.GetOwner(source); owner != "" {
 		displayName = displayName + " (" + source + ")"
 	}
 	update, ok := ac.Categorized[displayName]
 	if !ok {
-		update = NewCategory(displayName)
+		update = newAggregateCategory(displayName)
 		ac.Categorized[displayName] = update
 	}
 	return update
 }
 
-func (ac *aggregateContributor) SortedCategories() []*Category {
-	var result []*Category
+func (ac *aggregateContributor) SortedCategories() []*aggregateCategory {
+	var result []*aggregateCategory
 	for _, cat := range ac.Categorized {
 		result = append(result, cat)
 	}
-	sort.Sort(catByDamageRev(result))
+	sort.Sort(acatByHealingRev(result))
 	return result
 }
 
-type acByDamageRev []*aggregateContributor
+type acByHealingRev []*aggregateContributor
 
-func (a acByDamageRev) Len() int           { return len(a) }
-func (a acByDamageRev) Less(i, j int) bool { return a[i].TotalDamage > a[j].TotalDamage }
-func (a acByDamageRev) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a acByHealingRev) Len() int           { return len(a) }
+func (a acByHealingRev) Less(i, j int) bool { return a[i].TotalHealed > a[j].TotalHealed }
+func (a acByHealingRev) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+type aggregateCategory struct {
+	DisplayName string
+	TotalHealed int64
+	Count       int
+}
+
+func newAggregateCategory(displayName string) *aggregateCategory {
+	return &aggregateCategory{DisplayName: displayName}
+}
+
+type acatByHealingRev []*aggregateCategory
+
+func (a acatByHealingRev) Len() int           { return len(a) }
+func (a acatByHealingRev) Less(i, j int) bool { return a[i].TotalHealed > a[j].TotalHealed }
+func (a acatByHealingRev) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
