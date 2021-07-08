@@ -4,6 +4,19 @@ import "strconv"
 
 // RenderAmount converts an amount into a brief string representation with at most 3 significant digits
 func RenderAmount(amount float64) string {
+	if amount < 999.5 {
+		return strconv.FormatFloat(amount, 'g', 3, 64)
+	} else if amount < 9999500 {
+		amtFlt := float64(amount) / 1000.0
+		return strconv.FormatFloat(amtFlt, 'g', 3, 64) + "k"
+	} else {
+		amtFlt := float64(amount) / 1000000.0
+		return strconv.FormatFloat(amtFlt, 'g', 3, 64) + "M"
+	}
+}
+
+// RenderFixed converts an amount into a brief string representation with exactly 3 significant digits
+func RenderFixed(amount float64) string {
 	if amount < 0.09995 {
 		return "   0 "
 
@@ -18,16 +31,16 @@ func RenderAmount(amount float64) string {
 		return intRep[:2]+"."+intRep[2:]+" "
 	} else if amount < 999.5 {
 		intRep := strconv.FormatInt(int64(amount+0.5),10)
-		return " "+intRep+" "
+		return intRep+". "
 	} else if amount < 9999500 {
-		return RenderAmount(amount/1000.0)[:4]+"k"
+		return RenderFixed(amount/1000.0)[:4]+"k"
 	} else {
-		return RenderAmount(amount)[:4]+"M"
+		return RenderFixed(amount)[:4]+"M"
 	}
 }
 
 func RenderPercent(ratio float64) string {
-	return RenderAmount(100*ratio)[:4]+"%"
+	return RenderFixed(100*ratio)[:4]+"%"
 }
 
 const ColorLimeGreen = "#32CD32"
