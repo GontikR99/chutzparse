@@ -19,7 +19,8 @@ func toThroughputBar(c *aggregateContributor, index int, totalDamage int64, maxD
 			parsedefs.RenderAmount(float64(c.TotalDamage)),
 			float64(100*c.TotalDamage)/float64(totalDamage),
 			parsedefs.RenderAmount(dps)),
-		Sectors: nil,
+		RightStyle: presenter.MonoStyle,
+		Sectors:    nil,
 	}
 	for idx, ctb := range c.RawContributions {
 		result.Sectors = append(result.Sectors, presenter.BarSector{
@@ -45,9 +46,10 @@ func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 
 	var bars []presenter.ThroughputBar
 	bars = append(bars, presenter.ThroughputBar{
-		LeftText:  fmt.Sprintf("[Damage] %s in %ss", r.Target, parsedefs.RenderAmount(durationSec)),
-		RightText: fmt.Sprintf("%s = %s dps", parsedefs.RenderAmount(float64(aggRep.TotalDamage)), parsedefs.RenderAmount(dps)),
-		Sectors:   []presenter.BarSector{{"dimgray", 1.0}},
+		LeftText:   fmt.Sprintf("[Damage] %s in %ss", r.Target, parsedefs.RenderAmount(durationSec)),
+		RightText:  fmt.Sprintf("%s = %s dps", parsedefs.RenderAmount(float64(aggRep.TotalDamage)), parsedefs.RenderAmount(dps)),
+		RightStyle: presenter.MonoStyle,
+		Sectors:    []presenter.BarSector{{"dimgray", 1.0}},
 	})
 
 	if len(aggRep.Contributions) == 0 {

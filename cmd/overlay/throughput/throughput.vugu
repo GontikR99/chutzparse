@@ -12,17 +12,17 @@
           :d="c.sectorPath(sector.displayIndex, sector.barIndex, sector.arcStart, sector.arcEnd)" stroke="none"
           :fill="sector.color" fill-opacity="0.5"/>
     <text vg-for="_, bar := range c.packBars()" text-anchor="start" vg-if='bar.bar.LeftText!=""'
-          :style='fmt.Sprintf("fill: %s; fill-opacity: 0.6; font-size: %s;", c.TextColor, c.TextSize)'>
+          :style='fmt.Sprintf("fill: %s; fill-opacity: 0.6; font-size: %s; %s", c.TextColor, c.TextSize, bar.bar.LeftStyle)'>
         <textPath :href='fmt.Sprintf("#throughput-path-%d-%d",bar.display,bar.index)' startOffset="0%"
                   vg-content="bar.bar.LeftText"></textPath>
     </text>
     <text vg-for="_, bar := range c.packBars()" text-anchor="middle" vg-if='bar.bar.CenterText!=""'
-          :style='fmt.Sprintf("fill: %s; fill-opacity: 0.6; font-size: %s;", c.TextColor, c.TextSize)'>
+          :style='fmt.Sprintf("fill: %s; fill-opacity: 0.6; font-size: %s; %s", c.TextColor, c.TextSize, bar.bar.CenterStyle)'>
         <textPath :href='fmt.Sprintf("#throughput-path-%d-%d",bar.display,bar.index)' startOffset="50%"
                   vg-content="bar.bar.CenterText"></textPath>
     </text>
     <text vg-for="_, bar := range c.packBars()" text-anchor="end" vg-if='bar.bar.RightText!=""'
-          :style='fmt.Sprintf("fill: %s; fill-opacity: 0.6; font-size: %s;", c.TextColor, c.TextSize)'>
+          :style='fmt.Sprintf("fill: %s; fill-opacity: 0.6; font-size: %s; %s", c.TextColor, c.TextSize, bar.bar.RightStyle)'>
         <textPath :href='fmt.Sprintf("#throughput-path-%d-%d",bar.display,bar.index)' startOffset="100%"
                   vg-content="bar.bar.RightText"></textPath>
     </text>
