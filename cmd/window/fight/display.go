@@ -84,12 +84,12 @@ func (c *Display) TabClass(tabName string) string {
 func (c *Display) FightNames() []ui.SelectBoxOption {
 	var opts []ui.SelectBoxOption
 	for _, fgt := range finishedFights {
-		duration := fgt.LastActivity.Sub(fgt.StartTime)/time.Second
+		duration := fgt.LastActivity.Sub(fgt.StartTime) / time.Second
 		if duration < 0 {
 			duration = 0
 		}
 		opts = append(opts, ui.SelectBoxOption{
-			Text:  fmt.Sprintf("[%02d:%02d:%02d +%4ds] %s",
+			Text: fmt.Sprintf("[%02d:%02d:%02d +%4ds] %s",
 				fgt.StartTime.Hour(), fgt.StartTime.Minute(), fgt.StartTime.Second(),
 				duration,
 				fgt.Target,

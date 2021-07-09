@@ -20,7 +20,7 @@ func toThroughputBar(c *aggregateContributor, index int, totalHealed int64, maxH
 			parsedefs.RenderPercent(float64(c.TotalHealed)/float64(totalHealed)),
 			parsedefs.RenderFixed(dps)),
 		RightStyle: presenter.MonoStyle,
-		Sectors: nil,
+		Sectors:    nil,
 	}
 	for idx, ctb := range c.RawContributions {
 		result.Sectors = append(result.Sectors, presenter.BarSector{
@@ -46,10 +46,10 @@ func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 
 	var bars []presenter.ThroughputBar
 	bars = append(bars, presenter.ThroughputBar{
-		LeftText:  fmt.Sprintf("[Healing] %s in %ss", r.Belligerent, parsedefs.RenderFixed(durationSec)),
-		RightText: fmt.Sprintf("%s = %s hps", parsedefs.RenderFixed(float64(aggRep.TotalHealed)), parsedefs.RenderFixed(hps)),
+		LeftText:   fmt.Sprintf("[Healing] %s in %ss", r.Belligerent, parsedefs.RenderFixed(durationSec)),
+		RightText:  fmt.Sprintf("%s = %s hps", parsedefs.RenderFixed(float64(aggRep.TotalHealed)), parsedefs.RenderFixed(hps)),
 		RightStyle: presenter.MonoStyle,
-		Sectors:   []presenter.BarSector{{"dimgray", 1.0}},
+		Sectors:    []presenter.BarSector{{"dimgray", 1.0}},
 	})
 
 	if len(aggRep.Contributions) == 0 {

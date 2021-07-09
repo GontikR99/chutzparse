@@ -28,11 +28,11 @@ type ThroughputBar struct {
 	CenterText string
 	RightText  string
 
-	LeftStyle string
+	LeftStyle   string
 	CenterStyle string
-	RightStyle string
+	RightStyle  string
 
-	Sectors    []BarSector
+	Sectors []BarSector
 }
 
 type BarSector struct {
@@ -43,4 +43,3 @@ type BarSector struct {
 const ThroughputBarCount = 10
 
 const MonoStyle = "font-family: \"Anka Coder Narrow\";"
-
