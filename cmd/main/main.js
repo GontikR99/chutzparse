@@ -1,18 +1,18 @@
 (function () {
     const {app} = require('electron');
 
-    app.commandLine.appendSwitch("high-dpi-support", 1)
-    // app.commandLine.appendSwitch("force-device-scale-factor", 1)
-
-    const path = require('path');
-    const fs = require('fs');
-    require(path.join(app.getAppPath(), 'src/external/wasm_exec.js'));
-
     // Handle creating/removing shortcuts on Windows when installing/uninstalling.
     if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
         app.quit();
         return;
     }
+
+    app.commandLine.appendSwitch("high-dpi-support", 1)
+
+    const path = require('path');
+    const fs = require('fs');
+    require(path.join(app.getAppPath(), 'src/external/wasm_exec.js'));
+
 
     const EventBarrier = function (signal) {
         const self = this;
@@ -41,8 +41,10 @@
         const go = new Go();
         const mod = await WebAssembly.compile(fs.readFileSync(path.join(app.getAppPath(), 'src/bin/main.wasm')));
         let inst = await WebAssembly.instantiate(mod, go.importObject);
-        go.run(inst);
+        await go.run(inst);
     }
 
-    run();
+    run()
+        .then(res => console.log(res))
+        .catch(res => console.log(res));
 })()

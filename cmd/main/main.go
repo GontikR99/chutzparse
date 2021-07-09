@@ -51,7 +51,10 @@ func main() {
 			ContextIsolation: true,
 		},
 	})
-	mainWindow.OnClosed(exitApp)
+	mainWindow.OnClosed(func() {
+		console.Log("main closed")
+		exitApp()
+	})
 	mainWindow.ServeRPC(mainrpc.NewServer())
 
 	mainWindow.Once("ready-to-show", func() {
@@ -87,7 +90,10 @@ func main() {
 			ContextIsolation: true,
 		},
 	})
-	overlayWnd.OnClosed(exitApp)
+	overlayWnd.OnClosed(func() {
+		console.Log("overlay closed")
+		exitApp()
+	})
 	overlayWnd.ServeRPC(mainrpc.NewServer())
 
 	overlayWnd.Once("ready-to-show", func() {
@@ -108,7 +114,7 @@ func main() {
 			select {
 			case <-appCtx.Done():
 				return
-			case <-time.After(50 * time.Millisecond):
+			case <-time.After(5000 * time.Millisecond):
 				break
 			}
 			newLoc, err := eqwnd.GetExtents()
@@ -140,6 +146,7 @@ func main() {
 	}()
 
 	<-appCtx.Done()
+	console.Log("Exiting")
 	browserwindow.CloseAll()
 	application.Quit()
 

@@ -15,11 +15,11 @@ func RenderAmount(amount float64) string {
 	}
 }
 
-// RenderFixed converts an amount into a brief string representation with exactly 3 significant digits
+// RenderFixed converts an amount into a brief string representation with exactly 3 significant digits, and exactly
+// 5 characters.
 func RenderFixed(amount float64) string {
 	if amount < 0.09995 {
-		return "   0 "
-
+		return "  0. "
 	} else if amount < 0.9995 {
 		intRep := strconv.FormatInt(int64(1000*amount+0.5),10)
 		return "."+intRep+" "
