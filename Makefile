@@ -51,7 +51,7 @@ bin/overlay.wasm: $(shell find cmd/overlay -type f) build/internal-generated $(s
 $(shell mkdir -p bin electron/src/bin build>/dev/null 2>&1 || true)
 
 # Download and install electron and other node modules
-build/npm-installed:
+build/npm-installed: electron/package.json
 	# FIXME: workaround until electron/windows-installer includes 7z-ia32.exe.  See issues:
 	#    https://github.com/electron/windows-installer/issues/378
 	#    https://github.com/electron/windows-installer/issues/386
