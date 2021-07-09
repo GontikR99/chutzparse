@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"github.com/gontikr99/chutzparse/cmd/main/mainrpc"
+	"github.com/gontikr99/chutzparse/internal"
 	"github.com/gontikr99/chutzparse/internal/eqlog"
 	"github.com/gontikr99/chutzparse/internal/eqwnd"
 	"github.com/gontikr99/chutzparse/internal/model"
@@ -45,6 +46,7 @@ func main() {
 		Width:  1600,
 		Height: 800,
 		Show:   false,
+		Title: "ChutzParse "+internal.Version,
 		WebPreferences: &browserwindow.WebPreferences{
 			Preload:          path.Join(application.GetAppPath(), "src/preload.js"),
 			NodeIntegration:  false,

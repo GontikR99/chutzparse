@@ -4,7 +4,7 @@ help:
 	@echo "Supported targets are:"
 	@echo "    help        Display this help message"
 	@echo "    clean       Remove built go artifacts (wasm and vugu stuff)"
-	@echo "    full-clean  Remove all built artifacts, including node_modules"
+	@echo "    fullclean  Remove all built artifacts, including node_modules"
 	@echo "    package     Create a redistributable package in bin/"
 	@echo "    start       Build and start in development mode"
 	@echo "    test        Run go unit tests"
@@ -23,8 +23,8 @@ clean:
 	rm -rf bin/* build/electron-built build/internal-generated electron/src/* electron/out $(shell find . -name 0_components_vgen.go)
 
 # Clean up everything, including electron/node modules
-full-clean: clean
-	rm -rf electron/node_modules/* build/npm-installed electron/package-lock.json
+fullclean: clean
+	rm -rf electron/node_modules/* build/npm-installed electron/package-lock.json electron/package.json build/packagejsongen.exe
 
 test:
 	go test $$(dirname $$(find . -name \*_test.go))
@@ -66,8 +66,14 @@ build/internal-generated: $(shell find internal -type f)
 	touch $@
 
 # Populate the electron directory with our code and assets
-build/electron-built: bin/main.wasm bin/window.wasm bin/overlay.wasm cmd/main/main.js cmd/main/preload.js $(shell find web/static/data -type f)
+build/electron-built: bin/main.wasm bin/window.wasm bin/overlay.wasm cmd/main/main.js cmd/main/preload.js $(shell find web/static/data -type f) electron/package.json
 	cp -r web/static/data/* electron/src
 	cp cmd/main/main.js cmd/main/preload.js electron/src
 	cp bin/main.wasm bin/window.wasm bin/overlay.wasm electron/src/bin
 	touch $@
+
+electron/package.json: build/packagejsongen.exe
+	build/packagejsongen.exe > $@
+
+build/packagejsongen.exe: $(shell find cmd/packagejsongen -name \*.go) internal/version.go internal/package.json.go
+	go build -tags native -o $@ ./cmd/packagejsongen
