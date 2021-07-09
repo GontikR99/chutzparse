@@ -42,6 +42,7 @@ type BrowserWindow interface {
 	SetContentBounds(rectangle *electron.Rectangle)
 
 	SetIgnoreMouseEvents(bool)
+	SetSkipTaskbar(bool)
 
 	// Additions
 	OnClosed(action func())
@@ -284,4 +285,8 @@ func (bw *electronBrowserWindow) SetContentBounds(rectangle *electron.Rectangle)
 
 func (bw *electronBrowserWindow) SetIgnoreMouseEvents(b bool) {
 	bw.browserWindow.Call("setIgnoreMouseEvents", b)
+}
+
+func (bw *electronBrowserWindow) SetSkipTaskbar(b bool) {
+	bw.browserWindow.Call("setSkipTaskbar", b)
 }

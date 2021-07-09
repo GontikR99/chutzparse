@@ -90,6 +90,7 @@ func main() {
 			ContextIsolation: true,
 		},
 	})
+	overlayWnd.SetSkipTaskbar(true)
 	overlayWnd.OnClosed(func() {
 		console.Log("overlay closed")
 		exitApp()
