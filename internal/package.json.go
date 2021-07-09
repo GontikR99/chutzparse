@@ -59,6 +59,7 @@ var PackageJson = dict{
 		"iohook": "^0.9.3",
 		"ref-napi": "^3.0.3",
 		"win32-api": "^9.6.0",
+		"clipboardy": "^2.3.0",
 	},
 	"devDependencies": dict{
 		"@electron-forge/cli": "^6.0.0-beta.57",

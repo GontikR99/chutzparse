@@ -1,6 +1,6 @@
 // +build wasm,web
 
-package home
+package welcome
 
 import (
 	"github.com/gontikr99/chutzparse/internal/rpc"
@@ -10,11 +10,11 @@ import (
 	"github.com/vugu/vugu"
 )
 
-type Home struct {
+type Welcome struct {
 	EqDir *ConfiguredValue
 }
 
-func (c *Home) Init(vCtx vugu.InitCtx) {
+func (c *Welcome) Init(vCtx vugu.InitCtx) {
 	c.EqDir = &ConfiguredValue{
 		Key:      settings.EverQuestDirectory,
 		Callback: func(s string) { rpc.RestartScan(ipcrenderer.Client) },
@@ -23,7 +23,7 @@ func (c *Home) Init(vCtx vugu.InitCtx) {
 	c.EqDir.Init(vCtx)
 }
 
-func (c *Home) BrowseEqDir(event vugu.DOMEvent) {
+func (c *Welcome) BrowseEqDir(event vugu.DOMEvent) {
 	event.PreventDefault()
 	go func() {
 		newDir, err := rpc.DirectoryDialog(ipcrenderer.Client, c.EqDir.Value)

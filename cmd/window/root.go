@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/gontikr99/chutzparse/cmd/window/fight"
-	"github.com/gontikr99/chutzparse/cmd/window/home"
+	"github.com/gontikr99/chutzparse/cmd/window/welcome"
 	"github.com/gontikr99/chutzparse/cmd/window/settings"
 	"github.com/gontikr99/chutzparse/internal/place"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
@@ -38,13 +38,13 @@ var neverShow = func() bool { return false }
 var alwaysShow = func() bool { return true }
 
 var routes = []*routeEntry{
-	{"", "Home", alwaysShow, func() vugu.Builder { return &home.Home{} }},
+	{"", "Welcome", alwaysShow, func() vugu.Builder { return &welcome.Welcome{} }},
 	{"fight", "Fights", alwaysShow, func() vugu.Builder { return &fight.Display{} }},
 	{"settings", "Settings", alwaysShow, func() vugu.Builder { return &settings.Settings{} }},
 }
 
 func (c *Root) Init(vCtx vugu.InitCtx) {
-	c.Body = &home.Home{}
+	c.Body = &welcome.Welcome{}
 	c.InitBackground(vCtx, c)
 }
 

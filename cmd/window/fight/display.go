@@ -5,7 +5,9 @@ package fight
 import (
 	"fmt"
 	"github.com/gontikr99/chutzparse/internal/model/fight"
+	"github.com/gontikr99/chutzparse/internal/rpc"
 	"github.com/gontikr99/chutzparse/internal/ui"
+	"github.com/gontikr99/chutzparse/pkg/electron/ipc/ipcrenderer"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
 	"strconv"
@@ -105,4 +107,15 @@ func (c *Display) FightNames() []ui.SelectBoxOption {
 		j--
 	}
 	return opts
+}
+
+func (c *Display) CopySummary(event vugu.DOMEvent) {
+	event.PreventDefault()
+	event.StopPropagation()
+	if report, ok := c.reportSet[c.currentTab]; ok {
+		text := report.Summarize()
+		go func() {
+			rpc.CopyClipboard(ipcrenderer.Client, text)
+		}()
+	}
 }

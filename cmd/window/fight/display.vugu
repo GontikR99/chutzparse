@@ -14,6 +14,10 @@
             <vg-comp vg-if="c.currentView!=nil" expr="c.currentView"></vg-comp>
         </div>
     </div>
+    <div class="row">
+        <button type="button" class="btn btn-secondary" @click="c.CopySummary(event)" vg-if="c.currentView!=nil">Send summary to EQ</button>
+        <button type="button" class="btn btn-secondary" disabled vg-if="c.currentView==nil">Send summary to EQ</button>
+    </div>
 </div>
 
 <script type="application/x-go">

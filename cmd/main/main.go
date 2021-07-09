@@ -62,6 +62,9 @@ func main() {
 	mainWindow.Once("ready-to-show", func() {
 		mainWindow.RemoveMenu()
 		mainWindow.Show()
+		//mainWindow.JSValue().Get("webContents").Call("openDevTools", map[string]interface{} {
+		//	"mode":"detach",
+		//})
 	})
 	mainWindow.Once("show", shown)
 	mainWindow.LoadFile(path.Join(application.GetAppPath(), "src/window.html"))
