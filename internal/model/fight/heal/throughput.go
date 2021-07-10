@@ -16,9 +16,9 @@ func toThroughputBar(c *aggregateContributor, index int, totalHealed int64, maxH
 		LeftText:   fmt.Sprintf("%d. %s", index+1, c.DisplayName()),
 		CenterText: "",
 		RightText: fmt.Sprintf("%s [%s] = %s hps",
-			parsedefs.RenderFixed(float64(c.TotalHealed)),
-			parsedefs.RenderPercent(float64(c.TotalHealed)/float64(totalHealed)),
-			parsedefs.RenderFixed(dps)),
+			parsedefs.FormatFixed(float64(c.TotalHealed)),
+			parsedefs.FormatPercent(float64(c.TotalHealed)/float64(totalHealed)),
+			parsedefs.FormatFixed(dps)),
 		RightStyle: presenter.MonoStyle,
 		Sectors:    nil,
 	}
@@ -46,8 +46,8 @@ func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 
 	var bars []presenter.ThroughputBar
 	bars = append(bars, presenter.ThroughputBar{
-		LeftText:   fmt.Sprintf("[Healing] %s in %ss", r.Belligerent, parsedefs.RenderFixed(durationSec)),
-		RightText:  fmt.Sprintf("%s = %s hps", parsedefs.RenderFixed(float64(aggRep.TotalHealed)), parsedefs.RenderFixed(hps)),
+		LeftText:   fmt.Sprintf("[Healing] %s in %ss", r.Belligerent, parsedefs.FormatFixed(durationSec)),
+		RightText:  fmt.Sprintf("%s = %s hps", parsedefs.FormatFixed(float64(aggRep.TotalHealed)), parsedefs.FormatFixed(hps)),
 		RightStyle: presenter.MonoStyle,
 		Sectors:    []presenter.BarSector{{"dimgray", 1.0}},
 	})

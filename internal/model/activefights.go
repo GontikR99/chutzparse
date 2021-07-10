@@ -57,7 +57,7 @@ func retireActiveFight(target string) {
 			buffer := &bytes.Buffer{}
 			err := gob.NewEncoder(buffer).Encode(fightData)
 			if err == nil {
-				browserwindow.Broadcast(fight.ChannelFinishedFights, buffer.Bytes())
+				browserwindow.BroadcastChunked(fight.ChannelFinishedFights, buffer.Bytes())
 			} else {
 				console.Log(err)
 			}

@@ -230,6 +230,12 @@ func Broadcast(channel string, content []byte) {
 	}
 }
 
+func BroadcastChunked(channel string, content []byte) {
+	for _, v := range openWindows {
+		msgcomm.SendChunked(v, channel, content)
+	}
+}
+
 func (bw *electronBrowserWindow) Id() int {
 	return bw.webContents.Get("id").Int()
 }

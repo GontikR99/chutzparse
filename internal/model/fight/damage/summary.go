@@ -21,8 +21,8 @@ func (r *Report) Summarize() string {
 	sb := &strings.Builder{}
 
 	sb.WriteString(fmt.Sprintf("ChutzDmg: %s [%s HP] in %ss: ", r.Target,
-		parsedefs.RenderAmount(float64(agRep.TotalDamage)),
-		parsedefs.RenderAmount(durationSec)))
+		parsedefs.FormatAmount(float64(agRep.TotalDamage)),
+		parsedefs.FormatAmount(durationSec)))
 
 	contribs := agRep.SortedContributors()
 	if len(contribs)==0 {
@@ -37,8 +37,8 @@ func (r *Report) Summarize() string {
 		}
 		sb.WriteString(fmt.Sprintf("%d. %s %s DPS [%s]", 1+i,
 			contribs[i].AttributedSource,
-			parsedefs.RenderAmount(float64(contribs[i].TotalDamage)/float64(durationSec)),
-			parsedefs.RenderPercent(float64(contribs[i].TotalDamage)/float64(agRep.TotalDamage)),
+			parsedefs.FormatAmount(float64(contribs[i].TotalDamage)/float64(durationSec)),
+			parsedefs.FormatPercent(float64(contribs[i].TotalDamage)/float64(agRep.TotalDamage)),
 			))
 	}
 	return sb.String()

@@ -16,9 +16,9 @@ func toThroughputBar(c *aggregateContributor, index int, totalDamage int64, maxD
 		LeftText:   fmt.Sprintf("%d. %s", index+1, c.DisplayName()),
 		CenterText: "",
 		RightText: fmt.Sprintf("%s [%s] = %s dps",
-			parsedefs.RenderFixed(float64(c.TotalDamage)),
-			parsedefs.RenderPercent(float64(c.TotalDamage)/float64(totalDamage)),
-			parsedefs.RenderFixed(dps)),
+			parsedefs.FormatFixed(float64(c.TotalDamage)),
+			parsedefs.FormatPercent(float64(c.TotalDamage)/float64(totalDamage)),
+			parsedefs.FormatFixed(dps)),
 		RightStyle: presenter.MonoStyle,
 		Sectors:    nil,
 	}
@@ -46,8 +46,8 @@ func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 
 	var bars []presenter.ThroughputBar
 	bars = append(bars, presenter.ThroughputBar{
-		LeftText:   fmt.Sprintf("[Damage] %s in %ss", r.Target, parsedefs.RenderFixed(durationSec)),
-		RightText:  fmt.Sprintf("%s = %s dps", parsedefs.RenderFixed(float64(aggRep.TotalDamage)), parsedefs.RenderFixed(dps)),
+		LeftText:   fmt.Sprintf("[Damage] %s in %ss", r.Target, parsedefs.FormatFixed(durationSec)),
+		RightText:  fmt.Sprintf("%s = %s dps", parsedefs.FormatFixed(float64(aggRep.TotalDamage)), parsedefs.FormatFixed(dps)),
 		RightStyle: presenter.MonoStyle,
 		Sectors:    []presenter.BarSector{{"dimgray", 1.0}},
 	})

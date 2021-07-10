@@ -25,7 +25,7 @@ func BroadcastThroughput(displays []ThroughputState) {
 	buf := &bytes.Buffer{}
 	err := gob.NewEncoder(buf).Encode(&ThroughputStateEvent{Content: displays})
 	if err == nil {
-		browserwindow.Broadcast(ChannelThroughput, buf.Bytes())
+		browserwindow.BroadcastChunked(ChannelThroughput, buf.Bytes())
 	} else {
 		console.Log(err)
 	}

@@ -20,7 +20,15 @@ type Message interface {
 	JSValue() js.Value
 }
 
-type Endpoint interface {
-	Listen(channelName string) (recv <-chan Message, done func())
+type Sender interface {
 	Send(channelName string, data []byte)
+}
+
+type Listener interface {
+	Listen(channelName string) (recv <-chan Message, done func())
+}
+
+type Endpoint interface {
+	Sender
+	Listener
 }
