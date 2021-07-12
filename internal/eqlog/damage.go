@@ -36,6 +36,7 @@ const (
 	BiteHit
 	BluntHit
 	BowHit
+	ClawHit
 	FrenzyHit
 	HandHit
 	HitHit
@@ -50,7 +51,7 @@ const (
 	SpellHit
 )
 
-var hitTypeNames = []string{"backstab", "bash", "bite", "crush", "shoot", "frenzy", "hand to hand", "hit",
+var hitTypeNames = []string{"backstab", "bash", "bite", "crush", "shoot", "claw", "frenzy", "hand to hand", "hit",
 	"kick", "pierce", "slash", "other melee",
 	"damage shield", "unspecified DoT", "environmental", "unspecified spell"}
 
@@ -111,6 +112,10 @@ func handleDamage(mp *multipattern.Multipattern) *multipattern.Multipattern {
 				hitType = BiteHit
 			case "bites":
 				hitType = BiteHit
+			case "claw":
+				hitType = ClawHit
+			case "claws":
+				hitType = ClawHit
 			case "crush":
 				hitType = BluntHit
 			case "crushes":

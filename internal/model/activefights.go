@@ -9,6 +9,7 @@ import (
 	"github.com/gontikr99/chutzparse/internal/model/fight"
 	"github.com/gontikr99/chutzparse/internal/model/iff"
 	"github.com/gontikr99/chutzparse/internal/presenter"
+	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
 	"sort"
@@ -143,28 +144,34 @@ func maintainThroughput() {
 			}
 			activeUpdated = false
 			var states []presenter.ThroughputState
-			for _, fight := range activeFights {
-				if !fight.Reports.Interesting() {
-					continue
+			if value, present, err := settings.LookupSetting(settings.ShowMeters); err==nil && present && value=="true" {
+				for _, fight := range activeFights {
+					if !fight.Reports.Interesting() {
+						continue
+					}
+					var top []presenter.ThroughputBar
+					var bottom []presenter.ThroughputBar
+					if dmgRep, present := fight.Reports["Damage"]; present {
+						bottom = dmgRep.Throughput(fight)
+					}
+					if dmgRep, present := fight.Reports["Healing"]; present {
+						top = dmgRep.Throughput(fight)
+					}
+					if top != nil || bottom != nil {
+						states = append(states, presenter.ThroughputState{
+							FightId:    fight.Id,
+							TopBars:    top,
+							BottomBars: bottom,
+						})
+					}
 				}
-				var top []presenter.ThroughputBar
-				var bottom []presenter.ThroughputBar
-				if dmgRep, present := fight.Reports["Damage"]; present {
-					bottom = dmgRep.Throughput(fight)
-				}
-				if dmgRep, present := fight.Reports["Healing"]; present {
-					top = dmgRep.Throughput(fight)
-				}
-				if top != nil || bottom != nil {
-					states = append(states, presenter.ThroughputState{
-						FightId:    fight.Id,
-						TopBars:    top,
-						BottomBars: bottom,
-					})
-				}
+				sort.Sort(tsById(states))
 			}
-			sort.Sort(tsById(states))
 			presenter.BroadcastThroughput(states)
 		}
 	}()
+}
+
+func init() {
+	settings.DefaultSetting(settings.ShowMeters, "true")
 }

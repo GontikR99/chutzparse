@@ -120,7 +120,7 @@ func main() {
 			select {
 			case <-appCtx.Done():
 				return
-			case <-time.After(5000 * time.Millisecond):
+			case <-time.After(50 * time.Millisecond):
 				break
 			}
 			newLoc, err := eqwnd.GetExtents()
