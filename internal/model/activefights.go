@@ -6,8 +6,8 @@ import (
 	"bytes"
 	"encoding/gob"
 	"github.com/gontikr99/chutzparse/internal/eqlog"
+	iff2 "github.com/gontikr99/chutzparse/internal/iff"
 	"github.com/gontikr99/chutzparse/internal/model/fight"
-	"github.com/gontikr99/chutzparse/internal/model/iff"
 	"github.com/gontikr99/chutzparse/internal/presenter"
 	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/pkg/console"
@@ -79,7 +79,7 @@ func listenForFights() {
 		}
 
 		for _, entry := range entries {
-			iff.Update(entry)
+			iff2.Update(entry)
 
 			// If we just zoned, retire all active fights.
 			if _, zoned := entry.Meaning.(*eqlog.ZoneLog); zoned {
@@ -94,7 +94,7 @@ func listenForFights() {
 				nr := &nameReader{names: map[string]struct{}{}}
 				entry.Meaning.Visit(nr)
 				for name := range nr.names {
-					if iff.IsFoe(name) && iff.GetOwner(name) == "" && !strings.HasSuffix(name, " pet") {
+					if iff2.IsFoe(name) && iff2.GetOwner(name) == "" && !strings.HasSuffix(name, " pet") {
 						if _, present := activeFights[name]; present {
 							activeFights[name].LastActivity = time.Now()
 						} else {

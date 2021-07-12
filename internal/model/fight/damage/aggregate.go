@@ -1,7 +1,7 @@
 package damage
 
 import (
-	"github.com/gontikr99/chutzparse/internal/model/iff"
+	iff2 "github.com/gontikr99/chutzparse/internal/iff"
 	"sort"
 )
 
@@ -38,7 +38,7 @@ func newAggregateReport(target string) *aggregateReport {
 
 func (ar *aggregateReport) ContributionOf(source string) *aggregateContributor {
 	attributedSource := source
-	if owner := iff.GetOwner(source); owner != "" {
+	if owner := iff2.GetOwner(source); owner != "" {
 		attributedSource = owner
 	}
 	update, ok := ar.Contributions[attributedSource]
@@ -90,7 +90,7 @@ func (ac *aggregateContributor) DisplayName() string {
 }
 
 func (ac *aggregateContributor) CategoryOf(source string, displayName string) *Category {
-	if owner := iff.GetOwner(source); owner != "" {
+	if owner := iff2.GetOwner(source); owner != "" {
 		displayName = displayName + " (" + source + ")"
 	}
 	update, ok := ac.Categorized[displayName]
