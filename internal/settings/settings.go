@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron/application"
+	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
 	"github.com/gontikr99/chutzparse/pkg/nodejs/path"
 	"io/ioutil"
 	"os"
@@ -32,6 +33,7 @@ func LookupSetting(key string) (string, bool, error) {
 // Upsert a value into a setting
 func SetSetting(key string, value string) error {
 	memoizedSettings[key] = value
+	browserwindow.Broadcast(ChannelChange, []byte{})
 	return sync()
 }
 

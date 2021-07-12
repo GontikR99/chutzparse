@@ -1,3 +1,36 @@
 <div class="container">
-    The settings pane.
+    <h2>Settings</h2>
+    <form @submit="event.PreventDefault()">
+        <div class="container-fluid border-light border">
+            <h6>System</h6>
+            <div class="form-group row">
+                <label class="col-form-label col-2">EverQuest directory</label>
+                <div class="col-8">
+                    <vgform:Input type="text" class="form-control" :Value="c.EqDir"/>
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-primary" @click="c.BrowseEqDir(event)">&#x1F4C1; Browse...</button>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid border-light border">
+            <h6>Overlay</h6>
+            <div class="form-group row">
+                <label class="col-form-label col-2">Show hit text</label>
+                <div class="col-4">
+                    <input type="checkbox" class="form-control" .checked="c.EnableFlyingText" @change="c.ToggleCheckbox(event, settings.ShowFlyingHits, &c.EnableFlyingText)" />
+                </div>
+                <label class="col-form-label col-2">Show damage meters</label>
+                <div class="col-4">
+                    <input type="checkbox" class="form-control" .checked="c.EnableMeters" @change="c.ToggleCheckbox(event, settings.ShowMeters, &c.EnableMeters)" />
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
+<script type="application/x-go">
+import (
+    "github.com/vugu/vugu/vgform"
+    "github.com/gontikr99/chutzparse/internal/settings"
+)
+</script>

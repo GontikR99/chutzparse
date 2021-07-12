@@ -35,18 +35,7 @@
             disk, rather than in chunks: <tt>/loginterval 0</tt></li>
     </ul>
     <h4>ChutzParse setup</h4>
-    <p>If you've squirreled EverQuest into some unusual location, please tell me where:</p>
-    <form @submit="event.PreventDefault()">
-        <div class="form-group row">
-            <label class="col-form-label col-sm-2">EverQuest directory</label>
-            <div class="col-8">
-                <vgform:Input type="text" class="form-control" :Value="c.EqDir"/>
-            </div>
-            <div class="col-2">
-                <button type="button" class="btn btn-primary" @click="c.BrowseEqDir(event)">&#x1F4C1; Browse...</button>
-            </div>
-        </div>
-    </form>
+    <p>If you've squirreled EverQuest into some unusual location, please tell me where in the <a href="#settings">settings</a>.</p>
     <h4>Running ChutzParse</h4>
     <p>Got logs on and your EverQuest directory selected above? That should be it. Go play some EverQuest and see the
         numbers fly!</p>
@@ -67,6 +56,3 @@
         </li>
     </ul>
 </div>
-<script type="application/x-go">
-    import "github.com/vugu/vugu/vgform"
-</script>
