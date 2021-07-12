@@ -15,8 +15,36 @@
         </div>
     </div>
     <div class="row">
-        <button type="button" class="btn btn-secondary" @click="c.CopySummary(event)" vg-if="c.currentView!=nil">Send summary to EQ</button>
-        <button type="button" class="btn btn-secondary" disabled vg-if="c.currentView==nil">Send summary to EQ</button>
+        <div class="col-2">
+            <button type="button" class="btn btn-secondary" @click="c.CopySummary(event)" vg-if="c.currentView!=nil">Send summary to EQ</button>
+            <button type="button" class="btn btn-secondary" disabled vg-if="c.currentView==nil">Send summary to EQ</button>
+        </div>
+        <div class="col-6">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-8">
+                        <ui:SelectBox class="form-control bg-dark text-light" :Options="c.PetNames()" :Selected="c.selectedUnlinkPet" style="width:100%;"></ui:SelectBox>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary" @click="c.UnlinkPet(event)">Unlink pet</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-1">Pet:</div>
+                    <div class="col-3">
+                        <ui:SelectBox class="form-control bg-dark text-light" :Options="c.PotentialPetsOwners()" :Selected="c.selectedLinkPet" style="width:100%;"></ui:SelectBox>
+                    </div>
+                    <div class="col-1">Owner:</div>
+                    <div class="col-3">
+                        <ui:SelectBox class="form-control bg-dark text-light" :Options="c.PotentialPetsOwners()" :Selected="c.selectedLinkOwner" style="width:100%;"></ui:SelectBox>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary" @click="c.LinkPet(event)" vg-if="c.currentView!=nil">Link pet</button>
+                        <button type="button" class="btn btn-secondary" @click="c.LinkPet(event)" disabled vg-if="c.currentView==nil">Link pet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

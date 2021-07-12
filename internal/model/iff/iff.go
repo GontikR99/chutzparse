@@ -46,3 +46,11 @@ func GetOwner(name string) string {
 	owner, _ := pets[name]
 	return owner
 }
+
+func GetPets() map[string]string {
+	result := map[string]string{}
+	for k,v := range pets {
+		result[k] = v
+	}
+	return result
+}

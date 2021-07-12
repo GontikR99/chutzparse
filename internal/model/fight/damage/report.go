@@ -22,6 +22,12 @@ func (r *Report) Interesting() bool {
 	return len(r.Contributions) != 0
 }
 
+func (r *Report) Participants(p map[string]struct{}) {
+	for k, _ := range r.Contributions {
+		p[k]=struct{}{}
+	}
+}
+
 // NewReport creates a new empty report with the specified target
 func NewReport(target string) *Report {
 	return &Report{Target: target, Contributions: make(map[string]*Contribution), ActivitySet: algorithm.EmptyTimeIntervalSet}

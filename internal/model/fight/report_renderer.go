@@ -13,4 +13,15 @@ type FightReport interface {
 
 	// Create a string summary of this report, for pasting to a clipboard
 	Summarize() string
+
+	// Update a set with all possible player controlled participants
+	Participants(p map[string]struct{})
+}
+
+func (f FightReportSet) Participants() map[string]struct{} {
+	result := map[string]struct{}{}
+	for _, report := range f {
+		report.Participants(result)
+	}
+	return result
 }

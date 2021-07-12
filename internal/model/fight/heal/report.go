@@ -22,6 +22,12 @@ func (r *Report) Interesting() bool {
 	return false
 }
 
+func (r *Report) Participants(p map[string]struct{}) {
+	for k, _ := range r.Contributions {
+		p[k]=struct{}{}
+	}
+}
+
 func NewReport(belligerent string) *Report {
 	return &Report{Belligerent: belligerent, Contributions: map[string]*Contribution{}}
 }

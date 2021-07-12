@@ -18,7 +18,13 @@ func MakeFoe(name string) {
 }
 
 func MakePet(pet string, owner string) {
-	update := &IffPet{pet, owner}
+	update := &IffNewPet{pet, owner}
+	update.Apply()
+	postUpdate(update)
+}
+
+func UnlinkPet(pet string) {
+	update := &IffUnlinkPet{pet}
 	update.Apply()
 	postUpdate(update)
 }
@@ -31,9 +37,12 @@ type IffUpdate interface {
 
 type IffFriend struct{ Name string }
 type IffFoe struct{ Name string }
-type IffPet struct {
+type IffNewPet struct {
 	Pet   string
 	Owner string
+}
+type IffUnlinkPet struct {
+	Pet string
 }
 
 func (i *IffFriend) Apply() {
@@ -44,8 +53,17 @@ func (i *IffFoe) Apply() {
 	delete(friends, i.Name)
 	foes[i.Name] = time.Now().Add(foeDuration)
 }
-func (i *IffPet) Apply() {
-	pets[i.Pet] = i.Owner
+func (i *IffNewPet) Apply() {
+	if oldOwner, present := pets[i.Pet]; !present || oldOwner!=i.Owner {
+		pets[i.Pet] = i.Owner
+		petChange(i)
+	}
+}
+func (i *IffUnlinkPet) Apply() {
+	if _, present := pets[i.Pet]; present {
+		delete(pets, i.Pet)
+		petChange(i)
+	}
 }
 
 type IffUpdateHolder struct {
@@ -55,5 +73,28 @@ type IffUpdateHolder struct {
 func init() {
 	gob.RegisterName("iff:friend", &IffFriend{})
 	gob.RegisterName("iff:foe", &IffFoe{})
-	gob.RegisterName("iff:pet", &IffPet{})
+	gob.RegisterName("iff:pet", &IffNewPet{})
+	gob.RegisterName("iff:unlinkpet", &IffUnlinkPet{})
+}
+
+var petListenerGen=0
+var petListeners=map[int]chan<- struct{}{}
+
+// ListenPets lets us listen for changes to the pet mapping
+func ListenPets() (<-chan struct{}, func()) {
+	id := petListenerGen
+	petListenerGen++
+	updateChan := make(chan struct{})
+	petListeners[id]=updateChan
+	doneFunc := func() {delete(petListeners, id)}
+	return updateChan, doneFunc
+}
+
+func petChange(update IffUpdate) {
+	for _, outChan := range petListeners {
+		func(){
+			defer func() {recover()}()
+			outChan <- struct{}{}
+		}()
+	}
 }
