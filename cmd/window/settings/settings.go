@@ -14,6 +14,7 @@ import (
 type Settings struct {
 	vuguutil.BackgroundComponent
 	EqDir *ConfiguredValue
+	LinkObviousPets bool
 	EnableFlyingText bool
 	EnableMeters bool
 }
@@ -32,6 +33,7 @@ func (c *Settings) RunInBackground() {
 	sc, doneFunc := ipcrenderer.Endpoint{}.Listen(settings.ChannelChange)
 	defer doneFunc()
 	for {
+		go c.refreshCheckbox(c.Env(), settings.LinkObviousPets, &c.LinkObviousPets)
 		go c.refreshCheckbox(c.Env(), settings.ShowFlyingHits, &c.EnableFlyingText)
 		go c.refreshCheckbox(c.Env(), settings.ShowMeters, &c.EnableMeters)
 		select {

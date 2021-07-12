@@ -18,10 +18,8 @@ type FightReport interface {
 	Participants(p map[string]struct{})
 }
 
-func (f FightReportSet) Participants() map[string]struct{} {
-	result := map[string]struct{}{}
+func (f FightReportSet) Participants(p map[string]struct{}) {
 	for _, report := range f {
-		report.Participants(result)
+		report.Participants(p)
 	}
-	return result
 }

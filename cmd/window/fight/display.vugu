@@ -39,8 +39,7 @@
                         <ui:SelectBox class="form-control bg-dark text-light" :Options="c.PotentialPetsOwners()" :Selected="c.selectedLinkOwner" style="width:100%;"></ui:SelectBox>
                     </div>
                     <div class="col-4">
-                        <button type="button" class="btn btn-secondary" @click="c.LinkPet(event)" vg-if="c.currentView!=nil">Link pet</button>
-                        <button type="button" class="btn btn-secondary" @click="c.LinkPet(event)" disabled vg-if="c.currentView==nil">Link pet</button>
+                        <button type="button" class="btn btn-secondary" @click="c.LinkPet(event)">Link pet</button>
                     </div>
                 </div>
             </div>

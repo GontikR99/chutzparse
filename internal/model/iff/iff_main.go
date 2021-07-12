@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"github.com/gontikr99/chutzparse/internal/eqlog"
+	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
 	"regexp"
@@ -32,14 +33,25 @@ func postUpdate(update IffUpdate) {
 }
 
 func heuristicId(name string) {
+	linkText, present, err := settings.LookupSetting(settings.LinkObviousPets)
+	linkObviousPets:=false
+	if present && err==nil && linkText=="true" {
+		linkObviousPets = true
+	}
 	if name == eqlog.UnspecifiedName {
 
 	} else if strings.HasSuffix(name, "`s pet") {
-		MakePet(name, name[:len(name)-6])
+		if linkObviousPets {
+			MakePet(name, name[:len(name)-6])
+		}
 	} else if strings.HasSuffix(name, "`s warder") {
-		MakePet(name, name[:len(name)-9])
+		if linkObviousPets {
+			MakePet(name, name[:len(name)-9])
+		}
 	} else if strings.HasSuffix(name, "`s ward") {
-		MakePet(name, name[:len(name)-7])
+		if linkObviousPets {
+			MakePet(name, name[:len(name)-7])
+		}
 	} else {
 		for _, c := range name {
 			if !unicode.IsLetter(rune(c)) {
@@ -100,11 +112,22 @@ func (i iffAction) OnHeal(log *eqlog.HealLog) interface{} {
 var leaderRE = regexp.MustCompile("^My leader is ([A-Z][a-z]+)[.]$")
 
 func (i iffAction) OnChat(log *eqlog.ChatLog) interface{} {
+	linkText, present, err := settings.LookupSetting(settings.LinkObviousPets)
+	linkObviousPets:=false
+	if present && err==nil && linkText=="true" {
+		linkObviousPets = true
+	}
 	if match := leaderRE.FindStringSubmatch(log.Text); match != nil {
-		MakePet(log.Source, match[1])
+		if linkObviousPets {
+			MakePet(log.Source, match[1])
+		}
 	}
 	return nil
 }
 
 func (i iffAction) OnDeath(log *eqlog.DeathLog) interface{} { return nil }
 func (i iffAction) OnZone(log *eqlog.ZoneLog) interface{}   { return nil }
+
+func init() {
+	settings.DefaultSetting(settings.LinkObviousPets, "true")
+}

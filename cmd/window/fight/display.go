@@ -107,8 +107,8 @@ func (c *Display) UnlinkPet(event vugu.DOMEvent) {
 
 func (c *Display) PotentialPetsOwners() []ui.SelectBoxOption {
 	rawOpts:=map[string]struct{}{}
-	if c.reportSet!=nil {
-		rawOpts=c.reportSet.Participants()
+	for _, fight := range finishedFights {
+		fight.Reports.Participants(rawOpts)
 	}
 
 	for k, _ := range c.selectedLinkPet {
