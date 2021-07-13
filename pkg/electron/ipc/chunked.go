@@ -1,6 +1,6 @@
 // +build wasm
 
-package msgcomm
+package ipc
 
 import (
 	"encoding/binary"
@@ -48,14 +48,14 @@ var msgIdGen = int32(0)
 func SendChunked(sender Sender, channel string, msg []byte) {
 	msgId := msgIdGen
 	msgIdGen++
-	chunkCount:=(len(msg)+chunkSize-1)/chunkSize
+	chunkCount:=(len(msg)+ chunkSize -1)/ chunkSize
 	if chunkCount==0 {
 		chunkCount=1
 	}
 	var msgs [][]byte
 	for i:=0;i<chunkCount;i++ {
-		start := i*chunkSize
-		end := (i+1)*chunkSize
+		start := i* chunkSize
+		end := (i+1)* chunkSize
 		if end>len(msg) {
 			end = len(msg)
 		}
@@ -77,7 +77,7 @@ func SendChunked(sender Sender, channel string, msg []byte) {
 // chunked messages
 func GetChunkedEndpoint(targetEndpoint Endpoint) Endpoint {
 	if _, ok := endpointsWithChunkedListeners[targetEndpoint]; !ok {
-		endpointsWithChunkedListeners[targetEndpoint]=newChunkedEndpoint(targetEndpoint)
+		endpointsWithChunkedListeners[targetEndpoint]= newChunkedEndpoint(targetEndpoint)
 	}
 	return endpointsWithChunkedListeners[targetEndpoint]
 }
@@ -98,7 +98,7 @@ func newChunkedEndpoint(endpoint Endpoint) *chunkedEndpoint {
 	go func() {
 		for {
 			chunkRawMsg := <-inChunks
-			chunkMsg:=deserializeMsgChunk(chunkRawMsg.Content())
+			chunkMsg:= deserializeMsgChunk(chunkRawMsg.Content())
 			msgPartials := cl.getPartial(chunkMsg.MsgId)
 			msgPartials[chunkMsg.ThisChunk] = chunkMsg.Content
 			if len(msgPartials)!=int(chunkMsg.ChunkCount) {
@@ -161,7 +161,7 @@ type chunkedMessage struct {
 }
 
 func (c chunkedMessage) Content() []byte {return c.content}
-func (c chunkedMessage) Sender() string {return "chunked"}
+func (c chunkedMessage) Sender() string  {return "chunked"}
 func (c chunkedMessage) Reply(channelName string, data []byte) {
 }
 

@@ -1,6 +1,6 @@
 // +build wasm,electron
 
-package eqwnd
+package eqspec
 
 import (
 	"errors"
@@ -23,7 +23,7 @@ func findWindow() (uint32, error) {
 	}
 }
 
-func IsTop() bool {
+func IsTopWindow() bool {
 	hwnd, err := findWindow()
 	if err != nil {
 		return false
@@ -32,7 +32,7 @@ func IsTop() bool {
 	return hwnd == topHwnd
 }
 
-func GetExtents() (*electron.Rectangle, error) {
+func GetWindowExtents() (*electron.Rectangle, error) {
 	hwnd, err := findWindow()
 	if err != nil {
 		return nil, err

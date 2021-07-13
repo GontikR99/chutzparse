@@ -6,8 +6,7 @@ import (
 	"context"
 	"github.com/gontikr99/chutzparse/cmd/main/mainrpc"
 	"github.com/gontikr99/chutzparse/internal"
-	"github.com/gontikr99/chutzparse/internal/eqlog"
-	"github.com/gontikr99/chutzparse/internal/eqwnd"
+	"github.com/gontikr99/chutzparse/internal/eqspec"
 	"github.com/gontikr99/chutzparse/internal/model"
 	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/pkg/console"
@@ -34,7 +33,7 @@ func main() {
 
 	model.RegisterReports()
 	model.StartMain()
-	eqlog.RestartLogScans(appCtx)
+	eqspec.RestartLogScans(appCtx)
 
 	startup, ready := context.WithCancel(appCtx)
 	application.OnReady(ready)
@@ -53,10 +52,7 @@ func main() {
 			ContextIsolation: true,
 		},
 	})
-	mainWindow.OnClosed(func() {
-		console.Log("main closed")
-		exitApp()
-	})
+	mainWindow.OnClosed(exitApp)
 	mainWindow.ServeRPC(mainrpc.NewServer())
 
 	mainWindow.Once("ready-to-show", func() {
@@ -96,10 +92,7 @@ func main() {
 		},
 	})
 	overlayWnd.SetSkipTaskbar(true)
-	overlayWnd.OnClosed(func() {
-		console.Log("overlay closed")
-		exitApp()
-	})
+	overlayWnd.OnClosed(exitApp)
 	overlayWnd.ServeRPC(mainrpc.NewServer())
 
 	overlayWnd.Once("ready-to-show", func() {
@@ -115,6 +108,7 @@ func main() {
 	overlayWnd.LoadFile(path.Join(application.GetAppPath(), "src", "overlay.html"))
 	<-overlayBuilding.Done()
 
+	overlayShowing := true
 	go func() {
 		for {
 			select {
@@ -123,7 +117,18 @@ func main() {
 			case <-time.After(50 * time.Millisecond):
 				break
 			}
-			newLoc, err := eqwnd.GetExtents()
+			isTop := eqspec.IsTopWindow()
+			if overlayShowing != isTop {
+				if isTop {
+					overlayShowing = true
+					overlayWnd.ShowInactive()
+				} else {
+					overlayShowing = false
+					overlayWnd.Hide()
+					continue
+				}
+			}
+			newLoc, err := eqspec.GetWindowExtents()
 			if err != nil {
 				continue
 			}

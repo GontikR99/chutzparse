@@ -5,27 +5,27 @@ package ipcmain
 import (
 	"github.com/gontikr99/chutzparse/pkg/electron"
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc"
-	"github.com/gontikr99/chutzparse/pkg/msgcomm"
+	"github.com/gontikr99/chutzparse/pkg/jsbinding"
 	"strconv"
 	"syscall/js"
 )
 
 var ipcMain = electron.JSValue().Get("ipcMain")
 
-func Listen(channelName string) (<-chan msgcomm.Message, func()) {
-	resultChan := make(chan msgcomm.Message)
+func Listen(channelName string) (<-chan ipc.Message, func()) {
+	resultChan := make(chan ipc.Message)
 	recvFunc := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		event := args[0]
-		data, _ := ipc.Decode(args[1])
+		data := jsbinding.ReadArrayBuffer(args[1])
 		resultChan <- &electronMessage{
 			event:   event,
 			content: []byte(data),
 		}
 		return nil
 	})
-	ipcMain.Call("on", msgcomm.Prefix+channelName, recvFunc)
+	ipcMain.Call("on", ipc.Prefix+channelName, recvFunc)
 	return resultChan, func() {
-		ipcMain.Call("removeListener", msgcomm.Prefix+channelName, recvFunc)
+		ipcMain.Call("removeListener", ipc.Prefix+channelName, recvFunc)
 		recvFunc.Release()
 		close(resultChan)
 	}
@@ -49,5 +49,5 @@ func (e *electronMessage) Sender() string {
 }
 
 func (e *electronMessage) Reply(channelName string, data []byte) {
-	e.event.Call("reply", msgcomm.Prefix+channelName, ipc.Encode(data))
+	e.event.Call("reply", ipc.Prefix+channelName, jsbinding.MakeArrayBuffer(data))
 }

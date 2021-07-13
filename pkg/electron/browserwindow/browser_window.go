@@ -8,7 +8,7 @@ import (
 	"github.com/gontikr99/chutzparse/pkg/electron/binding"
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc"
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc/ipcmain"
-	"github.com/gontikr99/chutzparse/pkg/msgcomm"
+	"github.com/gontikr99/chutzparse/pkg/jsbinding"
 	"io"
 	"net/rpc"
 	"strconv"
@@ -19,13 +19,14 @@ var browserWindow = electron.JSValue().Get("BrowserWindow")
 
 type BrowserWindow interface {
 	io.Closer
-	msgcomm.Endpoint
+	ipc.Endpoint
 
 	Destroy()
 
 	RemoveMenu()
 	Show()
 	ShowInactive()
+	Hide()
 	LoadFile(path string)
 
 	Id() int
@@ -220,7 +221,7 @@ func (bw *electronBrowserWindow) Send(channelName string, content []byte) {
 			// ignore errors sending
 		}
 	}()
-	bw.webContents.Call("send", msgcomm.Prefix+channelName, ipc.Encode(content))
+	bw.webContents.Call("send", ipc.Prefix+channelName, jsbinding.MakeArrayBuffer(content))
 }
 
 // Send a message to all open windows on the specified channel
@@ -232,7 +233,7 @@ func Broadcast(channel string, content []byte) {
 
 func BroadcastChunked(channel string, content []byte) {
 	for _, v := range openWindows {
-		msgcomm.SendChunked(v, channel, content)
+		ipc.SendChunked(v, channel, content)
 	}
 }
 
@@ -240,8 +241,8 @@ func (bw *electronBrowserWindow) Id() int {
 	return bw.webContents.Get("id").Int()
 }
 
-func (bw *electronBrowserWindow) Listen(channelName string) (<-chan msgcomm.Message, func()) {
-	outChan := make(chan msgcomm.Message)
+func (bw *electronBrowserWindow) Listen(channelName string) (<-chan ipc.Message, func()) {
+	outChan := make(chan ipc.Message)
 	inChan, inDone := ipcmain.Listen(channelName)
 	go func() {
 		for {
@@ -260,7 +261,7 @@ func (bw *electronBrowserWindow) Listen(channelName string) (<-chan msgcomm.Mess
 }
 
 func (bw *electronBrowserWindow) ServeRPC(server *rpc.Server) {
-	endpointStream := msgcomm.EndpointAsStream("rpcMain", bw)
+	endpointStream := ipc.EndpointAsStream("rpcMain", bw)
 	bw.OnClosed(func() {
 		endpointStream.Close()
 	})
@@ -295,4 +296,8 @@ func (bw *electronBrowserWindow) SetIgnoreMouseEvents(b bool) {
 
 func (bw *electronBrowserWindow) SetSkipTaskbar(b bool) {
 	bw.browserWindow.Call("setSkipTaskbar", b)
+}
+
+func (bw *electronBrowserWindow) Hide() {
+	bw.browserWindow.Call("hide")
 }

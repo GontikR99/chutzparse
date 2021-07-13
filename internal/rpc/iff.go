@@ -7,28 +7,28 @@ type IffServer interface {
 	Link(pet string, owner string) error
 }
 
-type IffClient struct {
+type StubIff struct {
 	is IffServer
 }
 
-func (ic *IffClient) Unlink(req *UnlinkPetRequest, res *UnlinkPetResponse) error {
+func (ic *StubIff) Unlink(req *UnlinkPetRequest, res *UnlinkPetResponse) error {
 	return ic.is.Unlink(req.Pet)
 }
 
 func UnlinkPet(client *rpc.Client, pet string) error {
 	req := &UnlinkPetRequest{pet}
 	res := new(UnlinkPetResponse)
-	return client.Call("IffClient.Unlink", req, res)
+	return client.Call("StubIff.Unlink", req, res)
 }
 
-func (ic *IffClient) Link(req *LinkPetRequest, res *LinkPetResponse) error {
+func (ic *StubIff) Link(req *LinkPetRequest, res *LinkPetResponse) error {
 	return ic.is.Link(req.Pet, req.Owner)
 }
 
 func LinkPet(client *rpc.Client, pet string, owner string) error {
 	req := &LinkPetRequest{pet, owner}
 	res := new(LinkPetResponse)
-	return client.Call("IffClient.Link", req, res)
+	return client.Call("StubIff.Link", req, res)
 }
 
 type UnlinkPetRequest struct {
@@ -44,7 +44,7 @@ type LinkPetRequest struct {
 type LinkPetResponse struct {}
 
 func HandleIff(iff IffServer) func(server *rpc.Server) {
-	ic := &IffClient{iff}
+	ic := &StubIff{iff}
 	return func(server *rpc.Server) {
 		server.Register(ic)
 	}

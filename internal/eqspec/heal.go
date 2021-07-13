@@ -1,6 +1,6 @@
 // +build wasm,electron
 
-package eqlog
+package eqspec
 
 import (
 	"fmt"

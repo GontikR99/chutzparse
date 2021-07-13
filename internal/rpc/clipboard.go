@@ -15,22 +15,22 @@ type ClipboardServer interface {
 	Copy(text string) error
 }
 
-type ClipboardClient struct {
+type StubClipboard struct {
 	cs ClipboardServer
 }
 
-func (cc *ClipboardClient) Copy(req *ClipboardCopyRequest, res *ClipboardCopyResponse) error {
+func (cc *StubClipboard) Copy(req *ClipboardCopyRequest, res *ClipboardCopyResponse) error {
 	return cc.cs.Copy(req.Text)
 }
 
 func CopyClipboard(client *rpc.Client, text string) error {
 	req := &ClipboardCopyRequest{Text: text}
 	res := new(ClipboardCopyResponse)
-	return client.Call("ClipboardClient.Copy", req, res)
+	return client.Call("StubClipboard.Copy", req, res)
 }
 
 func HandleClipboard(clipboard ClipboardServer) func(server *rpc.Server) {
-	cc := &ClipboardClient{clipboard}
+	cc := &StubClipboard{clipboard}
 	return func(server *rpc.Server) {
 		server.Register(cc)
 	}

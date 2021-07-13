@@ -1,6 +1,6 @@
 // +build wasm
 
-package msgcomm
+package ipc
 
 import (
 	"bytes"

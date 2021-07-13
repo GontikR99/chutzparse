@@ -5,7 +5,7 @@ package model
 import (
 	"bytes"
 	"encoding/gob"
-	"github.com/gontikr99/chutzparse/internal/eqlog"
+	"github.com/gontikr99/chutzparse/internal/eqspec"
 	iff2 "github.com/gontikr99/chutzparse/internal/iff"
 	"github.com/gontikr99/chutzparse/internal/model/fight"
 	"github.com/gontikr99/chutzparse/internal/presenter"
@@ -25,25 +25,25 @@ type nameReader struct {
 	names map[string]struct{}
 }
 
-func (nr *nameReader) OnDamage(log *eqlog.DamageLog) interface{} {
+func (nr *nameReader) OnDamage(log *eqspec.DamageLog) interface{} {
 	nr.storeName(log.Source)
 	nr.storeName(log.Target)
 	return nil
 }
-func (nr *nameReader) OnHeal(log *eqlog.HealLog) interface{} {
+func (nr *nameReader) OnHeal(log *eqspec.HealLog) interface{} {
 	nr.storeName(log.Source)
 	nr.storeName(log.Target)
 	return nil
 }
-func (nr *nameReader) OnDeath(log *eqlog.DeathLog) interface{} {
+func (nr *nameReader) OnDeath(log *eqspec.DeathLog) interface{} {
 	nr.storeName(log.Source)
 	nr.storeName(log.Target)
 	return nil
 }
-func (nr *nameReader) OnChat(log *eqlog.ChatLog) interface{} { nr.storeName(log.Source); return nil }
-func (nr *nameReader) OnZone(*eqlog.ZoneLog) interface{}     { return nil }
+func (nr *nameReader) OnChat(log *eqspec.ChatLog) interface{} { nr.storeName(log.Source); return nil }
+func (nr *nameReader) OnZone(*eqspec.ZoneLog) interface{}     { return nil }
 func (nr *nameReader) storeName(name string) {
-	if name != eqlog.UnspecifiedName && name != "" {
+	if name != eqspec.UnspecifiedName && name != "" {
 		nr.names[name] = struct{}{}
 	}
 }
@@ -69,7 +69,7 @@ func retireActiveFight(target string) {
 
 func listenForFights() {
 	var fightIdGen int
-	eqlog.RegisterLogsListener(func(entries []*eqlog.LogEntry) {
+	eqspec.RegisterLogsListener(func(entries []*eqspec.LogEntry) {
 		// Any fight that hasn't been updated in a while gets retired
 		now := time.Now()
 		for _, fight := range activeFights {
@@ -82,7 +82,7 @@ func listenForFights() {
 			iff2.Update(entry)
 
 			// If we just zoned, retire all active fights.
-			if _, zoned := entry.Meaning.(*eqlog.ZoneLog); zoned {
+			if _, zoned := entry.Meaning.(*eqspec.ZoneLog); zoned {
 				for target := range activeFights {
 					retireActiveFight(target)
 				}
@@ -120,7 +120,7 @@ func listenForFights() {
 			}
 
 			// Explicitly retire an active fight if its target dies
-			if death, ok := entry.Meaning.(*eqlog.DeathLog); ok {
+			if death, ok := entry.Meaning.(*eqspec.DeathLog); ok {
 				if _, ok2 := activeFights[death.Target]; ok2 {
 					retireActiveFight(death.Target)
 				}

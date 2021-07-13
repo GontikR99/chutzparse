@@ -7,12 +7,8 @@ import (
 	"syscall/js"
 )
 
-var electron js.Value
-
-func init() {
-	electron = nodejs.Require("electron")
-}
+var electronJs = nodejs.Require("electron")
 
 func JSValue() js.Value {
-	return electron
+	return electronJs
 }

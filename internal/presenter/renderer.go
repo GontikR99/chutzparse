@@ -7,8 +7,8 @@ import (
 	"context"
 	"encoding/gob"
 	"github.com/gontikr99/chutzparse/pkg/console"
+	"github.com/gontikr99/chutzparse/pkg/electron/ipc"
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc/ipcrenderer"
-	"github.com/gontikr99/chutzparse/pkg/msgcomm"
 )
 
 func HitDisplayListen(ctx context.Context, channel string) <-chan *HitEvent {
@@ -34,7 +34,7 @@ func HitDisplayListen(ctx context.Context, channel string) <-chan *HitEvent {
 }
 
 func ThroughputListen(ctx context.Context) <-chan []ThroughputState {
-	chn, _ := msgcomm.GetChunkedEndpoint(ipcrenderer.Endpoint{}).Listen(ChannelThroughput)
+	chn, _ := ipc.GetChunkedEndpoint(ipcrenderer.Endpoint{}).Listen(ChannelThroughput)
 	outChan := make(chan []ThroughputState)
 	go func() {
 		for {

@@ -5,7 +5,7 @@ package iff
 import (
 	"bytes"
 	"encoding/gob"
-	"github.com/gontikr99/chutzparse/internal/eqlog"
+	"github.com/gontikr99/chutzparse/internal/eqspec"
 	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
@@ -14,7 +14,7 @@ import (
 	"unicode"
 )
 
-func Update(entry *eqlog.LogEntry) {
+func Update(entry *eqspec.LogEntry) {
 	MakeFriend(entry.Character)
 	if entry.Meaning != nil {
 		entry.Meaning.Visit(iffAction{entry})
@@ -38,7 +38,7 @@ func heuristicId(name string) {
 	if present && err==nil && linkText=="true" {
 		linkObviousPets = true
 	}
-	if name == eqlog.UnspecifiedName {
+	if name == eqspec.UnspecifiedName {
 
 	} else if strings.HasSuffix(name, "`s pet") {
 		if linkObviousPets {
@@ -63,14 +63,14 @@ func heuristicId(name string) {
 }
 
 type iffAction struct {
-	Entry *eqlog.LogEntry
+	Entry *eqspec.LogEntry
 }
 
-func (i iffAction) OnDamage(log *eqlog.DamageLog) interface{} {
+func (i iffAction) OnDamage(log *eqspec.DamageLog) interface{} {
 	if log.Source == log.Target {
 		return nil
 	}
-	if log.Source == eqlog.UnspecifiedName || log.Target == eqlog.UnspecifiedName {
+	if log.Source == eqspec.UnspecifiedName || log.Target == eqspec.UnspecifiedName {
 		return nil
 	}
 	heuristicId(log.Source)
@@ -87,11 +87,11 @@ func (i iffAction) OnDamage(log *eqlog.DamageLog) interface{} {
 	return nil
 }
 
-func (i iffAction) OnHeal(log *eqlog.HealLog) interface{} {
+func (i iffAction) OnHeal(log *eqspec.HealLog) interface{} {
 	if log.Source == log.Target {
 		return nil
 	}
-	if log.Source == eqlog.UnspecifiedName || log.Target == eqlog.UnspecifiedName {
+	if log.Source == eqspec.UnspecifiedName || log.Target == eqspec.UnspecifiedName {
 		return nil
 	}
 	heuristicId(log.Source)
@@ -111,7 +111,7 @@ func (i iffAction) OnHeal(log *eqlog.HealLog) interface{} {
 
 var leaderRE = regexp.MustCompile("^My leader is ([A-Z][a-z]+)[.]$")
 
-func (i iffAction) OnChat(log *eqlog.ChatLog) interface{} {
+func (i iffAction) OnChat(log *eqspec.ChatLog) interface{} {
 	linkText, present, err := settings.LookupSetting(settings.LinkObviousPets)
 	linkObviousPets:=false
 	if present && err==nil && linkText=="true" {
@@ -125,8 +125,8 @@ func (i iffAction) OnChat(log *eqlog.ChatLog) interface{} {
 	return nil
 }
 
-func (i iffAction) OnDeath(log *eqlog.DeathLog) interface{} { return nil }
-func (i iffAction) OnZone(log *eqlog.ZoneLog) interface{}   { return nil }
+func (i iffAction) OnDeath(log *eqspec.DeathLog) interface{} { return nil }
+func (i iffAction) OnZone(log *eqspec.ZoneLog) interface{}   { return nil }
 
 func init() {
 	settings.DefaultSetting(settings.LinkObviousPets, "true")

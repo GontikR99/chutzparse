@@ -1,6 +1,6 @@
 // +build wasm,electron
 
-package eqlog
+package eqspec
 
 import (
 	"github.com/gontikr99/chutzparse/pkg/multipattern"

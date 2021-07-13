@@ -4,7 +4,7 @@ package ipcrenderer
 
 import (
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc"
-	"github.com/gontikr99/chutzparse/pkg/msgcomm"
+	"github.com/gontikr99/chutzparse/pkg/jsbinding"
 	"net/rpc"
 	"syscall/js"
 )
@@ -13,11 +13,11 @@ var ipcRenderer = js.Global().Get("ipcRenderer")
 
 type Endpoint struct{}
 
-func (i Endpoint) Listen(channelName string) (<-chan msgcomm.Message, func()) {
-	resultChan := make(chan msgcomm.Message, 16)
+func (i Endpoint) Listen(channelName string) (<-chan ipc.Message, func()) {
+	resultChan := make(chan ipc.Message, 16)
 	recvFunc := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		event := args[0]
-		data, _ := ipc.Decode(args[1])
+		data := jsbinding.ReadArrayBuffer(args[1])
 		func() {
 			defer func() { recover() }()
 			resultChan <- &electronMessage{
@@ -27,16 +27,16 @@ func (i Endpoint) Listen(channelName string) (<-chan msgcomm.Message, func()) {
 		}()
 		return nil
 	})
-	ipcRenderer.Call("on", msgcomm.Prefix+channelName, recvFunc)
+	ipcRenderer.Call("on", ipc.Prefix+channelName, recvFunc)
 	return resultChan, func() {
-		ipcRenderer.Call("removeListener", msgcomm.Prefix+channelName, recvFunc)
+		ipcRenderer.Call("removeListener", ipc.Prefix+channelName, recvFunc)
 		recvFunc.Release()
 		close(resultChan)
 	}
 }
 
 func (i Endpoint) Send(channelName string, content []byte) {
-	ipcRenderer.Call("send", msgcomm.Prefix+channelName, ipc.Encode(content))
+	ipcRenderer.Call("send", ipc.Prefix+channelName, jsbinding.MakeArrayBuffer(content))
 }
 
 type electronMessage struct {
@@ -57,7 +57,7 @@ func (e *electronMessage) Sender() string {
 }
 
 func (e *electronMessage) Reply(channelName string, data []byte) {
-	e.event.Call("reply", msgcomm.Prefix+channelName, ipc.Encode(data))
+	e.event.Call("reply", ipc.Prefix+channelName, jsbinding.MakeArrayBuffer(data))
 }
 
 // Renderer side RPC client
@@ -65,6 +65,6 @@ var Client *rpc.Client
 
 func init() {
 	if !ipcRenderer.IsUndefined() {
-		Client = msgcomm.NewClient(msgcomm.ChannelRPCMain, &Endpoint{})
+		Client = ipc.NewClient(ipc.ChannelRPCMain, &Endpoint{})
 	}
 }
