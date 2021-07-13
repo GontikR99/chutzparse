@@ -90,6 +90,8 @@ func (c *Display) PetNames() []ui.SelectBoxOption {
 	return opts
 }
 
+var iffcontrol=rpc.NewIffControlClient(ipcrenderer.Client)
+
 func (c *Display) UnlinkPet(event vugu.DOMEvent) {
 	event.PreventDefault()
 	event.StopPropagation()
@@ -97,7 +99,7 @@ func (c *Display) UnlinkPet(event vugu.DOMEvent) {
 		for k, _ := range c.selectedUnlinkPet {
 			if k!="" {
 				go func() {
-					rpc.UnlinkPet(ipcrenderer.Client, k)
+					iffcontrol.Unlink(k)
 				}()
 				return
 			}
@@ -162,7 +164,7 @@ func (c *Display) LinkPet(event vugu.DOMEvent) {
 		c.selectedLinkPet[""]=struct{}{}
 		c.selectedLinkOwner[""]=struct{}{}
 		go func() {
-			rpc.LinkPet(ipcrenderer.Client, pet, owner)
+			iffcontrol.Link(pet, owner)
 		}()
 	}
 }

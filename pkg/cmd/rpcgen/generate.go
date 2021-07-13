@@ -12,10 +12,15 @@ import (
 	"strings"
 )
 
+type FuncArg struct {
+	Name string
+	Type string
+}
+
 type InterfaceMethod struct {
 	Name string
-	ArgTypes []string
-	RetTypes []string
+	ArgTypes []FuncArg
+	RetTypes []FuncArg
 }
 
 type Import struct {
@@ -62,6 +67,14 @@ func formatType(reqimports map[string]struct{}, expr ast.Expr) string {
 		return "[]"+formatType(reqimports, arrExp.Elt)
 	}
 	panic(fmt.Errorf("unknown expression type at %v", expr.Pos()))
+}
+
+func upperCamlCase(name string) string {
+	if len(name)>0 {
+		return strings.ToUpper(name[:1])+name[1:]
+	} else {
+		return name
+	}
 }
 
 func main() {
@@ -133,13 +146,27 @@ func main() {
 		if !ok {
 			panic(fmt.Errorf("expected method to be a function type at %v", method.Pos()))
 		}
-		for _, arg := range fun.Params.List {
-			ifMethod.ArgTypes = append(ifMethod.ArgTypes, formatType(neededImports, arg.Type))
+		for idx, arg := range fun.Params.List {
+			fArg := FuncArg{
+				Name: fmt.Sprintf("Arg%d", idx),
+				Type: formatType(neededImports, arg.Type),
+			}
+			if len(arg.Names)==1 {
+				fArg.Name=upperCamlCase(arg.Names[0].Name)
+			}
+			ifMethod.ArgTypes = append(ifMethod.ArgTypes, fArg)
 		}
-		for _, ret := range fun.Results.List {
-			ifMethod.RetTypes = append(ifMethod.RetTypes, formatType(neededImports, ret.Type))
+		for idx, ret := range fun.Results.List {
+			rArg := FuncArg{
+				Name: fmt.Sprintf("Ret%d", idx),
+				Type: formatType(neededImports, ret.Type),
+			}
+			if len(ret.Names)==1 {
+				rArg.Name=upperCamlCase(ret.Names[0].Name)
+			}
+			ifMethod.RetTypes = append(ifMethod.RetTypes, rArg)
 		}
-		if len(ifMethod.RetTypes)==0 || ifMethod.RetTypes[len(ifMethod.RetTypes)-1]!="error" {
+		if len(ifMethod.RetTypes)==0 || ifMethod.RetTypes[len(ifMethod.RetTypes)-1].Type!="error" {
 			panic(fmt.Errorf("Method %s must return 'error' as its last result type at %v", ifMethod.Name, method.Pos()))
 		}
 		ifMethod.RetTypes = ifMethod.RetTypes[:len(ifMethod.RetTypes)-1]
@@ -173,14 +200,14 @@ func main() {
 	// Create stub implementations
 	for _, method := range methods {
 		fmt.Fprintf(output, "type RequestMessage_%s_%s struct {\n", ifName, method.Name)
-		for idx, field := range method.ArgTypes {
-			fmt.Fprintf(output, "  Arg%d %s\n", idx, field)
+		for _, field := range method.ArgTypes {
+			fmt.Fprintf(output, "  %s %s\n", field.Name, field.Type)
 		}
 		fmt.Fprintln(output, "}")
 
 		fmt.Fprintf(output, "type ResponseMessage_%s_%s struct {\n", ifName, method.Name)
-		for idx, field := range method.RetTypes {
-			fmt.Fprintf(output, "  Ret%d %s\n", idx, field)
+		for _, field := range method.RetTypes {
+			fmt.Fprintf(output, "  %s %s\n", field.Name, field.Type)
 		}
 		fmt.Fprintln(output, "}")
 
@@ -192,18 +219,18 @@ func main() {
 		)
 		fmt.Fprintln(output, "  var err error")
 		output.WriteString("  ")
-		for idx, _ := range method.RetTypes {
-			fmt.Fprintf(output, "res.Ret%d, ", idx)
+		for _, field := range method.RetTypes {
+			fmt.Fprintf(output, "res.%s, ", field.Name)
 		}
 		fmt.Fprintf(output, "err = ss.impl.%s(", method.Name)
 		needSep := false
-		for idx, _ := range method.ArgTypes {
+		for _, field := range method.ArgTypes {
 			if needSep {
 				output.WriteString(", ")
 			} else {
 				needSep = true
 			}
-			fmt.Fprintf(output, "req.Arg%d", idx)
+			fmt.Fprintf(output, "req.%s", field.Name)
 		}
 		fmt.Fprintln(output, ")")
 		fmt.Fprintln(output, "  return err")
@@ -211,29 +238,29 @@ func main() {
 
 		fmt.Fprintf(output, "func (cs Stub_clientSide_%s) %s(", ifName, method.Name)
 		needSep = false
-		for idx, argType := range method.ArgTypes {
+		for idx, field := range method.ArgTypes {
 			if needSep {
 				output.WriteString(", ")
 			} else {
 				needSep = true
 			}
-			fmt.Fprintf(output, "arg%d %s", idx, argType)
+			fmt.Fprintf(output, "arg%d %s", idx, field.Type)
 		}
 		fmt.Fprintf(output, ") (")
-		for _, retType := range method.RetTypes {
-			fmt.Fprintf(output, "%s, ", retType)
+		for _, rField := range method.RetTypes {
+			fmt.Fprintf(output, "%s, ", rField.Type)
 		}
 		fmt.Fprintln(output, "error) {")
 		fmt.Fprintf(output, "  req := &RequestMessage_%s_%s{\n", ifName, method.Name)
-		for idx, _ := range method.ArgTypes {
-			fmt.Fprintf(output, "    Arg%d: arg%d,\n", idx, idx)
+		for idx, field := range method.ArgTypes {
+			fmt.Fprintf(output, "    %s: arg%d,\n", field.Name, idx)
 		}
 		fmt.Fprintln(output, "  }")
 		fmt.Fprintf(output, "  res := new(ResponseMessage_%s_%s)\n", ifName, method.Name)
 		fmt.Fprintf(output, "  err := cs.client.Call(\"Stub_serverSide_%s.%s\", req, res)\n", ifName, method.Name)
 		fmt.Fprintf(output, "  return ")
-		for idx, _ := range method.RetTypes {
-			fmt.Fprintf(output, "res.Ret%d, ", idx)
+		for _, field := range method.RetTypes {
+			fmt.Fprintf(output, "res.%s, ", field.Name)
 		}
 		fmt.Fprintln(output, "err")
 		fmt.Fprintln(output, "}")
