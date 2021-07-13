@@ -9,6 +9,7 @@ import (
 	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
+	"net/rpc"
 	"regexp"
 	"strings"
 	"unicode"
@@ -130,4 +131,20 @@ func (i iffAction) OnZone(log *eqspec.ZoneLog) interface{}   { return nil }
 
 func init() {
 	settings.DefaultSetting(settings.LinkObviousPets, "true")
+}
+
+type iffStub struct{}
+
+func (i iffStub) Unlink(pet string) error {
+	UnlinkPet(pet)
+	return nil
+}
+
+func (i iffStub) Link(pet string, owner string) error {
+	MakePet(pet, owner)
+	return nil
+}
+
+func HandleRPC() func(server *rpc.Server) {
+	return handleControl(iffStub{})
 }

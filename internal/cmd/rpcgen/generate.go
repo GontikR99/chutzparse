@@ -116,7 +116,7 @@ func New%sClient(client *%s.Client) %s {
     return Stub_clientSide_%s{client}
 }
 
-func Handle%s(server %s) func(*%s.Server) {
+func handle%s(server %s) func(*%s.Server) {
     ss:=Stub_serverSide_%s{server}
     return func(srv *%s.Server) {srv.Register(ss)}
 }

@@ -1,16 +1,16 @@
 // +build wasm,electron
 
-package mainrpc
+package main
 
 import "net/rpc"
 
 var installers []func(server *rpc.Server)
 
-func register(installer func(server *rpc.Server)) {
+func registerRpcHandler(installer func(server *rpc.Server)) {
 	installers = append(installers, installer)
 }
 
-func NewServer() *rpc.Server {
+func newRpcServer() *rpc.Server {
 	server := rpc.NewServer()
 	for _, installer := range installers {
 		installer(server)

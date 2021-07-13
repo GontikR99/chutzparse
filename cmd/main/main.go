@@ -4,11 +4,12 @@ package main
 
 import (
 	"context"
-	"github.com/gontikr99/chutzparse/cmd/main/mainrpc"
 	"github.com/gontikr99/chutzparse/internal"
 	"github.com/gontikr99/chutzparse/internal/eqspec"
+	"github.com/gontikr99/chutzparse/internal/iff"
 	"github.com/gontikr99/chutzparse/internal/model"
 	"github.com/gontikr99/chutzparse/internal/settings"
+	"github.com/gontikr99/chutzparse/internal/ui"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron"
 	"github.com/gontikr99/chutzparse/pkg/electron/application"
@@ -25,6 +26,11 @@ func main() {
 			panic(err)
 		}
 	}()
+
+	registerRpcHandler(eqspec.HandleRPC())
+	registerRpcHandler(iff.HandleRPC())
+	registerRpcHandler(settings.HandleRPC())
+	registerRpcHandler(ui.HandleRPC())
 
 	settings.DefaultSetting(settings.EverQuestDirectory, "C:\\Users\\Public\\Daybreak Game Company\\Installed Games\\EverQuest")
 
@@ -53,7 +59,7 @@ func main() {
 		},
 	})
 	mainWindow.OnClosed(exitApp)
-	mainWindow.ServeRPC(mainrpc.NewServer())
+	mainWindow.ServeRPC(newRpcServer())
 
 	mainWindow.Once("ready-to-show", func() {
 		mainWindow.RemoveMenu()
@@ -93,7 +99,7 @@ func main() {
 	})
 	overlayWnd.SetSkipTaskbar(true)
 	overlayWnd.OnClosed(exitApp)
-	overlayWnd.ServeRPC(mainrpc.NewServer())
+	overlayWnd.ServeRPC(newRpcServer())
 
 	overlayWnd.Once("ready-to-show", func() {
 		overlayWnd.RemoveMenu()

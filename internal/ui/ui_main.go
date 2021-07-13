@@ -1,12 +1,20 @@
 // +build wasm,electron
 
-package mainrpc
+package ui
 
 import (
 	"errors"
-	"github.com/gontikr99/chutzparse/internal/ui"
 	"github.com/gontikr99/chutzparse/pkg/electron/dialog"
+	"github.com/gontikr99/chutzparse/pkg/nodejs/clipboardy"
+	"net/rpc"
 )
+
+type clipboardServer struct {}
+
+func (c clipboardServer) Copy(text string) error {
+	clipboardy.WriteSync(text)
+	return nil
+}
 
 type dirDlgServer struct{}
 
@@ -26,6 +34,9 @@ func (d dirDlgServer) Choose(initial string) (chosenDirectory string, err error)
 	return filePaths[0], nil
 }
 
-func init() {
-	register(ui.HandleDirectoryDialog(dirDlgServer{}))
+
+func HandleRPC() func(server *rpc.Server) {
+	uiReg := handleClipboard(clipboardServer{})
+	dirDlgReg := handleDirectoryDialog(dirDlgServer{})
+	return func(server *rpc.Server) {uiReg(server); dirDlgReg(server)}
 }
