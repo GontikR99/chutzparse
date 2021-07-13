@@ -76,8 +76,8 @@ build/electron-built: bin/main.wasm bin/window.wasm bin/overlay.wasm cmd/main/ma
 electron/package.json: build/packagejsongen.exe
 	build/packagejsongen.exe > $@
 
-build/packagejsongen.exe: $(shell find cmd/packagejsongen -name \*.go) internal/version.go internal/package.json.go
-	go build -tags native -o $@ ./cmd/packagejsongen
+build/packagejsongen.exe: $(shell find internal/cmd/packagejsongen -name \*.go) internal/version.go internal/package.json.go
+	go build -tags native -o $@ ./internal/cmd/packagejsongen
 
-build/rpcgen.exe: $(shell find pkg/cmd/rpcgen -name \*.go)
-	go build -tags native -o $@ ./pkg/cmd/rpcgen
+build/rpcgen.exe: $(shell find internal/cmd/rpcgen -name \*.go)
+	go build -tags native -o $@ ./internal/cmd/rpcgen

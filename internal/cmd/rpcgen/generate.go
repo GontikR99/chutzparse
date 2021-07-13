@@ -1,3 +1,7 @@
+// +build native
+
+// Package rpcgen reads a go file containing a single interface, and generates stubs and helper functions to
+// allow golang's net/rpc package to carry the RPC
 package main
 
 import (
@@ -50,6 +54,9 @@ func (is *ImportSet) Lookup(abbrev string) string {
 	return abbrev
 }
 
+// formatType takes an ast.Expr representing a type and formats it into something that
+// can be written to a generated file.  In the process, it updates reqimports with any
+// imports from the original file that would need to be copied into the output file.
 func formatType(reqimports map[string]struct{}, expr ast.Expr) string {
 	if selExp, ok := expr.(*ast.SelectorExpr); ok {
 		pkg := selExp.X.(*ast.Ident).String()
@@ -66,6 +73,7 @@ func formatType(reqimports map[string]struct{}, expr ast.Expr) string {
 		// FIXME: handle fixed length arrays
 		return "[]"+formatType(reqimports, arrExp.Elt)
 	}
+	// FIXME: handle function types (*ast.FuncType), even though gob and net/rpc can't transport them?
 	panic(fmt.Errorf("unknown expression type at %v", expr.Pos()))
 }
 
