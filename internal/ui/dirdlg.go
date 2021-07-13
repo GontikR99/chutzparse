@@ -1,4 +1,4 @@
-package rpc
+package ui
 
 //go:generate ../../build/rpcgen dirdlg.go
 

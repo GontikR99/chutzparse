@@ -4,7 +4,6 @@ package mainrpc
 
 import (
 	"github.com/gontikr99/chutzparse/internal/iff"
-	"github.com/gontikr99/chutzparse/internal/rpc"
 )
 
 type iffStub struct{}
@@ -20,5 +19,5 @@ func (i iffStub) Link(pet string, owner string) error {
 }
 
 func init() {
-	register(rpc.HandleIffControl(iffStub{}))
+	register(iff.HandleControl(iffStub{}))
 }

@@ -3,7 +3,6 @@
 package mainrpc
 
 import (
-	"github.com/gontikr99/chutzparse/internal/rpc"
 	"github.com/gontikr99/chutzparse/internal/settings"
 )
 
@@ -22,5 +21,5 @@ func (s settingsServer) Clear(key string) error {
 }
 
 func init() {
-	register(rpc.HandleSettings(settingsServer{}))
+	register(settings.HandleSettings(settingsServer{}))
 }

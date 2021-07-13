@@ -3,8 +3,9 @@
 package settings
 
 import (
-	"github.com/gontikr99/chutzparse/internal/rpc"
+	"github.com/gontikr99/chutzparse/internal/eqspec"
 	"github.com/gontikr99/chutzparse/internal/settings"
+	"github.com/gontikr99/chutzparse/internal/ui"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc/ipcrenderer"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
@@ -19,7 +20,7 @@ type Settings struct {
 	EnableMeters bool
 }
 
-var scanctl = rpc.NewScanControlClient(ipcrenderer.Client)
+var scanctl = eqspec.NewScanControlClient(ipcrenderer.Client)
 
 func (c *Settings) Init(vCtx vugu.InitCtx) {
 	c.EqDir = &ConfiguredValue{
@@ -46,7 +47,7 @@ func (c *Settings) RunInBackground() {
 	}
 }
 
-var rpcset = rpc.NewSettingsClient(ipcrenderer.Client)
+var rpcset = settings.NewSettingsClient(ipcrenderer.Client)
 
 func (c *Settings) refreshCheckbox(env vugu.EventEnv, cbName string, cbValue *bool) {
 	value, present, err := rpcset.Lookup(cbName)
@@ -73,7 +74,7 @@ func (c *Settings) ToggleCheckbox(event vugu.DOMEvent, settingName string, setti
 	}()
 }
 
-var dirdlg = rpc.NewDirectoryDialogClient(ipcrenderer.Client)
+var dirdlg = ui.NewDirectoryDialogClient(ipcrenderer.Client)
 
 func (c *Settings) BrowseEqDir(event vugu.DOMEvent) {
 	event.PreventDefault()

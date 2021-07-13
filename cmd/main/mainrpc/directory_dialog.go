@@ -4,7 +4,7 @@ package mainrpc
 
 import (
 	"errors"
-	"github.com/gontikr99/chutzparse/internal/rpc"
+	"github.com/gontikr99/chutzparse/internal/ui"
 	"github.com/gontikr99/chutzparse/pkg/electron/dialog"
 )
 
@@ -27,5 +27,5 @@ func (d dirDlgServer) Choose(initial string) (chosenDirectory string, err error)
 }
 
 func init() {
-	register(rpc.HandleDirectoryDialog(dirDlgServer{}))
+	register(ui.HandleDirectoryDialog(dirDlgServer{}))
 }

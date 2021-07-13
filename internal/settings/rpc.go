@@ -1,6 +1,6 @@
-package rpc
+package settings
 
-//go:generate ../../build/rpcgen settings.go
+//go:generate ../../build/rpcgen rpc.go
 
 // Settings provides renderers the ability to query and change global program settings.
 type Settings interface {
@@ -8,3 +8,4 @@ type Settings interface {
 	Set(key string, value string) error
 	Clear(key string) error
 }
+

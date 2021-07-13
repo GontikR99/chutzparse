@@ -62,7 +62,7 @@ build/npm-installed: electron/package.json
 	touch $@
 
 build/internal-generated: $(shell find internal -type f) $(shell find pkg -type f) build/rpcgen.exe
-	go generate ./internal/rpc
+	go generate ./internal/...
 	go run -mod=vendor github.com/vugu/vugu/cmd/vugugen -s -r -skip-go-mod -skip-main internal
 	touch $@
 

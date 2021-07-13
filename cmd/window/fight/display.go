@@ -4,9 +4,8 @@ package fight
 
 import (
 	"fmt"
-	iff2 "github.com/gontikr99/chutzparse/internal/iff"
+	"github.com/gontikr99/chutzparse/internal/iff"
 	"github.com/gontikr99/chutzparse/internal/model/fight"
-	"github.com/gontikr99/chutzparse/internal/rpc"
 	"github.com/gontikr99/chutzparse/internal/ui"
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc/ipcrenderer"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
@@ -39,7 +38,7 @@ func (c *Display) Init(vCtx vugu.InitCtx) {
 func (c *Display) RunInBackground() {
 	newFight, newFightDone := listenForFights()
 	defer newFightDone()
-	petChange, petChangeDone := iff2.ListenPets()
+	petChange, petChangeDone := iff.ListenPets()
 	defer petChangeDone()
 	for {
 		select {
@@ -69,7 +68,7 @@ func (s sboByLabel) Less(i, j int) bool {return s[i].Text < s[j].Text}
 func (s sboByLabel) Swap(i, j int) {s[i],s[j] = s[j], s[i]}
 
 func (c *Display) PetNames() []ui.SelectBoxOption {
-	pets := iff2.GetPets()
+	pets := iff.GetPets()
 	for k, _ := range c.selectedUnlinkPet {
 		if _, present := pets[k]; !present {
 			delete(c.selectedUnlinkPet, k)
@@ -80,7 +79,7 @@ func (c *Display) PetNames() []ui.SelectBoxOption {
 	}
 
 	opts := []ui.SelectBoxOption{{"", ""}}
-	for pet, owner := range iff2.GetPets() {
+	for pet, owner := range iff.GetPets() {
 		opts=append(opts, ui.SelectBoxOption{
 			Text:  pet+" -> "+owner,
 			Value: pet,
@@ -90,7 +89,7 @@ func (c *Display) PetNames() []ui.SelectBoxOption {
 	return opts
 }
 
-var iffcontrol=rpc.NewIffControlClient(ipcrenderer.Client)
+var iffcontrol=iff.NewControlClient(ipcrenderer.Client)
 
 func (c *Display) UnlinkPet(event vugu.DOMEvent) {
 	event.PreventDefault()
@@ -132,7 +131,7 @@ func (c *Display) PotentialPetsOwners() []ui.SelectBoxOption {
 	}
 
 	opts:=[]ui.SelectBoxOption{{"", ""}}
-	pets := iff2.GetPets()
+	pets := iff.GetPets()
 	for rawOpt, _ := range rawOpts {
 		if _, present := pets[rawOpt]; !present {
 			opts = append(opts, ui.SelectBoxOption{
@@ -230,7 +229,7 @@ func (c *Display) FightNames() []ui.SelectBoxOption {
 	return opts
 }
 
-var clipboard = rpc.NewClipboardClient(ipcrenderer.Client)
+var clipboard = ui.NewClipboardClient(ipcrenderer.Client)
 func (c *Display) CopySummary(event vugu.DOMEvent) {
 	event.PreventDefault()
 	event.StopPropagation()

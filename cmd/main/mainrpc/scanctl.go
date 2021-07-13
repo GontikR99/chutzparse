@@ -5,7 +5,6 @@ package mainrpc
 import (
 	"context"
 	"github.com/gontikr99/chutzparse/internal/eqspec"
-	"github.com/gontikr99/chutzparse/internal/rpc"
 )
 
 type scanCtlServer struct {}
@@ -16,5 +15,5 @@ func (s scanCtlServer) Restart() error {
 }
 
 func init() {
-	register(rpc.HandleScanControl(scanCtlServer{}))
+	register(eqspec.HandleScanControl(scanCtlServer{}))
 }

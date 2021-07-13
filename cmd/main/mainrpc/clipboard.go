@@ -3,7 +3,7 @@
 package mainrpc
 
 import (
-	"github.com/gontikr99/chutzparse/internal/rpc"
+	"github.com/gontikr99/chutzparse/internal/ui"
 	"github.com/gontikr99/chutzparse/pkg/nodejs/clipboardy"
 )
 
@@ -15,5 +15,5 @@ func (c clipboardServer) Copy(text string) error {
 }
 
 func init() {
-	register(rpc.HandleClipboard(clipboardServer{}))
+	register(ui.HandleClipboard(clipboardServer{}))
 }
