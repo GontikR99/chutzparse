@@ -228,13 +228,14 @@ func (c *Display) FightNames() []ui.SelectBoxOption {
 	return opts
 }
 
+var clipboard = rpc.NewClipboardClient(ipcrenderer.Client)
 func (c *Display) CopySummary(event vugu.DOMEvent) {
 	event.PreventDefault()
 	event.StopPropagation()
 	if report, ok := c.reportSet[c.currentTab]; ok {
 		text := report.Summarize()
 		go func() {
-			rpc.CopyClipboard(ipcrenderer.Client, text)
+			clipboard.Copy(text)
 		}()
 	}
 }

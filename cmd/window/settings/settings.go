@@ -19,10 +19,12 @@ type Settings struct {
 	EnableMeters bool
 }
 
+var scanctl = rpc.NewScanControlClient(ipcrenderer.Client)
+
 func (c *Settings) Init(vCtx vugu.InitCtx) {
 	c.EqDir = &ConfiguredValue{
 		Key:      settings.EverQuestDirectory,
-		Callback: func(s string) { rpc.RestartScan(ipcrenderer.Client) },
+		Callback: func(s string) { scanctl.Restart() },
 	}
 
 	c.EqDir.Init(vCtx)
@@ -44,9 +46,10 @@ func (c *Settings) RunInBackground() {
 	}
 }
 
+var rpcset = rpc.NewSettingsClient(ipcrenderer.Client)
 
 func (c *Settings) refreshCheckbox(env vugu.EventEnv, cbName string, cbValue *bool) {
-	value, present, err := rpc.LookupSetting(ipcrenderer.Client, cbName)
+	value, present, err := rpcset.Lookup(cbName)
 	if present && err == nil {
 		env.Lock()
 		if value=="true" {
@@ -62,18 +65,20 @@ func (c *Settings) ToggleCheckbox(event vugu.DOMEvent, settingName string, setti
 	*settingValue=event.JSEventTarget().Get("checked").Truthy()
 	go func() {
 		if *settingValue {
-			rpc.SetSetting(ipcrenderer.Client, settingName, "true")
+			rpcset.Set(settingName, "true")
 		} else {
-			rpc.SetSetting(ipcrenderer.Client, settingName, "false")
+			rpcset.Set(settingName, "false")
 		}
 		c.refreshCheckbox(event.EventEnv(), settingName, settingValue)
 	}()
 }
 
+var dirdlg = rpc.NewDirectoryDialogClient(ipcrenderer.Client)
+
 func (c *Settings) BrowseEqDir(event vugu.DOMEvent) {
 	event.PreventDefault()
 	go func() {
-		newDir, err := rpc.DirectoryDialog(ipcrenderer.Client, c.EqDir.Value)
+		newDir, err := dirdlg.Choose(c.EqDir.Value)
 		if err != nil {
 			console.Log(err.Error())
 			return
@@ -92,7 +97,7 @@ type ConfiguredValue struct {
 
 func (cv *ConfiguredValue) Init(ctx vugu.InitCtx) {
 	go func() {
-		value, present, err := rpc.LookupSetting(ipcrenderer.Client, cv.Key)
+		value, present, err := rpcset.Lookup(cv.Key)
 		if err == nil && present {
 			ctx.EventEnv().Lock()
 			cv.Value = value
@@ -108,7 +113,7 @@ func (cv *ConfiguredValue) StringValue() string {
 func (cv *ConfiguredValue) SetStringValue(s string) {
 	cv.Value = s
 	go func() {
-		rpc.SetSetting(ipcrenderer.Client, cv.Key, s)
+		rpcset.Set(cv.Key, s)
 		if cv.Callback != nil {
 			cv.Callback(s)
 		}

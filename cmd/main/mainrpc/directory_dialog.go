@@ -8,20 +8,24 @@ import (
 	"github.com/gontikr99/chutzparse/pkg/electron/dialog"
 )
 
-func init() {
-	register(rpc.HandleDirectoryDialog(func(initial string) (string, error) {
-		filePaths, err := dialog.ShowOpenDialog(&dialog.OpenOptions{
-			Title:       "Select a directory",
-			DefaultPath: initial,
-			Properties:  &[]string{dialog.OpenDirectory, dialog.DontAddToRecent},
-		})
+type dirDlgServer struct{}
 
-		if err != nil {
-			return "", err
-		}
-		if len(filePaths) != 1 {
-			return "", errors.New("Expected single path")
-		}
-		return filePaths[0], nil
-	}))
+func (d dirDlgServer) Choose(initial string) (chosenDirectory string, err error) {
+	filePaths, err := dialog.ShowOpenDialog(&dialog.OpenOptions{
+		Title:       "Select a directory",
+		DefaultPath: initial,
+		Properties:  &[]string{dialog.OpenDirectory, dialog.DontAddToRecent},
+	})
+
+	if err != nil {
+		return "", err
+	}
+	if len(filePaths) != 1 {
+		return "", errors.New("expected single path")
+	}
+	return filePaths[0], nil
+}
+
+func init() {
+	register(rpc.HandleDirectoryDialog(dirDlgServer{}))
 }

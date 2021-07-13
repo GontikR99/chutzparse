@@ -22,5 +22,5 @@ func (s settingsServer) Clear(key string) error {
 }
 
 func init() {
-	register(rpc.HandleSetting(settingsServer{}))
+	register(rpc.HandleSettings(settingsServer{}))
 }

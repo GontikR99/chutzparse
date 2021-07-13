@@ -4,12 +4,14 @@ package main
 
 import (
 	"github.com/gontikr99/chutzparse/cmd/window/fight"
-	"github.com/gontikr99/chutzparse/cmd/window/welcome"
 	"github.com/gontikr99/chutzparse/cmd/window/settings"
-	"github.com/gontikr99/chutzparse/internal/place"
+	"github.com/gontikr99/chutzparse/cmd/window/welcome"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
+	"log"
+	"net/url"
 	"strings"
+	"syscall/js"
 	"time"
 )
 
@@ -27,7 +29,7 @@ type routeEntry struct {
 }
 
 func (r routeEntry) ClassText() string {
-	if place.GetPlace() == r.Place {
+	if GetPlace() == r.Place {
 		return "nav-link active"
 	} else {
 		return "nav-link"
@@ -49,10 +51,10 @@ func (c *Root) Init(vCtx vugu.InitCtx) {
 }
 
 func (c *Root) RunInBackground() {
-	lastPlace := place.GetPlace()
+	lastPlace := GetPlace()
 	for {
 		<-time.After(10 * time.Millisecond)
-		curPlace := place.GetPlace()
+		curPlace := GetPlace()
 		if lastPlace != curPlace {
 			c.Env().Lock()
 			lastPlace = curPlace
@@ -62,7 +64,7 @@ func (c *Root) RunInBackground() {
 }
 
 func (c *Root) Compute(ctx vugu.ComputeCtx) {
-	fullPlace := place.GetPlace()
+	fullPlace := GetPlace()
 	curPlace := strings.Split(fullPlace, ":")[0]
 	if curPlace == c.LastPlace {
 		return
@@ -74,5 +76,25 @@ func (c *Root) Compute(ctx vugu.ComputeCtx) {
 			return
 		}
 	}
-	place.NavigateTo(ctx.EventEnv(), "")
+	NavigateTo(ctx.EventEnv(), "")
+}
+
+var window=js.Global().Get("window")
+
+func GetPlace() string {
+	href := window.Get("location").Get("href").String()
+	parsed, err := url.Parse(href)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	return parsed.Fragment
+}
+
+func NavigateTo(env vugu.EventEnv, place string) {
+	go func() {
+		env.Lock()
+		window.Get("history").Call("pushState", nil, "", "#"+place)
+		env.UnlockRender()
+	}()
 }

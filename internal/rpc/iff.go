@@ -2,13 +2,13 @@ package rpc
 
 import "net/rpc"
 
-type IffServer interface {
+type IffRequests interface {
 	Unlink(pet string) error
 	Link(pet string, owner string) error
 }
 
 type StubIff struct {
-	is IffServer
+	is IffRequests
 }
 
 func (ic *StubIff) Unlink(req *UnlinkPetRequest, res *UnlinkPetResponse) error {
@@ -43,7 +43,7 @@ type LinkPetRequest struct {
 }
 type LinkPetResponse struct {}
 
-func HandleIff(iff IffServer) func(server *rpc.Server) {
+func HandleIff(iff IffRequests) func(server *rpc.Server) {
 	ic := &StubIff{iff}
 	return func(server *rpc.Server) {
 		server.Register(ic)

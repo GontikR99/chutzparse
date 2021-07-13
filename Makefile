@@ -20,11 +20,11 @@ start: build/electron-built build/npm-installed
 
 # Clean up
 clean:
-	rm -rf bin/* build/electron-built build/internal-generated electron/src/* electron/out $(shell find . -name 0_components_vgen.go)
+	rm -rf bin/* build/electron-built build/internal-generated electron/src/* electron/out $(shell find . -name 0_components_vgen.go) $(shell find . -name \*_genrpc.go)
 
 # Clean up everything, including electron/node modules
 fullclean: clean
-	rm -rf electron/node_modules/* build/npm-installed electron/package-lock.json electron/package.json build/packagejsongen.exe
+	rm -rf electron/node_modules/* build/npm-installed electron/package-lock.json electron/package.json build/packagejsongen.exe build/rpcgen.exe
 
 test:
 	go test $$(dirname $$(find . -name \*_test.go))
@@ -61,7 +61,8 @@ build/npm-installed: electron/package.json
 	curl -L https://github.com/electron/windows-installer/raw/b2380345e8fe1ad7716108b10b552d75e6fad0b7/vendor/7z-ia32.exe -o electron/node_modules/electron-winstaller/vendor/7z.exe
 	touch $@
 
-build/internal-generated: $(shell find internal -type f)
+build/internal-generated: $(shell find internal -type f) $(shell find pkg -type f) build/rpcgen.exe
+	go generate ./internal/rpc
 	go run -mod=vendor github.com/vugu/vugu/cmd/vugugen -s -r -skip-go-mod -skip-main internal
 	touch $@
 
@@ -77,3 +78,6 @@ electron/package.json: build/packagejsongen.exe
 
 build/packagejsongen.exe: $(shell find cmd/packagejsongen -name \*.go) internal/version.go internal/package.json.go
 	go build -tags native -o $@ ./cmd/packagejsongen
+
+build/rpcgen.exe: $(shell find pkg/cmd/rpcgen -name \*.go)
+	go build -tags native -o $@ ./pkg/cmd/rpcgen
