@@ -10,7 +10,7 @@ type Multipattern struct {
 	rexText       *strings.Builder
 	rex           *regexp.Regexp
 	offsets       []int
-	callbacks     []func([]string) interface{}
+	callbacks     []func(parts []string, context interface{}) interface{}
 	substitutions map[string]string
 }
 
@@ -38,7 +38,7 @@ func (mp *Multipattern) Define(name string, subexpr string) *Multipattern {
 	return mp
 }
 
-func (mp *Multipattern) On(pattern string, callback func([]string) interface{}) *Multipattern {
+func (mp *Multipattern) On(pattern string, callback func(parts []string, context interface{}) interface{}) *Multipattern {
 	mp.rex = nil
 
 	for needle, value := range mp.substitutions {
@@ -60,7 +60,7 @@ func (mp *Multipattern) On(pattern string, callback func([]string) interface{}) 
 	return mp
 }
 
-func (mp *Multipattern) Dispatch(needle string) interface{} {
+func (mp *Multipattern) Dispatch(needle string, context interface{}) interface{} {
 	if mp.rex == nil {
 		mp.rex = regexp.MustCompile(mp.rexText.String() + ")$")
 	}
@@ -70,7 +70,7 @@ func (mp *Multipattern) Dispatch(needle string) interface{} {
 			if submatch[mp.offsets[i]] != "" {
 				parts := []string{submatch[mp.offsets[i]][1:]}
 				parts = append(parts, submatch[1+mp.offsets[i]:mp.offsets[i+1]]...)
-				return mp.callbacks[i](parts)
+				return mp.callbacks[i](parts, context)
 			}
 		}
 	}

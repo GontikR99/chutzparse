@@ -23,6 +23,7 @@ func findWindow() (uint32, error) {
 	}
 }
 
+// IsTopWindow returns true if EverQuest has the focus
 func IsTopWindow() bool {
 	hwnd, err := findWindow()
 	if err != nil {
@@ -32,6 +33,7 @@ func IsTopWindow() bool {
 	return hwnd == topHwnd
 }
 
+// GetWindowExtents returns where on screen the EverQuest window is
 func GetWindowExtents() (*electron.Rectangle, error) {
 	hwnd, err := findWindow()
 	if err != nil {

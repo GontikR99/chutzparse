@@ -128,20 +128,20 @@ func tailLog(ctx context.Context, filename string, character string, server stri
 			line = strings.ReplaceAll(line, "\n", "")
 			if parts := loglineMatch.FindStringSubmatch(line); parts != nil {
 				parsedTime, _ := time.Parse(time.ANSIC, parts[1])
-				interpRaw := logterpreter.Dispatch(parts[2])
-				var interp ParsedLog
-				var ok bool
-				if interp, ok = interpRaw.(ParsedLog); interp != nil && ok {
-					interp = interp.Visit(substituteYouHandler{charName: character}).(ParsedLog)
-				}
 				entry := &LogEntry{
 					Id:        logIdGen,
 					Character: character,
 					Server:    server,
 					Timestamp: parsedTime,
 					Message:   parts[2],
-					Meaning:   interp,
 				}
+				interpRaw := logterpreter.Dispatch(parts[2], entry)
+				var interp ParsedLog
+				var ok bool
+				if interp, ok = interpRaw.(ParsedLog); interp != nil && ok {
+					interp = interp.Visit(substituteYouHandler{charName: character}).(ParsedLog)
+				}
+				entry.Meaning = interp
 				logIdGen++
 				entries = append(entries, entry)
 			}

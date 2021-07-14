@@ -31,7 +31,7 @@ const (
 
 func handleChat(mp *multipattern.Multipattern) *multipattern.Multipattern {
 	return commonSubpatterns(mp).
-		On("(.+) says, '(.*)'", func(parts []string) interface{} {
+		On("(.+) says, '(.*)'", func(parts []string, _ interface{}) interface{} {
 			return &ChatLog{
 				Source:  normalizeName(parts[1]),
 				Text:    parts[2],

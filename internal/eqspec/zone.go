@@ -12,7 +12,7 @@ func (z *ZoneLog) Visit(handler ParsedLogHandler) interface{} { return handler.O
 
 func handleZone(mp *multipattern.Multipattern) *multipattern.Multipattern {
 	return commonSubpatterns(mp).
-		On("You have entered (.+)[.]", func(parts []string) interface{} {
+		On("You have entered (.+)[.]", func(parts []string, _ interface{}) interface{} {
 			return &ZoneLog{
 				ZoneFull: parts[1],
 			}

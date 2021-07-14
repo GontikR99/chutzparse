@@ -1,7 +1,7 @@
 package damage
 
 import (
-	iff2 "github.com/gontikr99/chutzparse/internal/iff"
+	"github.com/gontikr99/chutzparse/internal/iff"
 	"sort"
 )
 
@@ -10,6 +10,9 @@ func (r *Report) Aggregate() *aggregateReport {
 	agRep := newAggregateReport(r.Target)
 	for source, contrib := range r.Contributions {
 		agContrib := agRep.ContributionOf(source)
+		if agContrib.AttributedSource == source {
+			agContrib.Flags = contrib.Flags()
+		}
 		agContrib.TotalDamage += contrib.TotalDamage
 		agRep.TotalDamage += contrib.TotalDamage
 		agContrib.RawContributions = append(agContrib.RawContributions, contrib)
@@ -18,6 +21,11 @@ func (r *Report) Aggregate() *aggregateReport {
 			agCat.TotalDamage += cat.TotalDamage
 			agCat.Success += cat.Success
 			agCat.Failure += cat.Failure
+		}
+	}
+	for source, agContrib := range agRep.Contributions {
+		if agContrib.TotalDamage == 0 {
+			delete(agRep.Contributions, source)
 		}
 	}
 	for _, agContrib := range agRep.Contributions {
@@ -38,7 +46,7 @@ func newAggregateReport(target string) *aggregateReport {
 
 func (ar *aggregateReport) ContributionOf(source string) *aggregateContributor {
 	attributedSource := source
-	if owner := iff2.GetOwner(source); owner != "" {
+	if owner := iff.GetOwner(source); owner != "" {
 		attributedSource = owner
 	}
 	update, ok := ar.Contributions[attributedSource]
@@ -66,6 +74,7 @@ type aggregateContributor struct {
 	TotalDamage      int64
 	Categorized      map[string]*Category
 	RawContributions []*Contribution
+	Flags            string
 }
 
 func newAggregateContributor(attributedSource string, source string) *aggregateContributor {
@@ -79,18 +88,22 @@ func newAggregateContributor(attributedSource string, source string) *aggregateC
 // DisplayName returns the name we should display for this contributor.  Usually that's
 // the character's name, but if only one of the character's pet has been detected, show the pet instead.
 func (ac *aggregateContributor) DisplayName() string {
+	flagText := ""
+	if ac.Flags != "" {
+		flagText = " {" + ac.Flags + "}"
+	}
 	if len(ac.Sources) == 1 {
 		for name := range ac.Sources {
-			return name
+			return name + flagText
 		}
 	} else {
-		return ac.AttributedSource + " + pets"
+		return ac.AttributedSource + flagText + " + pets"
 	}
 	return ac.AttributedSource
 }
 
 func (ac *aggregateContributor) CategoryOf(source string, displayName string) *Category {
-	if owner := iff2.GetOwner(source); owner != "" {
+	if owner := iff.GetOwner(source); owner != "" {
 		displayName = displayName + " (" + source + ")"
 	}
 	update, ok := ac.Categorized[displayName]
