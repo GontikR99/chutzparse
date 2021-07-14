@@ -151,19 +151,26 @@ func maintainThroughput() {
 					if !fight.Reports.Interesting() {
 						continue
 					}
-					var top []presenter.ThroughputBar
-					var bottom []presenter.ThroughputBar
-					if dmgRep, present := fight.Reports["Damage"]; present {
-						bottom = dmgRep.Throughput(fight)
+					var topMeter []presenter.ThroughputBar
+					var bottomMeter []presenter.ThroughputBar
+					topName, ok, err := settings.LookupSetting(settings.TopMeterReport)
+					if err==nil && ok {
+						if dmgRep, present := fight.Reports[topName]; present {
+							topMeter = dmgRep.Throughput(fight)
+						}
 					}
-					if dmgRep, present := fight.Reports["Healing"]; present {
-						top = dmgRep.Throughput(fight)
+
+					bottomName, ok, err := settings.LookupSetting(settings.BottomMeterReport)
+					if err==nil && ok {
+						if dmgRep, present := fight.Reports[bottomName]; present {
+							bottomMeter = dmgRep.Throughput(fight)
+						}
 					}
-					if top != nil || bottom != nil {
+					if topMeter != nil || bottomMeter != nil {
 						states = append(states, presenter.ThroughputState{
 							FightId:    fight.Id,
-							TopBars:    top,
-							BottomBars: bottom,
+							TopBars:    topMeter,
+							BottomBars: bottomMeter,
 						})
 					}
 				}
@@ -176,4 +183,6 @@ func maintainThroughput() {
 
 func init() {
 	settings.DefaultSetting(settings.ShowMeters, "true")
+	settings.DefaultSetting(settings.TopMeterReport, "Healing")
+	settings.DefaultSetting(settings.BottomMeterReport, "Damage")
 }

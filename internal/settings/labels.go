@@ -6,5 +6,7 @@ const EverQuestDirectory = "EverQuestDirectory"
 const LinkObviousPets = "LinkObviousPets"
 const ShowFlyingHits = "ShowFlyingText"
 const ShowMeters = "ShowMeters"
+const TopMeterReport = "TopMeterSource"
+const BottomMeterReport = "BottomMeterReport"
 
 const ChannelChange = "ChannelSettingsChange"

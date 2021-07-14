@@ -36,6 +36,30 @@
                     <input type="checkbox" class="form-control" .checked="c.EnableMeters" @change="c.ToggleCheckbox(event, settings.ShowMeters, &c.EnableMeters)" />
                 </div>
             </div>
+            <div class="form-group row" vg-if="c.EnableMeters">
+                <div class="col-4">
+                    <ui:SelectBox class="form-control bg-dark text-light" style="width:100%;"
+                                  :Options="c.damageMeterOptions()"
+                                  :Selected="c.selMap(0)"
+                                  :Change="c.selHndl(0)"
+                    ></ui:SelectBox>
+                </div>
+                <div class="col-8">
+                    Top meter
+                </div>
+            </div>
+            <div class="form-group row" vg-if="c.EnableMeters">
+                <div class="col-4">
+                    <ui:SelectBox class="form-control bg-dark text-light" style="width:100%;"
+                                  :Options="c.damageMeterOptions()"
+                                  :Selected="c.selMap(1)"
+                                  :Change="c.selHndl(1)"
+                    ></ui:SelectBox>
+                </div>
+                <div class="col-8">
+                    Bottom meter
+                </div>
+            </div>
         </div>
     </form>
 </div>
@@ -43,5 +67,6 @@
 import (
     "github.com/vugu/vugu/vgform"
     "github.com/gontikr99/chutzparse/internal/settings"
+    "github.com/gontikr99/chutzparse/internal/ui"
 )
 </script>
