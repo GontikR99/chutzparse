@@ -38,10 +38,11 @@ func main() {
 	mainCode := &bytes.Buffer{}
 	gc := &GenerationContext{}
 
+	netrpc := gc.ImportName("net/rpc")
 	for ifName, methods := range compFile.interfaces {
 		// Write stub declarations
 		fmt.Fprintf(mainCode, "type Stub_serverSide_%s struct {impl %s}\n", ifName, ifName)
-		fmt.Fprintf(mainCode, "type Stub_clientSide_%s struct {client *%s.Client}\n", ifName, gc.ImportName("net/rpc"))
+		fmt.Fprintf(mainCode, "type Stub_clientSide_%s struct {client *%s.Client}\n", ifName, netrpc)
 
 		// Create stub implementations
 		for methodName, method := range methods {
@@ -120,8 +121,8 @@ func handle%s(server %s) func(*%s.Server) {
     ss:=Stub_serverSide_%s{server}
     return func(srv *%s.Server) {srv.Register(ss)}
 }
-`, ifName, gc.ImportName("net/rpc"), ifName, ifName,
-			ifName, ifName, gc.ImportName("net/rpc"), ifName, gc.ImportName("net/rpc"))
+`, ifName, netrpc, ifName, ifName,
+			ifName, ifName, netrpc, ifName, netrpc)
 	}
 
 	fullBuf := &bytes.Buffer{}
