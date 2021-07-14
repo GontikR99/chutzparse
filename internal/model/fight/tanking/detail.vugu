@@ -5,7 +5,7 @@
         <th scope="col" style="width:2em;">#</th>
         <th scope="col">Name</th>
         <th scope="col">%</th>
-        <th scope="col">Dmage</th>
+        <th scope="col">Damage</th>
         </thead>
 
         <tbody>
