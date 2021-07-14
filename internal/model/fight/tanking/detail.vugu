@@ -11,7 +11,7 @@
         <tbody>
         <tr vg-for="_, dr := range c.rows()">
             <td style="width: 2em;" vg-content="dr.Rank"></td>
-            <td vg-content="dr.Target"></td>
+            <th scope="row" vg-content="dr.Target"></th>
             <td vg-content="dr.Percent"></td>
             <td vg-content="dr.Total"></td>
         </tr>
