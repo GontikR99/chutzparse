@@ -14,10 +14,10 @@ import (
 
 type Settings struct {
 	vuguutil.BackgroundComponent
-	EqDir *ConfiguredValue
-	LinkObviousPets bool
+	EqDir            *ConfiguredValue
+	LinkObviousPets  bool
 	EnableFlyingText bool
-	EnableMeters bool
+	EnableMeters     bool
 }
 
 var scanctl = eqspec.NewScanControlClient(ipcrenderer.Client)
@@ -53,17 +53,17 @@ func (c *Settings) refreshCheckbox(env vugu.EventEnv, cbName string, cbValue *bo
 	value, present, err := rpcset.Lookup(cbName)
 	if present && err == nil {
 		env.Lock()
-		if value=="true" {
-			*cbValue=true
+		if value == "true" {
+			*cbValue = true
 		} else {
-			*cbValue=false
+			*cbValue = false
 		}
 		env.UnlockRender()
 	}
 }
 
 func (c *Settings) ToggleCheckbox(event vugu.DOMEvent, settingName string, settingValue *bool) {
-	*settingValue=event.JSEventTarget().Get("checked").Truthy()
+	*settingValue = event.JSEventTarget().Get("checked").Truthy()
 	go func() {
 		if *settingValue {
 			rpcset.Set(settingName, "true")

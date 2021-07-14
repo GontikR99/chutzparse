@@ -34,8 +34,8 @@ func FormatFixed(amount float64) string {
 		return intRep + ". "
 	} else if amount < 999500 {
 		return FormatFixed(amount / 1000.0)[:4] + "k"
-	} else if amount < 999500000.0{
-		return FormatFixed(amount / 1000000.0 )[:4] + "M"
+	} else if amount < 999500000.0 {
+		return FormatFixed(amount / 1000000.0)[:4] + "M"
 	} else {
 		return "+INF "
 	}

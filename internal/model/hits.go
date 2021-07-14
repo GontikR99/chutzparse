@@ -4,7 +4,7 @@ package model
 
 import (
 	"github.com/gontikr99/chutzparse/internal/eqspec"
-	iff2 "github.com/gontikr99/chutzparse/internal/iff"
+	"github.com/gontikr99/chutzparse/internal/iff"
 	"github.com/gontikr99/chutzparse/internal/model/parsedefs"
 	"github.com/gontikr99/chutzparse/internal/presenter"
 	"github.com/gontikr99/chutzparse/internal/settings"
@@ -17,7 +17,7 @@ func init() {
 func listenForHits() {
 	eqspec.RegisterLogsListener(func(entries []*eqspec.LogEntry) {
 		st, present, err := settings.LookupSetting(settings.ShowFlyingHits)
-		if err==nil && present && st=="true" {
+		if err == nil && present && st == "true" {
 			for _, entry := range entries {
 				if dmgEntry, ok := entry.Meaning.(*eqspec.DamageLog); ok {
 					if dmgEntry.Source == entry.Character && dmgEntry.Target == entry.Character {
@@ -61,7 +61,7 @@ func listenForHits() {
 							Color: "red",
 							Big:   dmgEntry.Flag&eqspec.CriticalFlag != 0,
 						})
-					} else if iff2.GetOwner(dmgEntry.Source) == entry.Character {
+					} else if iff.GetOwner(dmgEntry.Source) == entry.Character {
 						// pet doing damage
 						if dmgEntry.SpellName != "" {
 							presenter.BroadcastHitEvent(presenter.ChannelHitTop, &presenter.HitEvent{
@@ -82,7 +82,7 @@ func listenForHits() {
 								Big:   dmgEntry.Flag&eqspec.CriticalFlag != 0,
 							})
 						}
-					} else if iff2.GetOwner(dmgEntry.Target) == entry.Character {
+					} else if iff.GetOwner(dmgEntry.Target) == entry.Character {
 						// incoming damage
 						presenter.BroadcastHitEvent(presenter.ChannelHitBottom, &presenter.HitEvent{
 							Text:  parsedefs.FormatAmount(float64(dmgEntry.Amount)),

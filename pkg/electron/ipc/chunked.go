@@ -8,11 +8,11 @@ import (
 )
 
 type msgChunk struct {
-	Channel string
-	MsgId int32
-	ThisChunk int32
+	Channel    string
+	MsgId      int32
+	ThisChunk  int32
 	ChunkCount int32
-	Content []byte
+	Content    []byte
 }
 
 func (m msgChunk) serialize() []byte {
@@ -33,13 +33,14 @@ func deserializeMsgChunk(data []byte) msgChunk {
 	result.MsgId = int32(binary.BigEndian.Uint32(data[2:6]))
 	result.ThisChunk = int32(binary.BigEndian.Uint32(data[6:10]))
 	result.ChunkCount = int32(binary.BigEndian.Uint32(data[10:14]))
-	result.Channel = string(data[14:14+chanLen])
+	result.Channel = string(data[14 : 14+chanLen])
 	result.Content = data[14+chanLen:]
 	return result
 }
 
-const channelChunk ="channelChunk"
-const chunkSize=4096
+const channelChunk = "channelChunk"
+const chunkSize = 4096
+
 var msgIdGen = int32(0)
 
 // SendChunked sends a message to a specific sender in a chunked format.  This allows the sending of enormous
@@ -48,20 +49,20 @@ var msgIdGen = int32(0)
 func SendChunked(sender Sender, channel string, msg []byte) {
 	msgId := msgIdGen
 	msgIdGen++
-	chunkCount:=(len(msg)+ chunkSize -1)/ chunkSize
-	if chunkCount==0 {
-		chunkCount=1
+	chunkCount := (len(msg) + chunkSize - 1) / chunkSize
+	if chunkCount == 0 {
+		chunkCount = 1
 	}
 	var msgs [][]byte
-	for i:=0;i<chunkCount;i++ {
-		start := i* chunkSize
-		end := (i+1)* chunkSize
-		if end>len(msg) {
+	for i := 0; i < chunkCount; i++ {
+		start := i * chunkSize
+		end := (i + 1) * chunkSize
+		if end > len(msg) {
 			end = len(msg)
 		}
 		chunk := msgChunk{
 			Channel:    channel,
-			MsgId: msgId,
+			MsgId:      msgId,
 			ChunkCount: int32(chunkCount),
 			ThisChunk:  int32(i),
 			Content:    msg[start:end],
@@ -77,7 +78,7 @@ func SendChunked(sender Sender, channel string, msg []byte) {
 // chunked messages
 func GetChunkedEndpoint(targetEndpoint Endpoint) Endpoint {
 	if _, ok := endpointsWithChunkedListeners[targetEndpoint]; !ok {
-		endpointsWithChunkedListeners[targetEndpoint]= newChunkedEndpoint(targetEndpoint)
+		endpointsWithChunkedListeners[targetEndpoint] = newChunkedEndpoint(targetEndpoint)
 	}
 	return endpointsWithChunkedListeners[targetEndpoint]
 }
@@ -98,15 +99,15 @@ func newChunkedEndpoint(endpoint Endpoint) *chunkedEndpoint {
 	go func() {
 		for {
 			chunkRawMsg := <-inChunks
-			chunkMsg:= deserializeMsgChunk(chunkRawMsg.Content())
+			chunkMsg := deserializeMsgChunk(chunkRawMsg.Content())
 			msgPartials := cl.getPartial(chunkMsg.MsgId)
 			msgPartials[chunkMsg.ThisChunk] = chunkMsg.Content
-			if len(msgPartials)!=int(chunkMsg.ChunkCount) {
+			if len(msgPartials) != int(chunkMsg.ChunkCount) {
 				continue
 			}
 			delete(cl.partials, chunkMsg.MsgId)
 			var fullMsgBytes []byte
-			for i:=int32(0);i<chunkMsg.ChunkCount;i++ {
+			for i := int32(0); i < chunkMsg.ChunkCount; i++ {
 				fullMsgBytes = append(fullMsgBytes, msgPartials[i]...)
 			}
 			outMsg := &chunkedMessage{
@@ -116,7 +117,7 @@ func newChunkedEndpoint(endpoint Endpoint) *chunkedEndpoint {
 			if listeners, ok := cl.outChans[chunkMsg.Channel]; ok {
 				for _, outChan := range listeners {
 					func() {
-						defer func(){recover()}()
+						defer func() { recover() }()
 						outChan <- outMsg
 					}()
 				}
@@ -130,16 +131,16 @@ func (ce *chunkedEndpoint) Send(channelName string, data []byte) {
 	SendChunked(ce.endpoint, channelName, data)
 }
 
-var listenerHandleGen=0
+var listenerHandleGen = 0
 
 func (ce *chunkedEndpoint) Listen(channelName string) (recv <-chan Message, done func()) {
 	msgChan := make(chan Message)
 	if _, ok := ce.outChans[channelName]; !ok {
-		ce.outChans[channelName]= map[int]chan<- Message{}
+		ce.outChans[channelName] = map[int]chan<- Message{}
 	}
 	listenerId := listenerHandleGen
 	listenerHandleGen++
-	ce.outChans[channelName][listenerId]=msgChan
+	ce.outChans[channelName][listenerId] = msgChan
 	doneFunc := func() {
 		delete(ce.outChans[channelName], listenerId)
 	}
@@ -150,21 +151,21 @@ func (ce *chunkedEndpoint) getPartial(msgId int32) map[int32][]byte {
 	update, ok := ce.partials[msgId]
 	if !ok {
 		update = map[int32][]byte{}
-		ce.partials[msgId]=update
+		ce.partials[msgId] = update
 	}
 	return update
 }
 
 type chunkedMessage struct {
-	source *chunkedEndpoint
+	source  *chunkedEndpoint
 	content []byte
 }
 
-func (c chunkedMessage) Content() []byte {return c.content}
-func (c chunkedMessage) Sender() string  {return "chunked"}
+func (c chunkedMessage) Content() []byte { return c.content }
+func (c chunkedMessage) Sender() string  { return "chunked" }
 func (c chunkedMessage) Reply(channelName string, data []byte) {
 }
 
-func (c chunkedMessage) JSValue() js.Value {return js.Undefined()}
+func (c chunkedMessage) JSValue() js.Value { return js.Undefined() }
 
-var endpointsWithChunkedListeners=map[Endpoint]*chunkedEndpoint{}
+var endpointsWithChunkedListeners = map[Endpoint]*chunkedEndpoint{}

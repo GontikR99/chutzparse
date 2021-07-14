@@ -23,7 +23,7 @@ type Import struct {
 // ImportName returns the shorthand name we'll use in the generated file to refer to a specific import path
 func (gc *GenerationContext) ImportName(impPath string) string {
 	for _, imRec := range gc.NeededImports {
-		if imRec.Path== impPath {
+		if imRec.Path == impPath {
 			return imRec.Name
 		}
 	}
@@ -31,8 +31,8 @@ func (gc *GenerationContext) ImportName(impPath string) string {
 	idx := 1
 	for {
 		storeName := base
-		if idx!=1 {
-			storeName=fmt.Sprintf("%s%d", base, idx)
+		if idx != 1 {
+			storeName = fmt.Sprintf("%s%d", base, idx)
 		}
 		free := true
 		for _, imRec := range gc.NeededImports {
@@ -53,17 +53,19 @@ func (gc *GenerationContext) ImportName(impPath string) string {
 
 func (gc *GenerationContext) WriteImports(out io.Writer) error {
 	_, err := fmt.Fprintln(out, "import (")
-	if err!=nil {return err}
+	if err != nil {
+		return err
+	}
 
 	for _, entry := range gc.NeededImports {
 		if path.Base(entry.Path) == entry.Name {
-			_, err = fmt.Fprintf(out,"    \"%s\"\n", entry.Path)
-			if err!=nil {
+			_, err = fmt.Fprintf(out, "    \"%s\"\n", entry.Path)
+			if err != nil {
 				return err
 			}
 		} else {
 			_, err = fmt.Fprintf(out, "    %s \"%s\"\n", entry.Name, entry.Path)
-			if err!=nil {
+			if err != nil {
 				return err
 			}
 		}
@@ -73,39 +75,41 @@ func (gc *GenerationContext) WriteImports(out io.Writer) error {
 }
 
 type ComprehendedSource struct {
-	fileSet *token.FileSet
+	fileSet    *token.FileSet
 	parsedFile *ast.File
-	importMap map[string]string
+	importMap  map[string]string
 	interfaces map[string]Interface
 }
 
 func ReadGoSource(fileName string) (*ComprehendedSource, error) {
 	result := &ComprehendedSource{
-		fileSet: token.NewFileSet(),
-		importMap: map[string]string{},
+		fileSet:    token.NewFileSet(),
+		importMap:  map[string]string{},
 		interfaces: map[string]Interface{},
 	}
 	var err error
 	result.parsedFile, err = parser.ParseFile(result.fileSet, fileName, nil, 0)
-	if err!=nil {
+	if err != nil {
 		return nil, err
 	}
 
 	// parse imports
 	for _, ispec := range result.parsedFile.Imports {
-		imPath := ispec.Path.Value[1:len(ispec.Path.Value)-1]
+		imPath := ispec.Path.Value[1 : len(ispec.Path.Value)-1]
 		imName := path.Base(imPath)
-		if ispec.Name==nil {
+		if ispec.Name == nil {
 			imName = ispec.Name.String()
 		}
-		result.importMap[imName]=imPath
+		result.importMap[imName] = imPath
 	}
 
 	// parse interfaces
 	for _, decl := range result.parsedFile.Decls {
 		genDec, ok := decl.(*ast.GenDecl)
-		if !ok {continue}
-		if len(genDec.Specs)<1 {
+		if !ok {
+			continue
+		}
+		if len(genDec.Specs) < 1 {
 			continue
 		}
 		if _, ok = genDec.Specs[0].(*ast.ImportSpec); ok {
@@ -114,7 +118,7 @@ func ReadGoSource(fileName string) (*ComprehendedSource, error) {
 		if _, ok = genDec.Specs[0].(*ast.ValueSpec); ok {
 			continue
 		}
-		if len(genDec.Specs)>1 {
+		if len(genDec.Specs) > 1 {
 			return nil, fmt.Errorf("multiple spec in declaration at %v", genDec.Pos())
 		}
 		typeSpec, ok := genDec.Specs[0].(*ast.TypeSpec)
@@ -130,7 +134,7 @@ func ReadGoSource(fileName string) (*ComprehendedSource, error) {
 		methods := Interface{}
 		for _, method := range ifType.Methods.List {
 			ifMethod := InterfaceMethod{}
-			if len(method.Names)!=1 {
+			if len(method.Names) != 1 {
 				return nil, fmt.Errorf("expected a single name per method at %v", method.Pos())
 			}
 			methodName := method.Names[0].String()
@@ -140,30 +144,30 @@ func ReadGoSource(fileName string) (*ComprehendedSource, error) {
 			}
 			for idx, arg := range fun.Params.List {
 				fArg := FuncParameter{
-					Name: fmt.Sprintf("arg%d", idx),
-					Type: arg.Type,
+					Name:       fmt.Sprintf("arg%d", idx),
+					Type:       arg.Type,
 					SourceFile: result,
 				}
-				if len(arg.Names)==1 {
-					fArg.Name=arg.Names[0].Name
+				if len(arg.Names) == 1 {
+					fArg.Name = arg.Names[0].Name
 				}
 				ifMethod.ArgTypes = append(ifMethod.ArgTypes, fArg)
 			}
 			for idx, ret := range fun.Results.List {
 				rArg := FuncParameter{
-					Name: fmt.Sprintf("ret%d", idx),
-					Type: ret.Type,
+					Name:       fmt.Sprintf("ret%d", idx),
+					Type:       ret.Type,
 					SourceFile: result,
 				}
-				if len(ret.Names)==1 {
-					rArg.Name=ret.Names[0].Name
+				if len(ret.Names) == 1 {
+					rArg.Name = ret.Names[0].Name
 				}
 				ifMethod.RetTypes = append(ifMethod.RetTypes, rArg)
 			}
 			ifMethod.RetTypes = ifMethod.RetTypes[:len(ifMethod.RetTypes)-1]
 			methods[methodName] = ifMethod
 		}
-		result.interfaces[ifName]=methods
+		result.interfaces[ifName] = methods
 	}
 	return result, nil
 }
@@ -173,8 +177,8 @@ func (cs *ComprehendedSource) PackageName() string {
 }
 
 type FuncParameter struct {
-	Name string
-	Type ast.Expr
+	Name       string
+	Type       ast.Expr
 	SourceFile *ComprehendedSource
 }
 
@@ -183,20 +187,20 @@ func formatType(gc *GenerationContext, cs *ComprehendedSource, expr ast.Expr) st
 		return idExp.String()
 	}
 	if starExp, ok := expr.(*ast.StarExpr); ok {
-		return "*"+formatType(gc, cs, starExp.X)
+		return "*" + formatType(gc, cs, starExp.X)
 	}
 	if arrExp, ok := expr.(*ast.ArrayType); ok {
 		// FIXME: handle arrays in addition to slices
-		return "[]"+formatType(gc, cs, arrExp.Elt)
+		return "[]" + formatType(gc, cs, arrExp.Elt)
 	}
 	if mapExp, ok := expr.(*ast.MapType); ok {
-		return "map["+formatType(gc, cs, mapExp.Key)+"]"+formatType(gc, cs, mapExp.Value)
+		return "map[" + formatType(gc, cs, mapExp.Key) + "]" + formatType(gc, cs, mapExp.Value)
 	}
 	if selExp, ok := expr.(*ast.SelectorExpr); ok {
 		pkg := selExp.X.(*ast.Ident).Name
 		pkgPath := cs.importMap[pkg]
 		impName := gc.ImportName(pkgPath)
-		return impName+"."+selExp.Sel.Name
+		return impName + "." + selExp.Sel.Name
 	}
 	// FIXME: handle function types (*ast.FuncType), even though gob and net/rpc can't transport them?
 	panic(fmt.Errorf("unknown expression type at %v", expr.Pos()))
@@ -217,13 +221,13 @@ type ImportSet []Import
 
 func (is *ImportSet) Add(ispec *ast.ImportSpec) {
 	iport := Import{}
-	iport.Path = ispec.Path.Value[1:len(ispec.Path.Value)-1]
-	if ispec.Name==nil {
-		iport.Name=path.Base(iport.Path)
+	iport.Path = ispec.Path.Value[1 : len(ispec.Path.Value)-1]
+	if ispec.Name == nil {
+		iport.Name = path.Base(iport.Path)
 	} else {
-		iport.Name=ispec.Name.String()
+		iport.Name = ispec.Name.String()
 	}
-	*is=append(*is, iport)
+	*is = append(*is, iport)
 }
 
 func (is *ImportSet) Lookup(abbrev string) string {

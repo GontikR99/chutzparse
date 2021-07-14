@@ -35,8 +35,8 @@ func postUpdate(update IffUpdate) {
 
 func heuristicId(name string) {
 	linkText, present, err := settings.LookupSetting(settings.LinkObviousPets)
-	linkObviousPets:=false
-	if present && err==nil && linkText=="true" {
+	linkObviousPets := false
+	if present && err == nil && linkText == "true" {
 		linkObviousPets = true
 	}
 	if name == eqspec.UnspecifiedName {
@@ -114,8 +114,8 @@ var leaderRE = regexp.MustCompile("^My leader is ([A-Z][a-z]+)[.]$")
 
 func (i iffAction) OnChat(log *eqspec.ChatLog) interface{} {
 	linkText, present, err := settings.LookupSetting(settings.LinkObviousPets)
-	linkObviousPets:=false
-	if present && err==nil && linkText=="true" {
+	linkObviousPets := false
+	if present && err == nil && linkText == "true" {
 		linkObviousPets = true
 	}
 	if match := leaderRE.FindStringSubmatch(log.Text); match != nil {

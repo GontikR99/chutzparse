@@ -32,8 +32,6 @@ func main() {
 	registerRpcHandler(settings.HandleRPC())
 	registerRpcHandler(ui.HandleRPC())
 
-	settings.DefaultSetting(settings.EverQuestDirectory, "C:\\Users\\Public\\Daybreak Game Company\\Installed Games\\EverQuest")
-
 	appCtx, exitApp := context.WithCancel(context.Background())
 	application.OnWindowAllClosed(exitApp)
 
@@ -51,7 +49,7 @@ func main() {
 		Width:  1600,
 		Height: 800,
 		Show:   false,
-		Title: "ChutzParse "+internal.Version,
+		Title:  "ChutzParse " + internal.Version,
 		WebPreferences: &browserwindow.WebPreferences{
 			Preload:          path.Join(application.GetAppPath(), "src/preload.js"),
 			NodeIntegration:  false,

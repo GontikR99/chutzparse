@@ -14,8 +14,8 @@ import (
 )
 
 func upperCamlCase(name string) string {
-	if len(name)>0 {
-		return strings.ToUpper(name[:1])+name[1:]
+	if len(name) > 0 {
+		return strings.ToUpper(name[:1]) + name[1:]
 	} else {
 		return name
 	}
@@ -27,11 +27,11 @@ func main() {
 	if strings.HasSuffix(inputBasename, ".go") {
 		inputBasename = inputBasename[:len(inputBasename)-3]
 	}
-	outputBasename := inputBasename+"_genrpc.go"
+	outputBasename := inputBasename + "_genrpc.go"
 	outputFilename := path.Join(path.Dir(inputFilename), outputBasename)
 
 	compFile, err := ReadGoSource(inputFilename)
-	if err!=nil {
+	if err != nil {
 		panic(err)
 	}
 
@@ -121,7 +121,7 @@ func handle%s(server %s) func(*%s.Server) {
     return func(srv *%s.Server) {srv.Register(ss)}
 }
 `, ifName, gc.ImportName("net/rpc"), ifName, ifName,
-ifName, ifName, gc.ImportName("net/rpc"), ifName, gc.ImportName("net/rpc"))
+			ifName, ifName, gc.ImportName("net/rpc"), ifName, gc.ImportName("net/rpc"))
 	}
 
 	fullBuf := &bytes.Buffer{}
@@ -140,7 +140,7 @@ ifName, ifName, gc.ImportName("net/rpc"), ifName, gc.ImportName("net/rpc"))
 	fullBuf.Write(mainCode.Bytes())
 
 	err = ioutil.WriteFile(outputFilename, fullBuf.Bytes(), 0644)
-	if err!=nil {
+	if err != nil {
 		panic(err)
 	}
 }

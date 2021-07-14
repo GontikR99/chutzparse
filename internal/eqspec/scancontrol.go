@@ -6,4 +6,3 @@ package eqspec
 type ScanControl interface {
 	Restart() error
 }
-

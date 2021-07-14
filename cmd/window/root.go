@@ -79,7 +79,7 @@ func (c *Root) Compute(ctx vugu.ComputeCtx) {
 	NavigateTo(ctx.EventEnv(), "")
 }
 
-var window=js.Global().Get("window")
+var window = js.Global().Get("window")
 
 func GetPlace() string {
 	href := window.Get("location").Get("href").String()

@@ -21,16 +21,16 @@ type Display struct {
 	currentTab  string
 	currentView vugu.Builder
 
-	selectedLinkPet map[string]struct{}
+	selectedLinkPet   map[string]struct{}
 	selectedLinkOwner map[string]struct{}
 	selectedUnlinkPet map[string]struct{}
 }
 
 func (c *Display) Init(vCtx vugu.InitCtx) {
 	c.currentTab = fight.ReportNames()[0]
-	c.selectedUnlinkPet= map[string]struct{}{}
-	c.selectedLinkPet= map[string]struct{}{}
-	c.selectedLinkOwner= map[string]struct{}{}
+	c.selectedUnlinkPet = map[string]struct{}{}
+	c.selectedLinkPet = map[string]struct{}{}
+	c.selectedLinkOwner = map[string]struct{}{}
 
 	c.InitBackground(vCtx, c)
 }
@@ -63,25 +63,26 @@ func (c *Display) SetTab(event vugu.DOMEvent, tabName string) {
 }
 
 type sboByLabel []ui.SelectBoxOption
-func (s sboByLabel) Len() int {return len(s)}
-func (s sboByLabel) Less(i, j int) bool {return s[i].Text < s[j].Text}
-func (s sboByLabel) Swap(i, j int) {s[i],s[j] = s[j], s[i]}
+
+func (s sboByLabel) Len() int           { return len(s) }
+func (s sboByLabel) Less(i, j int) bool { return s[i].Text < s[j].Text }
+func (s sboByLabel) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
 func (c *Display) PetNames() []ui.SelectBoxOption {
 	pets := iff.GetPets()
-	for k, _ := range c.selectedUnlinkPet {
+	for k := range c.selectedUnlinkPet {
 		if _, present := pets[k]; !present {
 			delete(c.selectedUnlinkPet, k)
 		}
 	}
-	if len(c.selectedUnlinkPet)==0 {
-		c.selectedUnlinkPet[""]=struct{}{}
+	if len(c.selectedUnlinkPet) == 0 {
+		c.selectedUnlinkPet[""] = struct{}{}
 	}
 
 	opts := []ui.SelectBoxOption{{"", ""}}
 	for pet, owner := range iff.GetPets() {
-		opts=append(opts, ui.SelectBoxOption{
-			Text:  pet+" -> "+owner,
+		opts = append(opts, ui.SelectBoxOption{
+			Text:  pet + " -> " + owner,
 			Value: pet,
 		})
 	}
@@ -89,14 +90,14 @@ func (c *Display) PetNames() []ui.SelectBoxOption {
 	return opts
 }
 
-var iffcontrol=iff.NewControlClient(ipcrenderer.Client)
+var iffcontrol = iff.NewControlClient(ipcrenderer.Client)
 
 func (c *Display) UnlinkPet(event vugu.DOMEvent) {
 	event.PreventDefault()
 	event.StopPropagation()
-	if len(c.selectedUnlinkPet)!=0 {
-		for k, _ := range c.selectedUnlinkPet {
-			if k!="" {
+	if len(c.selectedUnlinkPet) != 0 {
+		for k := range c.selectedUnlinkPet {
+			if k != "" {
 				go func() {
 					iffcontrol.Unlink(k)
 				}()
@@ -107,32 +108,32 @@ func (c *Display) UnlinkPet(event vugu.DOMEvent) {
 }
 
 func (c *Display) PotentialPetsOwners() []ui.SelectBoxOption {
-	rawOpts:=map[string]struct{}{}
+	rawOpts := map[string]struct{}{}
 	for _, fight := range finishedFights {
 		fight.Reports.Participants(rawOpts)
 	}
 
-	for k, _ := range c.selectedLinkPet {
+	for k := range c.selectedLinkPet {
 		if _, present := rawOpts[k]; !present {
 			delete(c.selectedLinkPet, k)
 		}
 	}
-	if len(c.selectedLinkPet)==0 {
-		c.selectedLinkPet[""]=struct{}{}
+	if len(c.selectedLinkPet) == 0 {
+		c.selectedLinkPet[""] = struct{}{}
 	}
 
-	for k, _ := range c.selectedLinkOwner {
+	for k := range c.selectedLinkOwner {
 		if _, present := rawOpts[k]; !present {
 			delete(c.selectedLinkOwner, k)
 		}
 	}
-	if len(c.selectedLinkOwner)==0 {
-		c.selectedLinkOwner[""]=struct{}{}
+	if len(c.selectedLinkOwner) == 0 {
+		c.selectedLinkOwner[""] = struct{}{}
 	}
 
-	opts:=[]ui.SelectBoxOption{{"", ""}}
+	opts := []ui.SelectBoxOption{{"", ""}}
 	pets := iff.GetPets()
-	for rawOpt, _ := range rawOpts {
+	for rawOpt := range rawOpts {
 		if _, present := pets[rawOpt]; !present {
 			opts = append(opts, ui.SelectBoxOption{
 				Text:  rawOpt,
@@ -148,20 +149,20 @@ func (c *Display) LinkPet(event vugu.DOMEvent) {
 	event.PreventDefault()
 	event.StopPropagation()
 	pet := ""
-	for k, _ := range c.selectedLinkPet {
-		pet=k
+	for k := range c.selectedLinkPet {
+		pet = k
 		break
 	}
 	owner := ""
-	for k, _ := range c.selectedLinkOwner {
-		owner=k
+	for k := range c.selectedLinkOwner {
+		owner = k
 		break
 	}
-	if pet!="" && owner!="" {
+	if pet != "" && owner != "" {
 		delete(c.selectedLinkPet, pet)
 		delete(c.selectedLinkOwner, owner)
-		c.selectedLinkPet[""]=struct{}{}
-		c.selectedLinkOwner[""]=struct{}{}
+		c.selectedLinkPet[""] = struct{}{}
+		c.selectedLinkOwner[""] = struct{}{}
 		go func() {
 			iffcontrol.Link(pet, owner)
 		}()
@@ -230,6 +231,7 @@ func (c *Display) FightNames() []ui.SelectBoxOption {
 }
 
 var clipboard = ui.NewClipboardClient(ipcrenderer.Client)
+
 func (c *Display) CopySummary(event vugu.DOMEvent) {
 	event.PreventDefault()
 	event.StopPropagation()

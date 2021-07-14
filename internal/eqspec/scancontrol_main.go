@@ -7,7 +7,7 @@ import (
 	"net/rpc"
 )
 
-type scanCtlServer struct {}
+type scanCtlServer struct{}
 
 func (s scanCtlServer) Restart() error {
 	RestartLogScans(context.Background())

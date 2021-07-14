@@ -23,8 +23,8 @@ func (r *Report) Interesting() bool {
 }
 
 func (r *Report) Participants(p map[string]struct{}) {
-	for k, _ := range r.Contributions {
-		p[k]=struct{}{}
+	for k := range r.Contributions {
+		p[k] = struct{}{}
 	}
 }
 

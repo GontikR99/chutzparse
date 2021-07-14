@@ -58,6 +58,10 @@ func RestartLogScans(baseCtx context.Context) {
 	go readAllLogsLoop(ctx)
 }
 
+func init() {
+	settings.DefaultSetting(settings.EverQuestDirectory, "C:\\Users\\Public\\Daybreak Game Company\\Installed Games\\EverQuest")
+}
+
 func readAllLogsLoop(ctx context.Context) {
 	eqDir, _, _ := settings.LookupSetting(settings.EverQuestDirectory)
 	eqLogDir := path.Join(eqDir, "Logs")

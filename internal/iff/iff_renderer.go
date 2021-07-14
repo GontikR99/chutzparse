@@ -13,7 +13,6 @@ import (
 func postUpdate(update IffUpdate) {
 }
 
-
 func init() {
 	go func() {
 		inChan, _ := ipcrenderer.Endpoint{}.Listen(channelIffUpdate)

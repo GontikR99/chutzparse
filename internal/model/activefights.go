@@ -144,7 +144,7 @@ func maintainThroughput() {
 			}
 			activeUpdated = false
 			var states []presenter.ThroughputState
-			if value, present, err := settings.LookupSetting(settings.ShowMeters); err==nil && present && value=="true" {
+			if value, present, err := settings.LookupSetting(settings.ShowMeters); err == nil && present && value == "true" {
 				for _, fight := range activeFights {
 					if !fight.Reports.Interesting() {
 						continue

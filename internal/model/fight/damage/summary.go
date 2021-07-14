@@ -14,9 +14,9 @@ func (r *Report) Summarize() string {
 	agRep := r.Aggregate()
 	duration := r.ActivitySet.TotalDuration()
 	if duration < time.Second {
-		duration=time.Second
+		duration = time.Second
 	}
-	durationSec := float64(duration)/float64(time.Second)
+	durationSec := float64(duration) / float64(time.Second)
 
 	sb := &strings.Builder{}
 
@@ -25,21 +25,21 @@ func (r *Report) Summarize() string {
 		parsedefs.FormatAmount(durationSec)))
 
 	contribs := agRep.SortedContributors()
-	if len(contribs)==0 {
+	if len(contribs) == 0 {
 		return ""
 	}
 	needSep := false
-	for i:=0; i<len(contribs) && i<presenter.ThroughputBarCount ; i++ {
+	for i := 0; i < len(contribs) && i < presenter.ThroughputBarCount; i++ {
 		if needSep {
 			sb.WriteString("; ")
 		} else {
-			needSep=true
+			needSep = true
 		}
 		sb.WriteString(fmt.Sprintf("%d. %s %s DPS [%s]", 1+i,
 			contribs[i].AttributedSource,
 			parsedefs.FormatAmount(float64(contribs[i].TotalDamage)/float64(durationSec)),
 			parsedefs.FormatPercent(float64(contribs[i].TotalDamage)/float64(agRep.TotalDamage)),
-			))
+		))
 	}
 	return sb.String()
 }

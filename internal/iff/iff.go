@@ -49,7 +49,7 @@ func GetOwner(name string) string {
 
 func GetPets() map[string]string {
 	result := map[string]string{}
-	for k,v := range pets {
+	for k, v := range pets {
 		result[k] = v
 	}
 	return result

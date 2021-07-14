@@ -9,7 +9,7 @@ import (
 	"net/rpc"
 )
 
-type clipboardServer struct {}
+type clipboardServer struct{}
 
 func (c clipboardServer) Copy(text string) error {
 	clipboardy.WriteSync(text)
@@ -34,9 +34,8 @@ func (d dirDlgServer) Choose(initial string) (chosenDirectory string, err error)
 	return filePaths[0], nil
 }
 
-
 func HandleRPC() func(server *rpc.Server) {
 	uiReg := handleClipboard(clipboardServer{})
 	dirDlgReg := handleDirectoryDialog(dirDlgServer{})
-	return func(server *rpc.Server) {uiReg(server); dirDlgReg(server)}
+	return func(server *rpc.Server) { uiReg(server); dirDlgReg(server) }
 }

@@ -8,4 +8,3 @@ type Settings interface {
 	Set(key string, value string) error
 	Clear(key string) error
 }
-

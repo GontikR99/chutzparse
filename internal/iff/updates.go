@@ -54,7 +54,7 @@ func (i *IffFoe) Apply() {
 	foes[i.Name] = time.Now().Add(foeDuration)
 }
 func (i *IffNewPet) Apply() {
-	if oldOwner, present := pets[i.Pet]; !present || oldOwner!=i.Owner {
+	if oldOwner, present := pets[i.Pet]; !present || oldOwner != i.Owner {
 		pets[i.Pet] = i.Owner
 		petChange(i)
 	}
@@ -77,23 +77,23 @@ func init() {
 	gob.RegisterName("iff:unlinkpet", &IffUnlinkPet{})
 }
 
-var petListenerGen=0
-var petListeners=map[int]chan<- struct{}{}
+var petListenerGen = 0
+var petListeners = map[int]chan<- struct{}{}
 
 // ListenPets lets us listen for changes to the pet mapping
 func ListenPets() (<-chan struct{}, func()) {
 	id := petListenerGen
 	petListenerGen++
 	updateChan := make(chan struct{})
-	petListeners[id]=updateChan
-	doneFunc := func() {delete(petListeners, id)}
+	petListeners[id] = updateChan
+	doneFunc := func() { delete(petListeners, id) }
 	return updateChan, doneFunc
 }
 
 func petChange(update IffUpdate) {
 	for _, outChan := range petListeners {
-		func(){
-			defer func() {recover()}()
+		func() {
+			defer func() { recover() }()
 			outChan <- struct{}{}
 		}()
 	}
