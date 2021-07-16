@@ -35,8 +35,13 @@ func (r *Report) Summarize() string {
 		} else {
 			needSep = true
 		}
-		sb.WriteString(fmt.Sprintf("%d. %s %s DPS [%s]", 1+i,
+		flags := contribs[i].Flags
+		if flags!="" {
+			flags=" {"+flags+"}"
+		}
+		sb.WriteString(fmt.Sprintf("%d. %s%s %s DPS [%s]", 1+i,
 			contribs[i].AttributedSource,
+			flags,
 			parsedefs.FormatAmount(float64(contribs[i].TotalDamage)/float64(durationSec)),
 			parsedefs.FormatPercent(float64(contribs[i].TotalDamage)/float64(agRep.TotalDamage)),
 		))

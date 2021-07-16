@@ -11,7 +11,9 @@ import (
 // Update the set of boosts that are currently active by considering the given log message
 func Update(entry *eqspec.LogEntry) {
 	boostReader.Dispatch(entry.Message, entry)
-	boostsForCharacter(entry.Character).maintain(entry.Timestamp)
+	for _, cb := range activeBoosts {
+		cb.maintain(entry.Timestamp)
+	}
 }
 
 // Get the set of boosts that are currently active for the specified character
