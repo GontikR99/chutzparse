@@ -17,6 +17,7 @@ type Settings struct {
 	vuguutil.BackgroundComponent
 	EqDir            *ConfiguredValue
 	LinkObviousPets  bool
+	TrackBardEpic    bool
 	EnableFlyingText bool
 	EnableMeters     bool
 
@@ -55,6 +56,7 @@ func (c *Settings) RunInBackground() {
 		go c.refreshCheckbox(c.Env(), settings.LinkObviousPets, &c.LinkObviousPets)
 		go c.refreshCheckbox(c.Env(), settings.ShowFlyingHits, &c.EnableFlyingText)
 		go c.refreshCheckbox(c.Env(), settings.ShowMeters, &c.EnableMeters)
+		go c.refreshCheckbox(c.Env(), settings.NoteBardEpic, &c.TrackBardEpic)
 		select {
 		case <-c.Done():
 			return

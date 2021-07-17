@@ -4,6 +4,7 @@ package boosts
 
 import (
 	"github.com/gontikr99/chutzparse/internal/eqspec"
+	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/pkg/multipattern"
 	"time"
 )
@@ -70,24 +71,36 @@ var boostReader = multipattern.New().
 	// Bard epics:
 	// Prismatic Dragon Blade (Spirit of the Kin)
 	On("You are filled with the spirit of the kin[.]", func(parts []string, context interface{}) interface{} {
-		logEntry := context.(*eqspec.LogEntry)
-		addBoost(logEntry.Character, BardEpic1_5, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
+		nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
+		if nbeText=="true" {
+			logEntry := context.(*eqspec.LogEntry)
+			addBoost(logEntry.Character, BardEpic1_5, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
+		}
 		return nil
 	}).
 	On("(.+) is filled with the spirit of the kin[.]", func(parts []string, context interface{}) interface{} {
-		logEntry := context.(*eqspec.LogEntry)
-		addBoost(parts[1], BardEpic1_5, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
+		nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
+		if nbeText=="true" {
+			logEntry := context.(*eqspec.LogEntry)
+			addBoost(logEntry.Character, BardEpic1_5, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
+		}
 		return nil
 	}).
 	// Blade of Vesagran (Spirit of Vesagran)
 	On("You are filled with the spirit of Vesagran[.]", func(parts []string, context interface{}) interface{} {
-		logEntry := context.(*eqspec.LogEntry)
-		addBoost(logEntry.Character, BardEpic2, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
+		nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
+		if nbeText=="true" {
+			logEntry := context.(*eqspec.LogEntry)
+			addBoost(logEntry.Character, BardEpic2, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
+		}
 		return nil
 	}).
 	On("(.+) is filled with the spirit of Vesagran[.]", func(parts []string, context interface{}) interface{} {
-		logEntry := context.(*eqspec.LogEntry)
-		addBoost(parts[1], BardEpic2, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
+	nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
+		if nbeText=="true" {
+			logEntry := context.(*eqspec.LogEntry)
+			addBoost(logEntry.Character, BardEpic2, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
+		}
 		return nil
 	}).
 
@@ -138,3 +151,7 @@ var boostReader = multipattern.New().
 		addBoost(parts[1], GlyphDestruction, logEntry.Id, logEntry.Timestamp.Add(120*time.Second))
 		return nil
 	})
+
+func init() {
+	settings.DefaultSetting(settings.NoteBardEpic, "false")
+}

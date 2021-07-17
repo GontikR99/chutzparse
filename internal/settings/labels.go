@@ -3,7 +3,10 @@
 package settings
 
 const EverQuestDirectory = "EverQuestDirectory"
+
 const LinkObviousPets = "LinkObviousPets"
+const NoteBardEpic = "NoteBardEpic"
+
 const ShowFlyingHits = "ShowFlyingText"
 const ShowMeters = "ShowMeters"
 const TopMeterReport = "TopMeterSource"

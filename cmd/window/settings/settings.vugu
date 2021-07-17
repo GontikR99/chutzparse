@@ -23,6 +23,17 @@
                     Also, <b>anyone</b> who says "My leader is Siluine." will be considered Siluine's pet.
                 </div>
             </div>
+            <div class="form-group row">
+                <label class="col-form-label col-2">Track Bard epic clicks</label>
+                <div class="col-4">
+                    <input type="checkbox" class="form-control" .checked="c.TrackBardEpic" @change="c.ToggleCheckbox(event, settings.NoteBardEpic, &c.TrackBardEpic)" />
+                </div>
+                <div class="col-6 text-muted small">
+                    When enabled, ChutzParse will track bard 1.5 and 2.0 epic clicks just as it does for Shaman epic clicks.
+                    Unfortunately, EverQuest doesn't let you know about bard epic clicks unless the bard and the recipient
+                    are in your group, so this tracking only notices your group members.
+                </div>
+            </div>
         </div>
         <div class="container-fluid border-light border">
             <h6>Overlay</h6>
