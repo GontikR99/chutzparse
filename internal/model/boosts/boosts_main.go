@@ -72,7 +72,7 @@ var boostReader = multipattern.New().
 	// Prismatic Dragon Blade (Spirit of the Kin)
 	On("You are filled with the spirit of the kin[.]", func(parts []string, context interface{}) interface{} {
 		nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
-		if nbeText=="true" {
+		if nbeText == "true" {
 			logEntry := context.(*eqspec.LogEntry)
 			addBoost(logEntry.Character, BardEpic1_5, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
 		}
@@ -80,7 +80,7 @@ var boostReader = multipattern.New().
 	}).
 	On("(.+) is filled with the spirit of the kin[.]", func(parts []string, context interface{}) interface{} {
 		nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
-		if nbeText=="true" {
+		if nbeText == "true" {
 			logEntry := context.(*eqspec.LogEntry)
 			addBoost(logEntry.Character, BardEpic1_5, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
 		}
@@ -89,15 +89,15 @@ var boostReader = multipattern.New().
 	// Blade of Vesagran (Spirit of Vesagran)
 	On("You are filled with the spirit of Vesagran[.]", func(parts []string, context interface{}) interface{} {
 		nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
-		if nbeText=="true" {
+		if nbeText == "true" {
 			logEntry := context.(*eqspec.LogEntry)
 			addBoost(logEntry.Character, BardEpic2, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
 		}
 		return nil
 	}).
 	On("(.+) is filled with the spirit of Vesagran[.]", func(parts []string, context interface{}) interface{} {
-	nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
-		if nbeText=="true" {
+		nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
+		if nbeText == "true" {
 			logEntry := context.(*eqspec.LogEntry)
 			addBoost(logEntry.Character, BardEpic2, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
 		}

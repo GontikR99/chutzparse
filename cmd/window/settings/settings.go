@@ -21,7 +21,7 @@ type Settings struct {
 	EnableFlyingText bool
 	EnableMeters     bool
 
-	selectedTopMeter   map[string]struct{}
+	selectedTopMeter    map[string]struct{}
 	selectedBottomMeter map[string]struct{}
 }
 
@@ -32,17 +32,21 @@ func (c *Settings) Init(vCtx vugu.InitCtx) {
 		Key:      settings.EverQuestDirectory,
 		Callback: func(s string) { scanctl.Restart() },
 	}
-	c.selectedTopMeter=map[string]struct{}{}
-	c.selectedBottomMeter= map[string]struct{}{}
+	c.selectedTopMeter = map[string]struct{}{}
+	c.selectedBottomMeter = map[string]struct{}{}
 	go func() {
 		topName, _, _ := rpcset.Lookup(settings.TopMeterReport)
 		botName, _, _ := rpcset.Lookup(settings.BottomMeterReport)
 
 		vCtx.EventEnv().Lock()
-		for k := range c.selectedTopMeter { delete(c.selectedTopMeter, k)}
-		for k := range c.selectedBottomMeter { delete(c.selectedBottomMeter, k)}
-		c.selectedTopMeter[topName]=struct{}{}
-		c.selectedBottomMeter[botName]=struct{}{}
+		for k := range c.selectedTopMeter {
+			delete(c.selectedTopMeter, k)
+		}
+		for k := range c.selectedBottomMeter {
+			delete(c.selectedBottomMeter, k)
+		}
+		c.selectedTopMeter[topName] = struct{}{}
+		c.selectedBottomMeter[botName] = struct{}{}
 		vCtx.EventEnv().UnlockRender()
 	}()
 	c.EqDir.Init(vCtx)
@@ -94,7 +98,7 @@ func (c *Settings) ToggleCheckbox(event vugu.DOMEvent, settingName string, setti
 
 func (c *Settings) damageMeterOptions() []ui.SelectBoxOption {
 	var result []ui.SelectBoxOption
-	result = append(result, ui.SelectBoxOption{"[none]",""})
+	result = append(result, ui.SelectBoxOption{"[none]", ""})
 	for _, repName := range fight.ReportNames() {
 		result = append(result, ui.SelectBoxOption{repName, repName})
 	}
@@ -107,23 +111,29 @@ type damageMeterChanger struct {
 
 func (c *Settings) selMap(i int) map[string]struct{} {
 	switch i {
-	case 0: return c.selectedTopMeter
-	case 1: return c.selectedBottomMeter
-	default: panic("Expected 0 or 1")
+	case 0:
+		return c.selectedTopMeter
+	case 1:
+		return c.selectedBottomMeter
+	default:
+		panic("Expected 0 or 1")
 	}
 }
 
 func (c *Settings) selHndl(i int) ui.SelectBoxChangeHandler {
 	switch i {
-	case 0: return &damageMeterChanger{settings.TopMeterReport}
-	case 1: return &damageMeterChanger{settings.BottomMeterReport}
-	default: panic("Expected 0 or 1")
+	case 0:
+		return &damageMeterChanger{settings.TopMeterReport}
+	case 1:
+		return &damageMeterChanger{settings.BottomMeterReport}
+	default:
+		panic("Expected 0 or 1")
 	}
 }
 
 func (d *damageMeterChanger) SelectBoxChangeHandle(event ui.SelectBoxChangeEvent) {
 	go func() {
-		for k, _ := range event.Selected() {
+		for k := range event.Selected() {
 			rpcset.Set(d.settingName, k)
 			break
 		}

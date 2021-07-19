@@ -112,6 +112,23 @@ func listenForHits() {
 							Color: parsedefs.ColorLimeGreen,
 							Big:   healEntry.Flag&eqspec.CriticalFlag != 0,
 						})
+					} else if iff.GetOwner(healEntry.Source) == entry.Character {
+						// pet doing healing
+						if healEntry.Target == healEntry.Source || healEntry.Target == entry.Character {
+							// pet healing itself or owner
+							presenter.BroadcastHitEvent(presenter.ChannelHitTop, &presenter.HitEvent{
+								Text:  parsedefs.FormatAmount(float64(healEntry.Actual)),
+								Color: parsedefs.ColorLimeGreen,
+								Big:   healEntry.Flag&eqspec.CriticalFlag != 0,
+							})
+						} else {
+							// pet outgoing healing
+							presenter.BroadcastHitEvent(presenter.ChannelHitTop, &presenter.HitEvent{
+								Text:  parsedefs.FormatAmount(float64(healEntry.Actual)),
+								Color: "cyan",
+								Big:   healEntry.Flag&eqspec.CriticalFlag != 0,
+							})
+						}
 					}
 				}
 			}

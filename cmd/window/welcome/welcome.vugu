@@ -1,9 +1,18 @@
 <div class="container">
-    <h1>Welcome to the ChutzParse pre-alpha</h1>
-    <p>
-        This is very much a work in progress. The goal is to make an open source EverQuest log parser with functionality
-        similar to GamParse, but with a few other features
-    </p>
+    <h1><u>Welcome to ChutzParse <span vg-content="internal.Version"></span></u></h1>
+    <h4>ChutzParse setup</h4>
+    <p>If you've squirreled EverQuest into some unusual location, please tell me where in the <a href="#settings">settings</a>.</p>
+    <h4>EverQuest setup</h4>
+    <p>EverQuest needs some setup for ChutzParse to work.</p>
+    <ul>
+        <li><b>ChutzParse's overlay requires windowed mode.</b> If you're running EverQuest in full screen mode, the
+            overlay will not show.
+        </li>
+        <li>ChutzParse is a log parser, and so requires logs be running. If you haven't turned them on in the past, turn
+            them on now: <tt>/log on</tt></li>
+        <li>If you have a reasonably fast system, you should instruct EverQuest to write log messages immediately to
+            disk, rather than in chunks: <tt>/loginterval 0</tt></li>
+    </ul>
     <h4>System setup</h4>
     <p>
         Antivirus programs don't interact well with EverQuest's logging: they can cause significant frame rate drops.
@@ -23,24 +32,9 @@
         </li>
         <li>Click "Select Folder"</li>
     </ul>
-    <h4>EverQuest setup</h4>
-    <p>EverQuest needs some setup for ChutzParse to work.</p>
-    <ul>
-        <li><b>ChutzParse's overlay requires windowed mode.</b> If you're running EverQuest in full screen mode, the
-            overlay will not show.
-        </li>
-        <li>ChutzParse is a log parser, and so requires logs be running. If you haven't turned them on in the past, turn
-            them on now: <tt>/log on</tt></li>
-        <li>If you have a reasonably fast system, you should instruct EverQuest to write log messages immediately to
-            disk, rather than in chunks: <tt>/loginterval 0</tt></li>
-    </ul>
-    <h4>ChutzParse setup</h4>
-    <p>If you've squirreled EverQuest into some unusual location, please tell me where in the <a href="#settings">settings</a>.</p>
     <h4>Running ChutzParse</h4>
     <p>Got logs on and your EverQuest directory selected above? That should be it. Go play some EverQuest and see the
         numbers fly!</p>
-    <h4>Pets</h4>
-    <p>Use <tt>/pet leader</tt> to have EverQuest tell ChutzParse who pets belong to.</p>
     <h4>Features</h4>
     <ul>
         <li>Overlay damage meters for active fight</li>
@@ -67,3 +61,6 @@
         </li>
     </ul>
 </div>
+<script type="application/x-go">
+import "github.com/gontikr99/chutzparse/internal"
+</script>

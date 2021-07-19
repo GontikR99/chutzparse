@@ -14,7 +14,9 @@ import (
 func (r *Report) Offer(entry *eqspec.LogEntry, epoch int) fight.FightReport {
 	r.LastCharName = entry.Character
 	if dmg, ok := entry.Meaning.(*eqspec.DamageLog); ok {
-		if dmg.Source != r.Source {return r}
+		if dmg.Source != r.Source {
+			return r
+		}
 		contrib := r.ContributionOf(dmg.Target)
 		contrib.TotalDamage += dmg.Amount
 		contrib.Hits++
@@ -33,7 +35,7 @@ func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 	durationSec := float64(duration) / float64(time.Second)
 
 	totalDamage := r.TotalDamage()
-	dps := float64(totalDamage)/durationSec
+	dps := float64(totalDamage) / durationSec
 
 	var bars []presenter.ThroughputBar
 	bars = append(bars, presenter.ThroughputBar{
@@ -43,9 +45,11 @@ func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 		Sectors:    []presenter.BarSector{{"dimgray", 1.0}},
 	})
 
-	if len(r.Contributions)==0 {return bars}
+	if len(r.Contributions) == 0 {
+		return bars
+	}
 	contribs := r.SortedContributors()
-	for idx := 0; idx<presenter.ThroughputBarCount && idx<len(contribs); idx++ {
+	for idx := 0; idx < presenter.ThroughputBarCount && idx < len(contribs); idx++ {
 		color := otherColor
 		contrib := contribs[idx]
 		if contrib.Target == r.LastCharName {
@@ -53,7 +57,7 @@ func (r *Report) Throughput(fight *fight.Fight) []presenter.ThroughputBar {
 		}
 		bars = append(bars, toThroughputBar(contrib, idx, totalDamage, contribs[0].TotalDamage, durationSec, color))
 	}
-	for idx:=presenter.ThroughputBarCount; idx<len(contribs); idx++ {
+	for idx := presenter.ThroughputBarCount; idx < len(contribs); idx++ {
 		contrib := contribs[idx]
 		if contrib.Target == r.LastCharName {
 			bars = append(bars, toThroughputBar(contrib, idx, totalDamage, contribs[0].TotalDamage, durationSec, selfColor))
@@ -73,7 +77,6 @@ func toThroughputBar(c *Contribution, index int, totalDamage int64, maxDmg int64
 		RightStyle: presenter.MonoStyle,
 		Sectors:    nil,
 	}
-	result.Sectors=[]presenter.BarSector{{Color: color, Portion: float64(c.TotalDamage)/float64(maxDmg)}}
+	result.Sectors = []presenter.BarSector{{Color: color, Portion: float64(c.TotalDamage) / float64(maxDmg)}}
 	return result
 }
-

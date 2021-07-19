@@ -36,8 +36,8 @@ func (r *Report) Summarize() string {
 			needSep = true
 		}
 		flags := contribs[i].Flags
-		if flags!="" {
-			flags=" {"+flags+"}"
+		if flags != "" {
+			flags = " {" + flags + "}"
 		}
 		sb.WriteString(fmt.Sprintf("%d. %s%s %s DPS [%s]", 1+i,
 			contribs[i].AttributedSource,

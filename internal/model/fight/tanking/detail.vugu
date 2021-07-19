@@ -2,10 +2,12 @@
     <h2 vg-content="c.report.Source"></h2>
     <table class="table table-striped table-dark table-sm">
         <thead class="thead-light">
-        <th scope="col" style="width:2em;">#</th>
-        <th scope="col">Name</th>
-        <th scope="col">%</th>
-        <th scope="col">Damage</th>
+        <tr>
+            <th scope="col" style="width:2em;">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">%</th>
+            <th scope="col">Damage</th>
+        </tr>
         </thead>
 
         <tbody>

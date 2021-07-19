@@ -154,14 +154,14 @@ func maintainThroughput() {
 					var topMeter []presenter.ThroughputBar
 					var bottomMeter []presenter.ThroughputBar
 					topName, ok, err := settings.LookupSetting(settings.TopMeterReport)
-					if err==nil && ok {
+					if err == nil && ok {
 						if dmgRep, present := fight.Reports[topName]; present {
 							topMeter = dmgRep.Throughput(fight)
 						}
 					}
 
 					bottomName, ok, err := settings.LookupSetting(settings.BottomMeterReport)
-					if err==nil && ok {
+					if err == nil && ok {
 						if dmgRep, present := fight.Reports[bottomName]; present {
 							bottomMeter = dmgRep.Throughput(fight)
 						}

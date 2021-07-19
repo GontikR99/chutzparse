@@ -55,21 +55,21 @@ type Detail struct {
 }
 
 type displayRow struct {
-	Rank string
-	Target string
+	Rank    string
+	Target  string
 	Percent string
-	Total string
+	Total   string
 }
 
 func (c *Detail) rows() []*displayRow {
 	totalDamage := c.report.TotalDamage()
 	var result []*displayRow
-	for idx, contrib :=range c.report.SortedContributors() {
-		if contrib.TotalDamage!=0 {
+	for idx, contrib := range c.report.SortedContributors() {
+		if contrib.TotalDamage != 0 {
 			result = append(result, &displayRow{
 				Rank:    strconv.FormatInt(1+int64(idx), 10),
 				Target:  contrib.Target,
-				Percent: parsedefs.FormatPercent(float64(contrib.TotalDamage)/float64(totalDamage)),
+				Percent: parsedefs.FormatPercent(float64(contrib.TotalDamage) / float64(totalDamage)),
 				Total:   parsedefs.FormatAmount(float64(contrib.TotalDamage)),
 			})
 		}
