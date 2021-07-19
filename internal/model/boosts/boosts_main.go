@@ -82,7 +82,7 @@ var boostReader = multipattern.New().
 		nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
 		if nbeText == "true" {
 			logEntry := context.(*eqspec.LogEntry)
-			addBoost(logEntry.Character, BardEpic1_5, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
+			addBoost(parts[1], BardEpic1_5, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
 		}
 		return nil
 	}).
@@ -99,7 +99,7 @@ var boostReader = multipattern.New().
 		nbeText, _, _ := settings.LookupSetting(settings.NoteBardEpic)
 		if nbeText == "true" {
 			logEntry := context.(*eqspec.LogEntry)
-			addBoost(logEntry.Character, BardEpic2, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
+			addBoost(parts[1], BardEpic2, logEntry.Id, logEntry.Timestamp.Add(1*time.Minute))
 		}
 		return nil
 	}).
