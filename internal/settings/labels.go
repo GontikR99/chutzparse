@@ -13,3 +13,22 @@ const TopMeterReport = "TopMeterSource"
 const BottomMeterReport = "BottomMeterReport"
 
 const ChannelChange = "ChannelSettingsChange"
+
+const (
+	HitColorSpellDamage   = "ColorSpellDamage"
+	HitColorMeleeDamage   = "ColorMeleeDamage"
+	HitColorRiposteDamage = "ColorRiposteDamage"
+	HitColorOtherDamage   = "ColorOtherDamage"
+	HitColorHealingDone   = "ColorHealingDone"
+
+	HitColorDamageTaken     = "ColorDamageTaken"
+	HitColorHealingReceived = "ColorHealingReceived"
+
+	HitColorPetMeleeDamage     = "ColorPetMeleeDamage"
+	HitColorPetSpellDamage     = "ColorPetSpellDamage"
+	HitColorPetRiposteDamage   = "ColorPetRiposteDamage"
+	HitColorPetOtherDamage     = "ColorPetOtherDamage"
+	HitColorPetDamageTaken     = "ColorPetDamageTaken"
+	HitColorPetHealingDone     = "ColorPetHealingDone"
+	HitColorPetHealingReceived = "ColorPetHealingReceived"
+)

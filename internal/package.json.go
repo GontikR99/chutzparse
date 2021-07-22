@@ -42,24 +42,24 @@ var PackageJson = dict{
 			},
 		},
 	},
-	"iohook": dict{
-		"targets": list{
-			"electron-87",
-			"node-88",
-		},
-		"platforms": list{
-			"win32",
-		},
-		"arches": list{
-			"ia32",
-		},
-	},
+	//"iohook": dict{
+	//	"targets": list{
+	//		"electron-87",
+	//		"node-88",
+	//	},
+	//	"platforms": list{
+	//		"win32",
+	//	},
+	//	"arches": list{
+	//		"ia32",
+	//	},
+	//},
 	"dependencies": dict{
 		"electron-squirrel-startup": "^1.0.0",
-		"iohook":                    "^0.9.3",
-		"ref-napi":                  "^3.0.3",
-		"win32-api":                 "^9.6.0",
-		"clipboardy":                "^2.3.0",
+		//"iohook":                    "^0.9.3",
+		"ref-napi":   "^3.0.3",
+		"win32-api":  "^9.6.0",
+		"clipboardy": "^2.3.0",
 	},
 	"devDependencies": dict{
 		"@electron-forge/cli":            "^6.0.0-beta.57",

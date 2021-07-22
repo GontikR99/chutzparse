@@ -2,7 +2,7 @@
     <h2>Settings</h2>
     <form @submit="event.PreventDefault()">
         <div class="container-fluid border-light border">
-            <h6>Parser</h6>
+            <h4 class="text-info" style="text-align: right;">Parser</h4>
             <div class="form-group row">
                 <label class="col-form-label col-2">EverQuest directory</label>
                 <div class="col-8">
@@ -14,10 +14,10 @@
             </div>
             <div class="form-group row">
                 <label class="col-form-label col-2">Auto-link obvious pets</label>
-                <div class="col-4">
+                <div class="col-2">
                     <input type="checkbox" class="form-control" .checked="c.LinkObviousPets" @change="c.ToggleCheckbox(event, settings.LinkObviousPets, &c.LinkObviousPets)" />
                 </div>
-                <div class="col-6 text-muted small">
+                <div class="col-8 text-muted small">
                     When enabled, NPCs with names like <code>Jephine`s pet</code>, <code>Joramini`s warder</code>, and
                     <code>Gontik`s ward</code> will automatically be treated as pets and linked to the appropriate owner.
                     Also, <b>anyone</b> who says "My leader is Siluine." will be considered Siluine's pet.
@@ -25,10 +25,10 @@
             </div>
             <div class="form-group row">
                 <label class="col-form-label col-2">Track Bard epic clicks</label>
-                <div class="col-4">
+                <div class="col-2">
                     <input type="checkbox" class="form-control" .checked="c.TrackBardEpic" @change="c.ToggleCheckbox(event, settings.NoteBardEpic, &c.TrackBardEpic)" />
                 </div>
-                <div class="col-6 text-muted small">
+                <div class="col-8 text-muted small">
                     When enabled, ChutzParse will track bard 1.5 and 2.0 epic clicks just as it does for Shaman epic clicks.
                     Unfortunately, EverQuest doesn't let you know about bard epic clicks unless the bard and the recipient
                     are in your group, so this tracking only notices your group members.
@@ -36,18 +36,16 @@
             </div>
         </div>
         <div class="container-fluid border-light border">
-            <h6>Overlay</h6>
-            <div class="form-group row">
-                <label class="col-form-label col-2">Show hit text</label>
-                <div class="col-4">
-                    <input type="checkbox" class="form-control" .checked="c.EnableFlyingText" @change="c.ToggleCheckbox(event, settings.ShowFlyingHits, &c.EnableFlyingText)" />
-                </div>
-                <label class="col-form-label col-2">Show damage meters</label>
-                <div class="col-4">
+            <h4 class="text-info" style="text-align: right;">Meters</h4>
+            <div class="row">
+                <label class="col-form-label col-2">Show HUD meters</label>
+                <div class="col-2">
                     <input type="checkbox" class="form-control" .checked="c.EnableMeters" @change="c.ToggleCheckbox(event, settings.ShowMeters, &c.EnableMeters)" />
                 </div>
+                <div class="col-4 text-center" vg-if="c.EnableMeters">Top meter</div>
             </div>
             <div class="form-group row" vg-if="c.EnableMeters">
+                <div class="col-4"></div>
                 <div class="col-4">
                     <ui:SelectBox class="form-control bg-dark text-light" style="width:100%;"
                                   :Options="c.damageMeterOptions()"
@@ -55,11 +53,9 @@
                                   :Change="c.selHndl(0)"
                     ></ui:SelectBox>
                 </div>
-                <div class="col-8">
-                    Top meter
-                </div>
             </div>
             <div class="form-group row" vg-if="c.EnableMeters">
+                <div class="col-4"></div>
                 <div class="col-4">
                     <ui:SelectBox class="form-control bg-dark text-light" style="width:100%;"
                                   :Options="c.damageMeterOptions()"
@@ -67,10 +63,83 @@
                                   :Change="c.selHndl(1)"
                     ></ui:SelectBox>
                 </div>
-                <div class="col-8">
-                    Bottom meter
+            </div>
+            <div class="row" vg-if="c.EnableMeters">
+                <div class="col-4"></div>
+                <div class="col-4 text-center">Bottom meter</div>
+            </div>
+        </div>
+        <div class="container-fluid border-light border">
+            <h4 class="text-info" style="text-align: right;">Flying text</h4>
+            <div class="form-group row">
+                <label class="col-form-label col-2">Show hit text</label>
+                <div class="col-2">
+                    <input type="checkbox" class="form-control" .checked="c.EnableFlyingText" @change="c.ToggleCheckbox(event, settings.ShowFlyingHits, &c.EnableFlyingText)" />
                 </div>
             </div>
+            <vg-template vg-if="c.EnableFlyingText">
+                <div class="row">
+                    <div class="col-1"></div>
+
+                    <div class="col-1 text-muted" style="text-align: center;">Self</div>
+                    <div class="col-2" style="text-align: center;"><b>Damage</b></div>
+                    <div class="col-1 text-muted" style="text-align: center;">Pet</div>
+
+                    <div class="col-1"></div>
+
+                    <div class="col-1 text-muted" style="text-align: center;">Self</div>
+                    <div class="col-2" style="text-align: center;"><b>Healing</b></div>
+                    <div class="col-1 text-muted" style="text-align: center;">Pet</div>
+
+                </div>
+                <div class="row form-group">
+                    <div class="col-1"></div>
+
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorDamageTaken"/></div>
+                    <div class="col-2" style="text-align: center;">Taken</div>
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetDamageTaken"/></div>
+
+                    <div class="col-1"></div>
+
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorHealingReceived"/></div>
+                    <div class="col-2" style="text-align: center;">Received</div>
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetHealingReceived"/></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-1"></div>
+
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorMeleeDamage"/></div>
+                    <div class="col-2" style="text-align: center;">Melee done</div>
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetMeleeDamage"/></div>
+
+                    <div class="col-1"></div>
+
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorHealingDone"/></div>
+                    <div class="col-2" style="text-align: center;">Done</div>
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetHealingDone"/></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-1"></div>
+
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorRiposteDamage"/></div>
+                    <div class="col-2" style="text-align: center;">Riposte done</div>
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetRiposteDamage"/></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-1"></div>
+
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorSpellDamage"/></div>
+                    <div class="col-2" style="text-align: center;">Spell done</div>
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetSpellDamage"/></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-1"></div>
+
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorOtherDamage"/></div>
+                    <div class="col-2" style="text-align: center;">Other done</div>
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetOtherDamage"/></div>
+                </div>
+            </vg-template>
         </div>
     </form>
 </div>

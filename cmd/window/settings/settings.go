@@ -23,15 +23,47 @@ type Settings struct {
 
 	selectedTopMeter    map[string]struct{}
 	selectedBottomMeter map[string]struct{}
+
+	// Hit display colors
+	ColorSpellDamage     *ConfiguredValue
+	ColorMeleeDamage     *ConfiguredValue
+	ColorRiposteDamage   *ConfiguredValue
+	ColorOtherDamage     *ConfiguredValue
+	ColorHealingDone     *ConfiguredValue
+	ColorDamageTaken     *ConfiguredValue
+	ColorHealingReceived *ConfiguredValue
+
+	ColorPetSpellDamage     *ConfiguredValue
+	ColorPetMeleeDamage     *ConfiguredValue
+	ColorPetRiposteDamage   *ConfiguredValue
+	ColorPetOtherDamage     *ConfiguredValue
+	ColorPetHealingDone     *ConfiguredValue
+	ColorPetDamageTaken     *ConfiguredValue
+	ColorPetHealingReceived *ConfiguredValue
 }
 
 var scanctl = eqspec.NewScanControlClient(ipcrenderer.Client)
 
 func (c *Settings) Init(vCtx vugu.InitCtx) {
-	c.EqDir = &ConfiguredValue{
-		Key:      settings.EverQuestDirectory,
-		Callback: func(s string) { scanctl.Restart() },
-	}
+	c.EqDir = NewConfiguredValue(vCtx, settings.EverQuestDirectory)
+	c.EqDir.Callback = func(s string) { scanctl.Restart() }
+
+	c.ColorSpellDamage = NewConfiguredValue(vCtx, settings.HitColorSpellDamage)
+	c.ColorMeleeDamage = NewConfiguredValue(vCtx, settings.HitColorMeleeDamage)
+	c.ColorRiposteDamage = NewConfiguredValue(vCtx, settings.HitColorRiposteDamage)
+	c.ColorOtherDamage = NewConfiguredValue(vCtx, settings.HitColorOtherDamage)
+	c.ColorHealingReceived = NewConfiguredValue(vCtx, settings.HitColorHealingReceived)
+	c.ColorDamageTaken = NewConfiguredValue(vCtx, settings.HitColorDamageTaken)
+	c.ColorHealingDone = NewConfiguredValue(vCtx, settings.HitColorHealingDone)
+
+	c.ColorPetSpellDamage = NewConfiguredValue(vCtx, settings.HitColorPetSpellDamage)
+	c.ColorPetMeleeDamage = NewConfiguredValue(vCtx, settings.HitColorPetMeleeDamage)
+	c.ColorPetRiposteDamage = NewConfiguredValue(vCtx, settings.HitColorPetRiposteDamage)
+	c.ColorPetOtherDamage = NewConfiguredValue(vCtx, settings.HitColorPetOtherDamage)
+	c.ColorPetHealingReceived = NewConfiguredValue(vCtx, settings.HitColorPetHealingReceived)
+	c.ColorPetDamageTaken = NewConfiguredValue(vCtx, settings.HitColorPetDamageTaken)
+	c.ColorPetHealingDone = NewConfiguredValue(vCtx, settings.HitColorPetHealingDone)
+
 	c.selectedTopMeter = map[string]struct{}{}
 	c.selectedBottomMeter = map[string]struct{}{}
 	go func() {
@@ -162,7 +194,11 @@ type ConfiguredValue struct {
 	Callback func(value string)
 }
 
-func (cv *ConfiguredValue) Init(ctx vugu.InitCtx) {
+func NewConfiguredValue(vCtx vugu.InitCtx, name string) *ConfiguredValue {
+	return (&ConfiguredValue{Key: name}).Init(vCtx)
+}
+
+func (cv *ConfiguredValue) Init(ctx vugu.InitCtx) *ConfiguredValue {
 	go func() {
 		value, present, err := rpcset.Lookup(cv.Key)
 		if err == nil && present {
@@ -171,6 +207,7 @@ func (cv *ConfiguredValue) Init(ctx vugu.InitCtx) {
 			ctx.EventEnv().UnlockRender()
 		}
 	}()
+	return cv
 }
 
 func (cv *ConfiguredValue) StringValue() string {

@@ -46,6 +46,3 @@ func FormatFixed(amount float64) string {
 func FormatPercent(ratio float64) string {
 	return FormatFixed(100 * ratio)[:4] + "%"
 }
-
-const ColorLimeGreen = "#32CD32"
-const ColorPastelRed = "#FAA0A0"
