@@ -79,64 +79,66 @@
             </div>
             <vg-template vg-if="c.EnableFlyingText">
                 <div class="row">
-                    <div class="col-1"></div>
-
                     <div class="col-1 text-muted" style="text-align: center;">Self</div>
-                    <div class="col-2" style="text-align: center;"><b>Damage</b></div>
+                    <div class="col-1" style="text-align: center;"><b>Damage Taken</b></div>
                     <div class="col-1 text-muted" style="text-align: center;">Pet</div>
 
                     <div class="col-1"></div>
 
                     <div class="col-1 text-muted" style="text-align: center;">Self</div>
-                    <div class="col-2" style="text-align: center;"><b>Healing</b></div>
+                    <div class="col-1" style="text-align: center;"><b>Damage Dealt</b></div>
+                    <div class="col-1 text-muted" style="text-align: center;">Pet</div>
+
+                    <div class="col-1"></div>
+
+                    <div class="col-1 text-muted" style="text-align: center;">Self</div>
+                    <div class="col-1" style="text-align: center;"><b>Healing</b></div>
                     <div class="col-1 text-muted" style="text-align: center;">Pet</div>
 
                 </div>
                 <div class="row form-group">
-                    <div class="col-1"></div>
-
                     <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorDamageTaken"/></div>
-                    <div class="col-2" style="text-align: center;">Taken</div>
+                    <div class="col-1" style="text-align: center;">----</div>
                     <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetDamageTaken"/></div>
 
                     <div class="col-1"></div>
 
-                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorHealingReceived"/></div>
-                    <div class="col-2" style="text-align: center;">Received</div>
-                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetHealingReceived"/></div>
-                </div>
-                <div class="row form-group">
-                    <div class="col-1"></div>
-
                     <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorMeleeDamage"/></div>
-                    <div class="col-2" style="text-align: center;">Melee done</div>
+                    <div class="col-1" style="text-align: center;">Melee</div>
                     <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetMeleeDamage"/></div>
 
                     <div class="col-1"></div>
 
-                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorHealingDone"/></div>
-                    <div class="col-2" style="text-align: center;">Done</div>
-                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetHealingDone"/></div>
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorHealingReceived"/></div>
+                    <div class="col-1" style="text-align: center;">Received</div>
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetHealingReceived"/></div>
                 </div>
                 <div class="row form-group">
-                    <div class="col-1"></div>
+                    <div class="col-4"></div>
 
                     <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorRiposteDamage"/></div>
-                    <div class="col-2" style="text-align: center;">Riposte done</div>
+                    <div class="col-1" style="text-align: center;">Riposte</div>
                     <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetRiposteDamage"/></div>
-                </div>
-                <div class="row form-group">
+
                     <div class="col-1"></div>
 
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorHealingDone"/></div>
+                    <div class="col-1" style="text-align: center;">Done</div>
+                    <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetHealingDone"/></div>
+
+                </div>
+                <div class="row form-group">
+                    <div class="col-4"></div>
+
                     <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorSpellDamage"/></div>
-                    <div class="col-2" style="text-align: center;">Spell done</div>
+                    <div class="col-1" style="text-align: center;">Spell</div>
                     <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetSpellDamage"/></div>
                 </div>
                 <div class="row form-group">
-                    <div class="col-1"></div>
+                    <div class="col-4"></div>
 
                     <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorOtherDamage"/></div>
-                    <div class="col-2" style="text-align: center;">Other done</div>
+                    <div class="col-1" style="text-align: center;">Other</div>
                     <div class="col-1"><vgform:Input type="color" class="form-control bg-dark" :Value="c.ColorPetOtherDamage"/></div>
                 </div>
             </vg-template>
