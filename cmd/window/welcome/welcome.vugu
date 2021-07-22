@@ -38,16 +38,7 @@
     <h4>Features</h4>
     <ul>
         <li>Overlay damage meters for active fight</li>
-        <li>Overlay strike text for your melee and spell damage.
-            <ul>
-                <li><b style="color: white;">White</b> text for your melee damage.</li>
-                <li><b style="color: yellow;">Yellow</b> text for your spell damage and procs.</li>
-                <li><b style="color: gray;">Gray</b> for your damage shields.</li>
-                <li><b style="color: cyan;">Cyan</b> for heals you cast.</li>
-                <li><b style="color: #32CD32;">Green</b> for heals you receive.</li>
-                <li><b style="color: red;">Red</b> for damage done to you.</li>
-            </ul>
-        </li>
+        <li>Overlay "flying" text for your melee and spell damage.</li>
         <li>Capture some common blockbuster DPS conditions in damage reports:
             <ul>
                 <li><code>s</code> - Fateseer's Boon (Shaman epic 1.5 effect)</li>
