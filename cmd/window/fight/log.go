@@ -11,6 +11,8 @@ import (
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc/ipcrenderer"
 )
 
+const maxRetention = 1000
+
 var finishedFights []*fight.Fight
 var listeners = map[int]chan struct{}{}
 var listenerId = 0
@@ -24,6 +26,9 @@ func init() {
 			err := gob.NewDecoder(bytes.NewReader(fightIn.Content())).Decode(&fightData)
 			if err == nil {
 				finishedFights = append(finishedFights, &fightData)
+				if len(finishedFights)>maxRetention {
+					finishedFights = append([]*fight.Fight(nil), finishedFights[len(finishedFights)-maxRetention:]...)
+				}
 				for _, listener := range listeners {
 					func() {
 						defer func() { recover() }()
