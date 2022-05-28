@@ -1,11 +1,16 @@
+//go:build wasm && web
 // +build wasm,web
 
 package dom
 
 import "syscall/js"
 
+type Wrapper interface {
+	JSValue() js.Value
+}
+
 type Element interface {
-	js.Wrapper
+	Wrapper
 	AddEventListener(name string, jsFunc js.Func)
 
 	Focus()
