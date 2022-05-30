@@ -1,3 +1,4 @@
+//go:build wasm && electron
 // +build wasm,electron
 
 package application
@@ -11,6 +12,10 @@ var app = electron.JSValue().Get("app")
 
 func JSValue() js.Value {
 	return app
+}
+
+func Exit(arg interface{}) {
+	app.Call("exit", arg)
 }
 
 func Quit() {

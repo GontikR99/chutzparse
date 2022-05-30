@@ -1,3 +1,4 @@
+//go:build wasm && electron
 // +build wasm,electron
 
 package eqspec
@@ -38,6 +39,13 @@ func handleChat(mp *multipattern.Multipattern) *multipattern.Multipattern {
 				Method:  MethodSay,
 				Channel: "",
 			}
-		})
+		}).On("(.+) tells you, '(.*)'", func(parts []string, context interface{}) interface{} {
+		return &ChatLog{
+			Source:  normalizeName(parts[1]),
+			Text:    parts[2],
+			Method:  MethodTell,
+			Channel: "",
+		}
+	})
 	// FIXME: add group, raid, guild, tell, shout, auction, ooc, global chat.  For both "you" and someone else.
 }

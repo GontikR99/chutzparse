@@ -1,8 +1,10 @@
+//go:build wasm && web
 // +build wasm,web
 
 package main
 
 import (
+	"github.com/gontikr99/chutzparse/cmd/window/bids"
 	"github.com/gontikr99/chutzparse/cmd/window/fight"
 	"github.com/gontikr99/chutzparse/cmd/window/settings"
 	"github.com/gontikr99/chutzparse/cmd/window/welcome"
@@ -43,6 +45,7 @@ var routes = []*routeEntry{
 	{"", "Welcome", alwaysShow, func() vugu.Builder { return &welcome.Welcome{} }},
 	{"fight", "Fights", alwaysShow, func() vugu.Builder { return &fight.Display{} }},
 	{"settings", "Settings", alwaysShow, func() vugu.Builder { return &settings.Settings{} }},
+	{"bids", "BidTrack", alwaysShow, func() vugu.Builder { return &bids.Bids{} }},
 }
 
 func (c *Root) Init(vCtx vugu.InitCtx) {

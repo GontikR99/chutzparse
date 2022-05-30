@@ -1,3 +1,4 @@
+//go:build native
 // +build native
 
 package internal
@@ -57,13 +58,15 @@ var PackageJson = dict{
 	"dependencies": dict{
 		"electron-squirrel-startup": "^1.0.0",
 		//"iohook":                    "^0.9.3",
-		"ref-napi":   "^3.0.3",
-		"win32-api":  "^9.6.0",
-		"clipboardy": "^2.3.0",
+		"ref-napi":       "^3.0.3",
+		"win32-api":      "^9.6.0",
+		"clipboardy":     "^2.3.0",
+		"electron-alert": "^0.1.20",
 	},
 	"devDependencies": dict{
 		"@electron-forge/cli":            "^6.0.0-beta.57",
 		"@electron-forge/maker-squirrel": "^6.0.0-beta.57",
-		"electron":                       "12.0.12",
+		//"electron":                       "12.0.12",
+		"electron": "19.0.1",
 	},
 }

@@ -1,8 +1,11 @@
+//go:build wasm && web
 // +build wasm,web
 
 package settings
 
 import (
+	"fmt"
+	"github.com/gontikr99/chutzparse/internal/bids"
 	"github.com/gontikr99/chutzparse/internal/eqspec"
 	"github.com/gontikr99/chutzparse/internal/model/fight"
 	"github.com/gontikr99/chutzparse/internal/settings"
@@ -40,9 +43,17 @@ type Settings struct {
 	ColorPetHealingDone     *ConfiguredValue
 	ColorPetDamageTaken     *ConfiguredValue
 	ColorPetHealingReceived *ConfiguredValue
+
+	// DKP site
+	EqDkpSite             *ConfiguredValue
+	DkpSiteTestInProgress bool
+	DkpSiteTestMessage    string
+	BidStartCmd           *ConfiguredValue
+	BidEndCmd             *ConfiguredValue
 }
 
 var scanctl = eqspec.NewScanControlClient(ipcrenderer.Client)
+var bidsctl = bids.NewBidsClient(ipcrenderer.Client)
 
 func (c *Settings) Init(vCtx vugu.InitCtx) {
 	c.EqDir = NewConfiguredValue(vCtx, settings.EverQuestDirectory)
@@ -63,6 +74,11 @@ func (c *Settings) Init(vCtx vugu.InitCtx) {
 	c.ColorPetHealingReceived = NewConfiguredValue(vCtx, settings.HitColorPetHealingReceived)
 	c.ColorPetDamageTaken = NewConfiguredValue(vCtx, settings.HitColorPetDamageTaken)
 	c.ColorPetHealingDone = NewConfiguredValue(vCtx, settings.HitColorPetHealingDone)
+
+	c.EqDkpSite = NewConfiguredValue(vCtx, settings.EqDkpSite)
+	c.EqDkpSite.Callback = func(s string) { bidsctl.RefreshDKP() }
+	c.BidStartCmd = NewConfiguredValue(vCtx, settings.BidStartCmd)
+	c.BidEndCmd = NewConfiguredValue(vCtx, settings.BidEndCmd)
 
 	c.selectedTopMeter = map[string]struct{}{}
 	c.selectedBottomMeter = map[string]struct{}{}
@@ -184,6 +200,31 @@ func (c *Settings) BrowseEqDir(event vugu.DOMEvent) {
 		}
 		event.EventEnv().Lock()
 		c.EqDir.SetStringValue(newDir)
+		event.EventEnv().UnlockRender()
+	}()
+}
+
+func (c *Settings) testDKPClass() string {
+	if c.DkpSiteTestInProgress {
+		return "btn btn-primary disabled"
+	} else {
+		return "btn btn-primary"
+	}
+}
+
+func (c *Settings) TestDKP(event vugu.DOMEvent) {
+	event.PreventDefault()
+	c.DkpSiteTestMessage = "Test in progress..."
+	c.DkpSiteTestInProgress = true
+	go func() {
+		count, err := bidsctl.RefreshDKP()
+		event.EventEnv().Lock()
+		c.DkpSiteTestInProgress = false
+		if err == nil {
+			c.DkpSiteTestMessage = fmt.Sprintf("%d characters retrieved", count)
+		} else {
+			c.DkpSiteTestMessage = err.Error()
+		}
 		event.EventEnv().UnlockRender()
 	}()
 }

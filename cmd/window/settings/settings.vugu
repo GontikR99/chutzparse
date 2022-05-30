@@ -143,6 +143,41 @@
                 </div>
             </vg-template>
         </div>
+        <div class="container-fluid border-light border">
+            <h4 class="text-info" style="text-align: right;">Bid tracker</h4>
+            <div class="form-group row">
+                <label class="col-form-label col-2">EQDKP site</label>
+                <div class="col-4">
+                    <vgform:Input type="text" class="form-control" :Value="c.EqDkpSite"/>
+                </div>
+                <div class="col-2">
+                    <button type="button" :class="c.testDKPClass()" @click="c.TestDKP(event)">Test</button>
+                </div>
+                <div class="col-4 text-muted small" vg-if='c.DkpSiteTestMessage==""'>
+                    Full URL for DKP site, e.g. <code>https://kithandkinguild.com/eqdkp/</code>
+                </div>
+                <div class="col-4 text-muted small" vg-if='c.DkpSiteTestMessage!=""' vg-content="c.DkpSiteTestMessage">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-form-label col-2">Auction start command</label>
+                <div class="col-4">
+                    <vgform:Input type="text" class="form-control" :Value="c.BidStartCmd"/>
+                </div>
+                <div class="col-6 text-muted small">To start an auction, <code>;tell <em>yourname</em>
+                    <span vg-content="c.BidStartCmd.StringValue()"></span></code>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-form-label col-2">Auction end command</label>
+                <div class="col-4">
+                    <vgform:Input type="text" class="form-control" :Value="c.BidEndCmd"/>
+                </div>
+                <div class="col-6 text-muted small">To start an auction, <code>;tell <em>yourname</em>
+                    <span vg-content="c.BidEndCmd.StringValue()"></span></code>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 <script type="application/x-go">

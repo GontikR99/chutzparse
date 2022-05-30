@@ -1,3 +1,4 @@
+//go:build electron && wasm
 // +build electron,wasm
 
 package main
@@ -5,6 +6,7 @@ package main
 import (
 	"context"
 	"github.com/gontikr99/chutzparse/internal"
+	"github.com/gontikr99/chutzparse/internal/bids"
 	"github.com/gontikr99/chutzparse/internal/eqspec"
 	"github.com/gontikr99/chutzparse/internal/iff"
 	"github.com/gontikr99/chutzparse/internal/model"
@@ -31,6 +33,7 @@ func main() {
 	registerRpcHandler(iff.HandleRPC())
 	registerRpcHandler(settings.HandleRPC())
 	registerRpcHandler(ui.HandleRPC())
+	registerRpcHandler(bids.HandleRPC())
 
 	appCtx, exitApp := context.WithCancel(context.Background())
 	application.OnWindowAllClosed(exitApp)
@@ -62,8 +65,8 @@ func main() {
 	mainWindow.Once("ready-to-show", func() {
 		mainWindow.RemoveMenu()
 		mainWindow.Show()
-		//mainWindow.JSValue().Get("webContents").Call("openDevTools", map[string]interface{} {
-		//	"mode":"detach",
+		//mainWindow.JSValue().Get("webContents").Call("openDevTools", map[string]interface{}{
+		//	"mode": "detach",
 		//})
 	})
 	mainWindow.Once("show", shown)

@@ -1,3 +1,4 @@
+//go:build wasm
 // +build wasm
 
 package settings
@@ -32,3 +33,7 @@ const (
 	HitColorPetHealingDone     = "ColorPetHealingDone"
 	HitColorPetHealingReceived = "ColorPetHealingReceived"
 )
+
+const EqDkpSite = "EqDkpSite"
+const BidStartCmd = "BidStartCmd"
+const BidEndCmd = "BidStopCmd"
