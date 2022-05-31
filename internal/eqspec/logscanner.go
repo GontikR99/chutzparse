@@ -1,3 +1,4 @@
+//go:build wasm && electron
 // +build wasm,electron
 
 package eqspec
@@ -164,7 +165,7 @@ func tailLog(ctx context.Context, filename string, character string, server stri
 	}
 }
 
-var logterpreter = handleChat(handleZone(handleHeal(handleDamage(handleDeath(multipattern.New())))))
+var logterpreter = handleDump(handleChat(handleZone(handleHeal(handleDamage(handleDeath(multipattern.New()))))))
 
 type substituteYouHandler struct {
 	charName string
@@ -180,6 +181,9 @@ func (s substituteYouHandler) OnDamage(log *DamageLog) interface{} {
 	}
 	if log.Target == "You" {
 		log.Target = s.charName
+	}
+	if log.Target == "Himself" || log.Target == "Herself" || log.Target == "Itself" {
+		log.Target = log.Source
 	}
 	return log
 }

@@ -21,6 +21,7 @@ type Bids struct {
 	StartCmd    string
 	EndCmd      string
 	Active      bool
+	HasDump     bool
 }
 
 func (c *Bids) Init(vCtx vugu.InitCtx) {
@@ -29,6 +30,7 @@ func (c *Bids) Init(vCtx vugu.InitCtx) {
 		c.EndCmd, _, _ = rpcset.Lookup(settings.BidEndCmd)
 		c.CurrentBids, _ = bidsctl.FetchBids()
 		c.Active, _ = bidsctl.AuctionActive()
+		c.HasDump, _ = bidsctl.HasGuildDump()
 
 		vCtx.EventEnv().Lock()
 		vCtx.EventEnv().UnlockRender()
@@ -47,9 +49,11 @@ func (c *Bids) RunInBackground() {
 			go func() {
 				cb, _ := bidsctl.FetchBids()
 				ac, _ := bidsctl.AuctionActive()
+				hd, _ := bidsctl.HasGuildDump()
 				c.Env().Lock()
 				c.CurrentBids = cb
 				c.Active = ac
+				c.HasDump = hd
 				c.Env().UnlockRender()
 			}()
 		}

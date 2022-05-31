@@ -7,9 +7,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/gontikr99/chutzparse/internal/eqspec"
 	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/pkg/console"
 	"github.com/gontikr99/chutzparse/pkg/electron"
+	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -18,6 +20,7 @@ import (
 )
 
 var currentDKP = map[string]CharacterStat{}
+var hasDKP = eqspec.NewItemTrie().Compress()
 
 func init() {
 	go func() {
@@ -48,7 +51,13 @@ func refreshDKP() (int32, error) {
 	if err != nil {
 		return 0, err
 	}
+	newTrie := eqspec.NewItemTrie()
+	for k, _ := range cd {
+		newTrie = newTrie.With(strings.ToUpper(k))
+	}
 	currentDKP = cd
+	hasDKP = newTrie.Compress()
+	browserwindow.Broadcast(ChannelChange, []byte{})
 	return int32(len(currentDKP)), nil
 }
 

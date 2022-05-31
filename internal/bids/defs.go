@@ -22,5 +22,10 @@ type ItemBids struct {
 	Bids []*AnnotatedBid
 }
 
+type MemberInfo struct {
+	Rank    string
+	Comment string
+}
+
 const UnspecifiedItem = "Unspecified"
 const ChannelChange = "BidsChange"

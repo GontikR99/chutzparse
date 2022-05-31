@@ -37,4 +37,10 @@
             </tbody>
         </table>
     </vg-template>
+    <div vg-if="!c.HasDump">
+        <hr>
+        <p>For best results, please run a guild dump.  Ensure that you've got "show offline" checked, "hide alts"
+            unchecked, and are listing "all" members</p>
+        <img src="guilddump.png"/>
+    </div>
 </div>

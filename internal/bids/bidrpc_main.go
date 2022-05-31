@@ -6,6 +6,7 @@ package bids
 import (
 	"net/rpc"
 	"sort"
+	"strings"
 )
 
 type bidsServer struct{}
@@ -17,6 +18,10 @@ func (b bidsServer) RefreshDKP() (int32, error) {
 
 func (b bidsServer) AuctionActive() (bool, error) {
 	return auctionActive, nil
+}
+
+func (b bidsServer) HasGuildDump() (bool, error) {
+	return len(guildMembers) != 0, nil
 }
 
 type byCostRev []*AnnotatedBid
@@ -61,8 +66,23 @@ func (b bidsServer) FetchBids() ([]*ItemBids, error) {
 					Attendance: nil,
 				},
 			}
+			if meminfo, ok := guildMembers[bidder]; ok {
+				annBid.Stat.Rank = meminfo.Rank
+			}
 			if stat, ok := currentDKP[bidder]; ok {
-				annBid.Stat = stat
+				annBid.Stat.Balance = stat.Balance
+				annBid.Stat.Attendance = stat.Attendance
+			} else if meminfo, ok := guildMembers[bidder]; ok {
+				upperComment := strings.ToUpper(meminfo.Comment)
+				candidates := hasDKP.Scan(upperComment)
+				if len(candidates) != 0 {
+					mainName := strings.ToUpper(candidates[0][0:1]) + strings.ToLower(candidates[0][1:])
+					annBid.Character = annBid.Character + " (" + mainName + ") "
+					if stat, ok2 := currentDKP[mainName]; ok2 {
+						annBid.Stat.Balance = stat.Balance
+						annBid.Stat.Attendance = stat.Attendance
+					}
+				}
 			}
 			charBids = append(charBids, annBid)
 		}

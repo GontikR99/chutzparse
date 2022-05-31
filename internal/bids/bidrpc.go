@@ -6,5 +6,6 @@ package bids
 type Bids interface {
 	RefreshDKP() (int32, error)
 	AuctionActive() (bool, error)
+	HasGuildDump() (bool, error)
 	FetchBids() ([]*ItemBids, error)
 }
