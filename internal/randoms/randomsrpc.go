@@ -4,5 +4,6 @@ package randoms
 
 type Randoms interface {
 	Reset() error
+	Cull() error
 	FetchRandoms() ([]*RollGroup, error)
 }

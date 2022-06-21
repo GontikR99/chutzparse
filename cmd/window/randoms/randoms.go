@@ -9,6 +9,7 @@ import (
 	"github.com/gontikr99/chutzparse/pkg/electron/ipc/ipcrenderer"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
 	"github.com/vugu/vugu"
+	"time"
 )
 
 var randomsctl = randoms.NewRandomsClient(ipcrenderer.Client)
@@ -36,10 +37,19 @@ func (c *Randoms) RunInBackground() {
 		case <-c.Done():
 			return
 		case <-sc:
-			cr, _ := randomsctl.FetchRandoms()
-			c.Env().Lock()
-			c.CurrentRandoms = cr
-			c.Env().UnlockRender()
+			go func() {
+				cr, _ := randomsctl.FetchRandoms()
+				c.Env().Lock()
+				c.CurrentRandoms = cr
+				c.Env().UnlockRender()
+			}()
+		case <-time.After(1 * time.Second):
+			go func() {
+				cr, _ := randomsctl.FetchRandoms()
+				c.Env().Lock()
+				c.CurrentRandoms = cr
+				c.Env().UnlockRender()
+			}()
 		}
 	}
 }
@@ -47,6 +57,12 @@ func (c *Randoms) RunInBackground() {
 func (c *Randoms) Reset(event vugu.DOMEvent) {
 	go func() {
 		randomsctl.Reset()
+	}()
+}
+
+func (c *Randoms) Cull(event vugu.DOMEvent) {
+	go func() {
+		randomsctl.Cull()
 	}()
 }
 

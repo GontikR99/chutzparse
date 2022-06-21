@@ -8,4 +8,7 @@ type Bids interface {
 	AuctionActive() (bool, error)
 	HasGuildDump() (bool, error)
 	FetchBids() ([]*ItemBids, error)
+
+	Start() error
+	End() error
 }

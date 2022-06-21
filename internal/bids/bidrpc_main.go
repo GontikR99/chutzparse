@@ -4,12 +4,25 @@
 package bids
 
 import (
+	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
 	"net/rpc"
 	"sort"
 	"strings"
 )
 
 type bidsServer struct{}
+
+func (b bidsServer) Start() error {
+	startAuction()
+	browserwindow.Broadcast(ChannelChange, []byte{})
+	return nil
+}
+
+func (b bidsServer) End() error {
+	endAuction()
+	browserwindow.Broadcast(ChannelChange, []byte{})
+	return nil
+}
 
 func (b bidsServer) RefreshDKP() (int32, error) {
 	chars, err := refreshDKP()

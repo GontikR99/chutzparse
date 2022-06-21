@@ -15,6 +15,15 @@ import (
 var auctionActive = false
 var activeBids = map[string]map[string]ItemBid{}
 
+func startAuction() {
+	auctionActive = true
+	activeBids = map[string]map[string]ItemBid{}
+}
+
+func endAuction() {
+	auctionActive = false
+}
+
 func init() {
 	settings.DefaultSetting(settings.BidStartCmd, "!start")
 	settings.DefaultSetting(settings.BidEndCmd, "!end")
@@ -40,15 +49,12 @@ func init() {
 				continue
 			}
 			if strings.EqualFold(entry.Character, msg.Source) {
-				console.Log("Starting auction")
 				if strings.EqualFold(bidStart, msg.Text) {
-					auctionActive = true
-					activeBids = map[string]map[string]ItemBid{}
+					startAuction()
 					didWork = true
 					continue
 				} else if strings.EqualFold(bidEnd, msg.Text) {
-					console.Log("Ending auction")
-					auctionActive = false
+					endAuction()
 					didWork = true
 					continue
 				}

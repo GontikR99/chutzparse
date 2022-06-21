@@ -2,7 +2,12 @@
     <h2>Rolls</h2>
     <div vg-if="len(c.CurrentRandoms)==0">Random rolls made by players will appear here.</div>
     <div vg-if="len(c.CurrentRandoms)!=0">
+        Clear all rolls:
         <button type="button" class="btn btn-primary" @click="c.Reset(event)">Reset</button>
+    </div>
+    <div vg-if="len(c.CurrentRandoms)!=0">
+        Clear all rolls more than 10 minutes old:
+        <button type="button" class="btn btn-primary" @click="c.Cull(event)">Cull</button>
     </div>
     <div class="card-columns">
         <div vg-for="_, rg:=range c.CurrentRandoms" class="card text-white bg-dark">
@@ -10,6 +15,8 @@
                 <h5 class="card-title" vg-content="title(rg)"></h5>
                 <div class="d-flex flex-row" vg-for="_, row:=range rg.Rolls">
                     <span vg-content="row.Character"></span>
+                    &nbsp;
+                    (<span vg-content="row.Age" style='font-family: "Anka Coder Condensed"'></span>)
                     <span class="ml-auto" vg-content="rvalue(row)"></span>
                 </div>
             </div>

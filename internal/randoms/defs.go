@@ -8,6 +8,7 @@ type RollGroup struct {
 
 type CharacterRoll struct {
 	Character string
+	Age       string
 	Value     int32
 }
 

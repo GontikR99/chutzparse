@@ -2,14 +2,18 @@
     <h2>Bids</h2>
     <div vg-if="len(c.CurrentBids)==0 && !c.Active">
         <h1>No current auction</h1>
-        <div>To start an auction, <code>;tell <em>yourname</em> <span vg-content="c.StartCmd"/></code></div>
+        <div>To start an auction, <code>;tell <em>yourname</em> <span vg-content="c.StartCmd"/></code> or
+            click <button type="button" class="btn btn-primary" @click="c.StartAuction()">Start</button>
+        </div>
     </div>
     <div vg-if="c.Active">
-        <div>To end the current auction, <code>;tell <em>yourname</em> <span vg-content="c.EndCmd"/></code></div>
+        <div>To end the current auction, <code>;tell <em>yourname</em> <span vg-content="c.EndCmd"/></code> or
+        click <button type="button" class="btn btn-primary" @click="c.EndAuction()">End</button></div>
     </div>
     <div vg-if="len(c.CurrentBids)!=0 && !c.Active">
         <div>This auction has ended and is not accepting further bids.</div>
-        <div>To start an auction, <code>;tell <em>yourname</em> <span vg-content="c.StartCmd"/></code></div>
+        <div>To start an auction, <code>;tell <em>yourname</em> <span vg-content="c.StartCmd"/></code> or
+        click <button type="button" class="btn btn-primary" @click="c.StartAuction()">Start</button></div>
     </div>
     <vg-template vg-for="itemidx, item := range c.CurrentBids">
         <h3 vg-content="item.Item"></h3>

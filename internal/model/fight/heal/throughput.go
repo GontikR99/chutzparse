@@ -1,3 +1,4 @@
+//go:build wasm && electron
 // +build wasm,electron
 
 package heal

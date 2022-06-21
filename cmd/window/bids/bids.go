@@ -67,3 +67,15 @@ func bidDKP(bid int32) string {
 		return strconv.Itoa(int(bid))
 	}
 }
+
+func (c *Bids) StartAuction() {
+	go func() {
+		bidsctl.Start()
+	}()
+}
+
+func (c *Bids) EndAuction() {
+	go func() {
+		bidsctl.End()
+	}()
+}

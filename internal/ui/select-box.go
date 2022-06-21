@@ -1,3 +1,4 @@
+//go:build wasm && web
 // +build wasm,web
 
 package ui

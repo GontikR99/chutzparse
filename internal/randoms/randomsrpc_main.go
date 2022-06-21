@@ -4,10 +4,11 @@
 package randoms
 
 import (
-	"github.com/gontikr99/chutzparse/internal/eqspec"
+	"fmt"
 	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
 	"net/rpc"
 	"sort"
+	"time"
 )
 
 type randomsServer struct{}
@@ -30,12 +31,26 @@ func (b byValueRev) Less(i, j int) bool { return b[i].Value > b[j].Value }
 func (b byValueRev) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
 
 func (r randomsServer) Reset() error {
-	currentRolls = []*eqspec.RandomLog{}
+	currentRolls = []*randomEntry{}
+	browserwindow.Broadcast(ChannelChange, []byte{})
+	return nil
+}
+
+func (r randomsServer) Cull() error {
+	newRolls := []*randomEntry{}
+	now := time.Now()
+	for _, roll := range currentRolls {
+		if now.Sub(roll.Timestamp) < 10*time.Minute {
+			newRolls = append(newRolls, roll)
+		}
+	}
+	currentRolls = newRolls
 	browserwindow.Broadcast(ChannelChange, []byte{})
 	return nil
 }
 
 func (r randomsServer) FetchRandoms() ([]*RollGroup, error) {
+	now := time.Now()
 	resultMap := map[int32]map[int32][]*CharacterRoll{}
 	for _, roll := range currentRolls {
 		if _, ok := resultMap[roll.Lbound]; !ok {
@@ -45,8 +60,10 @@ func (r randomsServer) FetchRandoms() ([]*RollGroup, error) {
 		if _, ok := umap[roll.Ubound]; !ok {
 			umap[roll.Ubound] = []*CharacterRoll{}
 		}
+		age := int(now.Sub(roll.Timestamp).Seconds())
 		umap[roll.Ubound] = append(umap[roll.Ubound], &CharacterRoll{
 			Character: roll.Source,
+			Age:       fmt.Sprintf("%d:%02d:%02d", age/3600, (age/60)%60, age%60),
 			Value:     roll.Value,
 		})
 	}
