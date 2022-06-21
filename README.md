@@ -5,7 +5,7 @@
 While my usual development environment is Linux, I developed this software in Windows. To start, you need to install:
 
 * MSYS 2 (Recommended install: `C:\msys64`)
-* Go 1.16+ (make sure the install path doesn't have any spaces in it. Recommended: `C:\msys64\go`)
+* Go 1.18+ (make sure the install path doesn't have any spaces in it. Recommended: `C:\msys64\go`)
 * Node v14.17.2 **32-bit** (make sure the install path doesn't have any spaces in it. Recommended:
   `C:\msys64\nodejs`)
 * Python 2.7.17 (Default installation location: `C:\Python27`)

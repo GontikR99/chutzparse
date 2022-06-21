@@ -6,6 +6,7 @@ package main
 import (
 	"github.com/gontikr99/chutzparse/cmd/window/bids"
 	"github.com/gontikr99/chutzparse/cmd/window/fight"
+	"github.com/gontikr99/chutzparse/cmd/window/randoms"
 	"github.com/gontikr99/chutzparse/cmd/window/settings"
 	"github.com/gontikr99/chutzparse/cmd/window/welcome"
 	"github.com/gontikr99/chutzparse/pkg/vuguutil"
@@ -44,8 +45,9 @@ var alwaysShow = func() bool { return true }
 var routes = []*routeEntry{
 	{"", "Welcome", alwaysShow, func() vugu.Builder { return &welcome.Welcome{} }},
 	{"fight", "Fights", alwaysShow, func() vugu.Builder { return &fight.Display{} }},
-	{"settings", "Settings", alwaysShow, func() vugu.Builder { return &settings.Settings{} }},
 	{"bids", "BidTrack", alwaysShow, func() vugu.Builder { return &bids.Bids{} }},
+	{"randoms", "Rolls", alwaysShow, func() vugu.Builder { return &randoms.Randoms{} }},
+	{"settings", "Settings", alwaysShow, func() vugu.Builder { return &settings.Settings{} }},
 }
 
 func (c *Root) Init(vCtx vugu.InitCtx) {

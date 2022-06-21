@@ -9,6 +9,7 @@
     </div>
     <div vg-if="len(c.CurrentBids)!=0 && !c.Active">
         <div>This auction has ended and is not accepting further bids.</div>
+        <div>To start an auction, <code>;tell <em>yourname</em> <span vg-content="c.StartCmd"/></code></div>
     </div>
     <vg-template vg-for="itemidx, item := range c.CurrentBids">
         <h3 vg-content="item.Item"></h3>

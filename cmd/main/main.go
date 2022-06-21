@@ -10,6 +10,7 @@ import (
 	"github.com/gontikr99/chutzparse/internal/eqspec"
 	"github.com/gontikr99/chutzparse/internal/iff"
 	"github.com/gontikr99/chutzparse/internal/model"
+	"github.com/gontikr99/chutzparse/internal/randoms"
 	"github.com/gontikr99/chutzparse/internal/settings"
 	"github.com/gontikr99/chutzparse/internal/ui"
 	"github.com/gontikr99/chutzparse/pkg/console"
@@ -34,6 +35,7 @@ func main() {
 	registerRpcHandler(settings.HandleRPC())
 	registerRpcHandler(ui.HandleRPC())
 	registerRpcHandler(bids.HandleRPC())
+	registerRpcHandler(randoms.HandleRPC())
 
 	appCtx, exitApp := context.WithCancel(context.Background())
 	application.OnWindowAllClosed(exitApp)

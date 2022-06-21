@@ -165,7 +165,8 @@ func tailLog(ctx context.Context, filename string, character string, server stri
 	}
 }
 
-var logterpreter = handleDump(handleChat(handleZone(handleHeal(handleDamage(handleDeath(multipattern.New()))))))
+var logterpreter = handleRandoms(handleDump(handleChat(
+	handleZone(handleHeal(handleDamage(handleDeath(multipattern.New())))))))
 
 type substituteYouHandler struct {
 	charName string

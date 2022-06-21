@@ -71,17 +71,20 @@ func init() {
 			} else {
 				remText = msg.Text[:nameIdx] + "|" + msg.Text[nameIdx+len(item):]
 			}
-			if _, ok := activeBids[item]; !ok {
-				activeBids[item] = map[string]ItemBid{}
+			bidValue := extractBid(remText)
+			if bidValue >= 0 {
+				if _, ok := activeBids[item]; !ok {
+					activeBids[item] = map[string]ItemBid{}
+				}
+				if _, ok := activeBids[item][msg.Source]; !ok {
+					activeBids[item][msg.Source] = ItemBid{}
+				}
+				newBid := ItemBid{
+					CalculatedBid: bidValue,
+					BidMessages:   append(activeBids[item][msg.Source].BidMessages, msg.Text),
+				}
+				activeBids[item][msg.Source] = newBid
 			}
-			if _, ok := activeBids[item][msg.Source]; !ok {
-				activeBids[item][msg.Source] = ItemBid{}
-			}
-			newBid := ItemBid{
-				CalculatedBid: extractBid(remText),
-				BidMessages:   append(activeBids[item][msg.Source].BidMessages, msg.Text),
-			}
-			activeBids[item][msg.Source] = newBid
 		}
 		if didWork {
 			browserwindow.Broadcast(ChannelChange, []byte{})
@@ -90,21 +93,21 @@ func init() {
 }
 
 func extractBid(msgText string) int32 {
-	bestBid := int32(0)
+	bestBid := int32(-1)
 	var bidBuf []byte
 	for _, c := range []byte(msgText) {
 		if '0' <= c && c <= '9' {
 			bidBuf = append(bidBuf, c)
 		} else {
-			bid, _ := strconv.Atoi(string(bidBuf))
-			if int32(bid) > bestBid {
+			bid, err := strconv.Atoi(string(bidBuf))
+			if err == nil && int32(bid) > bestBid {
 				bestBid = int32(bid)
 			}
 			bidBuf = []byte{}
 		}
 	}
-	bid, _ := strconv.Atoi(string(bidBuf))
-	if int32(bid) > bestBid {
+	bid, err := strconv.Atoi(string(bidBuf))
+	if err == nil && int32(bid) > bestBid {
 		bestBid = int32(bid)
 	}
 	return bestBid

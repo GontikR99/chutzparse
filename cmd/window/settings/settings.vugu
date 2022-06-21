@@ -173,7 +173,7 @@
                 <div class="col-4">
                     <vgform:Input type="text" class="form-control" :Value="c.BidEndCmd"/>
                 </div>
-                <div class="col-6 text-muted small">To start an auction, <code>;tell <em>yourname</em>
+                <div class="col-6 text-muted small">To end an auction, <code>;tell <em>yourname</em>
                     <span vg-content="c.BidEndCmd.StringValue()"></span></code>
                 </div>
             </div>
