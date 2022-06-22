@@ -4,7 +4,7 @@
 package bids
 
 import (
-	"bytes"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"github.com/gontikr99/chutzparse/internal/eqspec"
@@ -13,9 +13,9 @@ import (
 	"github.com/gontikr99/chutzparse/pkg/electron"
 	"github.com/gontikr99/chutzparse/pkg/electron/browserwindow"
 	"net/url"
-	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -34,7 +34,7 @@ func init() {
 			if err != nil {
 				console.Log(err)
 			}
-			time.Sleep(60 * time.Second)
+			time.Sleep(5 * 60 * time.Second)
 		}
 	}()
 }
@@ -59,6 +59,92 @@ func refreshDKP() (int32, error) {
 	hasDKP = newTrie.Compress()
 	browserwindow.Broadcast(ChannelChange, []byte{})
 	return int32(len(currentDKP)), nil
+}
+
+type EQDKPRaids struct {
+	XMLName xml.Name     `xml:"response"`
+	Raids   []*EQDKPRaid `xml:"raid"`
+}
+
+type EQDKPRaid struct {
+	Timestamp int64       `xml:"date_timestamp"`
+	Note      string      `xml:"note"`
+	Value     int32       `xml:"value"`
+	EventId   int32       `xml:"event_id"`
+	PlayerIds PlayerIdSet `xml:"raid_attendees"`
+}
+
+type PlayerIdSet map[int32]struct{}
+
+func (r *PlayerIdSet) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
+	result := map[int32]struct{}{}
+	for {
+		t, err := decoder.Token()
+		if err != nil {
+			return err
+		}
+		if ee, ok := t.(xml.EndElement); ok && ee.Name == start.Name {
+			break
+		}
+		if se, ok := t.(xml.StartElement); ok && strings.HasPrefix(se.Name.Local, "i") {
+			var playerId int32
+			err = decoder.DecodeElement(&playerId, &se)
+			if err != nil {
+				return err
+			}
+			result[playerId] = struct{}{}
+		}
+	}
+	*r = result
+	time.Sleep(1 * time.Millisecond)
+	return nil
+}
+
+type EQDKPPoints struct {
+	XMLName xml.Name       `xml:"response"`
+	Players []*EQDKPPlayer `xml:"players>player"`
+	Now     int64          `xml:"info>timestamp"`
+}
+
+type EQDKPPlayer struct {
+	PlayerId int32      `xml:"id"`
+	Name     string     `xml:"name"`
+	Active   int        `xml:"active"`
+	Hidden   int        `xml:"hidden"`
+	Points   int32      `xml:"points>multidkp_points>points_current"`
+	Pause    EQDKPPause `xml:"items"`
+}
+
+// Arrange schedule yielding points periodically so interface doesn't freeze parsing players
+type EQDKPPause struct{}
+
+func (E *EQDKPPause) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	for {
+		t, err := d.Token()
+		if err != nil {
+			return err
+		}
+		if ee, ok := t.(xml.EndElement); ok && ee.Name == start.Name {
+			break
+		}
+	}
+	time.Sleep(1 * time.Millisecond)
+	return nil
+}
+
+type EQDKPEvents struct {
+	XMLName xml.Name      `xml:"response"`
+	Events  []*EQDKPEvent `xml:"event"`
+}
+
+type EQDKPEvent struct {
+	Id         int32 `xml:"id"`
+	Attendance int32 `xml:"multidkp_pools>multidkp_pool>attendance""`
+}
+
+type attendanceTally struct {
+	raids30 int32
+	raids90 int32
 }
 
 func scrapeEQDKP(site string) (map[string]CharacterStat, error) {
@@ -86,107 +172,137 @@ func scrapeEQDKP(site string) (map[string]CharacterStat, error) {
 		pnum, _ := strconv.Atoi(loc.Port())
 		port = int16(pnum)
 	}
-	page, code, err := electron.HttpCall(loc.Scheme, "GET", loc.Host, port, path+"Points/", nil, nil)
-	if err != nil {
-		return nil, err
+
+	var points EQDKPPoints
+	var raids EQDKPRaids
+	var events EQDKPEvents
+	var fetcherr error
+
+	sg := sync.WaitGroup{}
+	sg.Add(1)
+	go func() {
+		defer sg.Done()
+		pointsbytes, code, err := electron.HttpCall(loc.Scheme, "GET", loc.Host, port, path+"api.php?function=points", nil, nil)
+		if err != nil {
+			fetcherr = err
+			return
+		}
+		if code >= 400 {
+			fetcherr = fmt.Errorf("Failed to fetch DKP information (%d).  Bad path?", code)
+			return
+		}
+		err = xml.Unmarshal(pointsbytes, &points)
+		if err != nil {
+			fetcherr = err
+			return
+		}
+	}()
+	sg.Add(1)
+	go func() {
+		defer sg.Done()
+		raidsbytes, code, err := electron.HttpCall(loc.Scheme, "GET", loc.Host, port, path+"api.php?function=raids", nil, nil)
+		if err != nil {
+			fetcherr = err
+			return
+		}
+		if code >= 400 {
+			fetcherr = fmt.Errorf("Failed to fetch DKP information (%d).  Bad path?", code)
+			return
+		}
+		err = xml.Unmarshal(raidsbytes, &raids)
+		if err != nil {
+			fetcherr = err
+			return
+		}
+	}()
+	sg.Add(1)
+	go func() {
+		defer sg.Done()
+		eventsbytes, code, err := electron.HttpCall(loc.Scheme, "GET", loc.Host, port, path+"api.php?function=events", nil, nil)
+		if err != nil {
+			fetcherr = err
+			return
+		}
+		if code >= 400 {
+			fetcherr = fmt.Errorf("Failed to fetch DKP information (%d).  Bad path?", code)
+			return
+		}
+		err = xml.Unmarshal(eventsbytes, &events)
+		if err != nil {
+			fetcherr = err
+			return
+		}
+	}()
+	sg.Wait()
+	if fetcherr != nil {
+		return nil, fetcherr
 	}
-	if code >= 400 {
-		return nil, fmt.Errorf("Failed to fetch DKP information (%d).  Bad path?", code)
+
+	// Calculate attendance
+	attendable := map[int32]struct{}{}
+	for _, event := range events.Events {
+		if event.Attendance != 0 {
+			attendable[event.Id] = struct{}{}
+		}
 	}
-	for _, row := range scrapeRows(page) {
-		cols := scrapeCols(row)
-		if len(cols) != 8 || !strings.Contains(string(cols[0]), "Character/") {
+
+	tallies := map[int32]*attendanceTally{}
+	var raids30, raids90 int32
+	var lastUpdate int64
+	for _, raid := range raids.Raids {
+		if _, ok := attendable[raid.EventId]; !ok {
 			continue
 		}
-		name := htmlTrim(cols[0])
-		balance, _ := strconv.Atoi(htmlTrim(cols[2]))
-		result[name] = CharacterStat{
-			Rank:       "",
-			Balance:    int32(balance),
-			Attendance: []string{htmlTrim(cols[3]), htmlTrim(cols[4]), htmlTrim(cols[5])},
+		if raid.Timestamp > lastUpdate {
+			lastUpdate = raid.Timestamp
 		}
+	}
+	for _, raid := range raids.Raids {
+		if _, ok := attendable[raid.EventId]; !ok {
+			continue
+		}
+		for pid, _ := range raid.PlayerIds {
+			if _, ok := tallies[pid]; !ok {
+				tallies[pid] = &attendanceTally{}
+			}
+		}
+		if lastUpdate-raid.Timestamp < int64(30*24*60*60) {
+			raids30 += 1
+			for pid, _ := range raid.PlayerIds {
+				tallies[pid].raids30 += 1
+			}
+		}
+		if lastUpdate-raid.Timestamp < int64(90*24*60*60) {
+			raids90 += 1
+			for pid, _ := range raid.PlayerIds {
+				tallies[pid].raids90 += 1
+			}
+		}
+		time.Sleep(1 * time.Millisecond)
+	}
+
+	// Create characterstat map
+	for _, player := range points.Players {
+		if player.Active == 0 {
+			continue
+		}
+		if player.Hidden != 0 {
+			continue
+		}
+		cs := CharacterStat{
+			Rank:       "",
+			Balance:    player.Points,
+			Attendance: nil,
+		}
+		if tally, ok := tallies[player.PlayerId]; ok {
+			if raids30 != 0 {
+				cs.Attendance = append(cs.Attendance, fmt.Sprintf("%d%% (%d/%d)", 100*tally.raids30/raids30, tally.raids30, raids30))
+			}
+			if raids90 != 0 {
+				cs.Attendance = append(cs.Attendance, fmt.Sprintf("%d%% (%d/%d)", 100*tally.raids90/raids90, tally.raids90, raids90))
+			}
+		}
+		result[player.Name] = cs
 	}
 	return result, nil
-}
-
-var rowStartRE = regexp.MustCompile("<\\s*tr")
-var rowEndRE = regexp.MustCompile("<\\s*/\\s*tr")
-
-func scrapeRows(rawPage []byte) [][]byte {
-	rows := [][]byte{}
-
-	for {
-		idxs := rowStartRE.FindIndex(rawPage)
-		if idxs == nil {
-			return rows
-		}
-		rawPage = rawPage[idxs[0]:]
-		closeIdx := strings.Index(string(rawPage), ">")
-		if closeIdx < 0 {
-			return rows
-		}
-		rawPage = rawPage[closeIdx+1:]
-		idxs = rowEndRE.FindIndex(rawPage)
-		if idxs == nil {
-			return rows
-		}
-		row := rawPage[:idxs[0]]
-		rows = append(rows, row)
-		rawPage = rawPage[idxs[0]:]
-		closeIdx = strings.Index(string(rawPage), ">")
-		if closeIdx < 0 {
-			return rows
-		}
-		rawPage = rawPage[closeIdx+1:]
-	}
-}
-
-var colStartRE = regexp.MustCompile("<\\s*td")
-var colEndRE = regexp.MustCompile("<\\s*/\\s*td")
-
-func scrapeCols(rawRow []byte) [][]byte {
-	cols := [][]byte{}
-
-	for {
-		idxs := colStartRE.FindIndex(rawRow)
-		if idxs == nil {
-			return cols
-		}
-		rawRow = rawRow[idxs[0]:]
-		closeIdx := strings.Index(string(rawRow), ">")
-		if closeIdx < 0 {
-			return cols
-		}
-		rawRow = rawRow[closeIdx+1:]
-		idxs = colEndRE.FindIndex(rawRow)
-		if idxs == nil {
-			return cols
-		}
-		col := rawRow[:idxs[0]]
-		cols = append(cols, col)
-		rawRow = rawRow[idxs[0]:]
-		closeIdx = strings.Index(string(rawRow), ">")
-		if closeIdx < 0 {
-			return cols
-		}
-		rawRow = rawRow[closeIdx+1:]
-	}
-}
-
-func htmlTrim(cell []byte) string {
-	var result []byte
-	idx := 0
-	for idx < len(cell) {
-		if cell[idx] != '<' {
-			result = append(result, cell[idx])
-			idx++
-			continue
-		}
-		closeIdx := bytes.IndexByte(cell[idx:], '>')
-		if closeIdx < 0 {
-			break
-		}
-		idx = idx + closeIdx + 1
-	}
-	return strings.Trim(string(result), " \t\r\n")
 }

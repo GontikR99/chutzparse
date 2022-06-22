@@ -20,7 +20,7 @@ func (rl *RandomLog) Visit(handler ParsedLogHandler) interface{} { return rl }
 func handleRandoms(mp *multipattern.Multipattern) *multipattern.Multipattern {
 	return commonSubpatterns(mp).
 		On("\\*\\*A Magic Die is rolled by (.+)[.] It could have been any number from (@num@) to (@num@),"+
-			" but this time it turned up a (@num@).", func(parts []string, context interface{}) interface{} {
+			" but this time it turned up a (@num@)[.]", func(parts []string, context interface{}) interface{} {
 			lb, _ := strconv.Atoi(parts[2])
 			ub, _ := strconv.Atoi(parts[3])
 			roll, _ := strconv.Atoi(parts[4])

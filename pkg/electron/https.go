@@ -9,11 +9,13 @@ import (
 	"fmt"
 	"github.com/gontikr99/chutzparse/pkg/jsbinding"
 	"github.com/gontikr99/chutzparse/pkg/nodejs"
+	"sync"
 	"syscall/js"
 )
 
 var http = nodejs.Require("http")
 var https = nodejs.Require("https")
+var dns = nodejs.Require("dns")
 
 func HttpCall(scheme string, method string, hostname string, port int16, path string, headers map[string]string, reqText []byte) (resBody []byte, statCode int, err error) {
 	defer func() {
@@ -25,6 +27,25 @@ func HttpCall(scheme string, method string, hostname string, port int16, path st
 			}
 		}
 	}()
+
+	sg := sync.WaitGroup{}
+	errHolder := new(error)
+	resolvFunc := new(js.Func)
+	*resolvFunc = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		defer sg.Done()
+		resolvFunc.Release()
+		if !args[0].IsUndefined() && !args[0].IsNull() {
+			*errHolder = errors.New("Failed to resolve " + hostname)
+		}
+		return nil
+	})
+	sg.Add(1)
+	dns.Call("resolve", hostname, *resolvFunc)
+	sg.Wait()
+	if *errHolder != nil {
+		return nil, 0, *errHolder
+	}
+
 	var schemelib js.Value
 	if scheme == "http" {
 		schemelib = http
@@ -53,7 +74,7 @@ func HttpCall(scheme string, method string, hostname string, port int16, path st
 
 	doneChan := make(chan struct{})
 	buffer := new(bytes.Buffer)
-	errHolder := new(error)
+
 	statusCodeHolder := new(int)
 
 	responseFunc := new(js.Func)
@@ -89,17 +110,18 @@ func HttpCall(scheme string, method string, hostname string, port int16, path st
 
 		return nil
 	})
-	// FIXME: how to catch the error?
-	ucHandle := RegisterUncaughtException(func(err error) {
-		*errHolder = err
-		doneChan <- struct{}{}
-	})
+	//// FIXME: how to catch the error?
+	//ucHandle := RegisterUncaughtException(func(err error) {
+	//	*errHolder = err
+	//	doneChan <- struct{}{}
+	//})
+	//defer ucHandle.Release()
 	req := schemelib.Call("request", options, *responseFunc)
+
 	req.Call("write", jsbinding.BufferOf(reqText))
 	req.Call("end")
 
 	<-doneChan
-	ucHandle.Release()
 	if *errHolder != nil {
 		return nil, 0, *errHolder
 	} else {
