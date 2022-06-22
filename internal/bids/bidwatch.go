@@ -78,19 +78,20 @@ func init() {
 				remText = msg.Text[:nameIdx] + "|" + msg.Text[nameIdx+len(item):]
 			}
 			bidValue := extractBid(remText)
-			if bidValue >= 0 {
-				if _, ok := activeBids[item]; !ok {
-					activeBids[item] = map[string]ItemBid{}
-				}
-				if _, ok := activeBids[item][msg.Source]; !ok {
-					activeBids[item][msg.Source] = ItemBid{}
-				}
-				newBid := ItemBid{
-					CalculatedBid: bidValue,
-					BidMessages:   append(activeBids[item][msg.Source].BidMessages, msg.Text),
-				}
-				activeBids[item][msg.Source] = newBid
+			if _, ok := activeBids[item]; !ok {
+				activeBids[item] = map[string]ItemBid{}
 			}
+			if _, ok := activeBids[item][msg.Source]; !ok {
+				activeBids[item][msg.Source] = ItemBid{}
+			}
+			if bidValue < 0 {
+				bidValue = activeBids[item][msg.Source].CalculatedBid
+			}
+			newBid := ItemBid{
+				CalculatedBid: bidValue,
+				BidMessages:   append(activeBids[item][msg.Source].BidMessages, msg.Text),
+			}
+			activeBids[item][msg.Source] = newBid
 		}
 		if didWork {
 			browserwindow.Broadcast(ChannelChange, []byte{})

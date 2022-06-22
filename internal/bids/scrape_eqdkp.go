@@ -144,6 +144,7 @@ type EQDKPEvent struct {
 
 type attendanceTally struct {
 	raids30 int32
+	raids60 int32
 	raids90 int32
 }
 
@@ -247,7 +248,7 @@ func scrapeEQDKP(site string) (map[string]CharacterStat, error) {
 	}
 
 	tallies := map[int32]*attendanceTally{}
-	var raids30, raids90 int32
+	var raids30, raids60, raids90 int32
 	var lastUpdate int64
 	for _, raid := range raids.Raids {
 		if _, ok := attendable[raid.EventId]; !ok {
@@ -270,6 +271,12 @@ func scrapeEQDKP(site string) (map[string]CharacterStat, error) {
 			raids30 += 1
 			for pid, _ := range raid.PlayerIds {
 				tallies[pid].raids30 += 1
+			}
+		}
+		if lastUpdate-raid.Timestamp < int64(60*24*60*60) {
+			raids60 += 1
+			for pid, _ := range raid.PlayerIds {
+				tallies[pid].raids60 += 1
 			}
 		}
 		if lastUpdate-raid.Timestamp < int64(90*24*60*60) {
@@ -296,10 +303,13 @@ func scrapeEQDKP(site string) (map[string]CharacterStat, error) {
 		}
 		if tally, ok := tallies[player.PlayerId]; ok {
 			if raids30 != 0 {
-				cs.Attendance = append(cs.Attendance, fmt.Sprintf("%d%% (%d/%d)", 100*tally.raids30/raids30, tally.raids30, raids30))
+				cs.Attendance = append(cs.Attendance, fmt.Sprintf("%d%% (%d/%d), 30 day", 100*tally.raids30/raids30, tally.raids30, raids30))
+			}
+			if raids60 != 0 {
+				cs.Attendance = append(cs.Attendance, fmt.Sprintf("%d%% (%d/%d), 60 day", 100*tally.raids60/raids60, tally.raids60, raids60))
 			}
 			if raids90 != 0 {
-				cs.Attendance = append(cs.Attendance, fmt.Sprintf("%d%% (%d/%d)", 100*tally.raids90/raids90, tally.raids90, raids90))
+				cs.Attendance = append(cs.Attendance, fmt.Sprintf("%d%% (%d/%d), 90 day", 100*tally.raids90/raids90, tally.raids90, raids90))
 			}
 		}
 		result[player.Name] = cs
