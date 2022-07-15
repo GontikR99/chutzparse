@@ -1,19 +1,19 @@
 package main
 
 import (
-	"bufio"
 	"compress/gzip"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/GontikR99/chillmodeinfo/internal/eqspec"
+	"github.com/gontikr99/chutzparse/internal/eqspec"
 	"os"
 	"sort"
-	"strings"
 )
 
 func main() {
 	if len(os.Args) != 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <trie/listing> <filename>\n", os.Args[0])
+		return
 	}
 	dbFile, err := os.Open(os.Args[2])
 	if err != nil {
@@ -25,17 +25,12 @@ func main() {
 		panic(err)
 	}
 	defer lineFile.Close()
-	lineScanner := bufio.NewScanner(lineFile)
-	lineScanner.Scan() // get rid of header
+	csvReader := csv.NewReader(lineFile)
+	csvReader.Read() // get rid of header
 	switch os.Args[1] {
 	case "listing":
 		var itemNames []string
-		for lineScanner.Scan() {
-			line := lineScanner.Text()
-			fields := strings.Split(line, "|")
-			if len(fields) < 2 {
-				continue
-			}
+		for fields, _ := csvReader.Read(); fields != nil; fields, _ = csvReader.Read() {
 			itemName := fields[1]
 			itemNames = append(itemNames, itemName)
 		}
@@ -50,19 +45,12 @@ func main() {
 		fmt.Println("}")
 	case "trie":
 		itemTrie := eqspec.NewItemTrie()
-		for lineScanner.Scan() {
-			line := lineScanner.Text()
-			fields := strings.Split(line, "|")
-			if len(fields) < 2 {
-				continue
-			}
+		for fields, _ := csvReader.Read(); fields != nil; fields, _ = csvReader.Read() {
 			itemName := fields[1]
 			itemTrie = itemTrie.With(itemName)
 		}
 		cTrie := itemTrie.Compress()
 
-		fmt.Println("// +build wasm, electron")
-		fmt.Println()
 		fmt.Println("package eqspec")
 		fmt.Println("var BuiltTrie=CompressedItemTrie{")
 		fmt.Print("    Transitions: CompressedItemTrieTransitions{")

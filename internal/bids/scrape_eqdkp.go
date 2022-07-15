@@ -96,7 +96,7 @@ func (r *PlayerIdSet) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement)
 		}
 	}
 	*r = result
-	time.Sleep(1 * time.Millisecond)
+	unfreeze()
 	return nil
 }
 
@@ -128,7 +128,7 @@ func (E *EQDKPPause) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 			break
 		}
 	}
-	time.Sleep(1 * time.Millisecond)
+	unfreeze()
 	return nil
 }
 
@@ -285,7 +285,7 @@ func scrapeEQDKP(site string) (map[string]CharacterStat, error) {
 				tallies[pid].raids90 += 1
 			}
 		}
-		time.Sleep(1 * time.Millisecond)
+		unfreeze()
 	}
 
 	// Create characterstat map
@@ -315,4 +315,16 @@ func scrapeEQDKP(site string) (map[string]CharacterStat, error) {
 		result[player.Name] = cs
 	}
 	return result, nil
+}
+
+var unfreezeCounter int16
+
+const unfreezeCycle = 100
+
+func unfreeze() {
+	unfreezeCounter += 1
+	if unfreezeCounter >= unfreezeCycle {
+		time.Sleep(1 * time.Millisecond)
+		unfreezeCounter = 0
+	}
 }

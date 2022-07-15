@@ -1,10 +1,11 @@
-.PHONY: all clean full-clean start package npm-install test help
+.PHONY: all clean full-clean start package npm-install test help items
 
 help:
 	@echo "Supported targets are:"
 	@echo "    help        Display this help message"
 	@echo "    clean       Remove built go artifacts (wasm and vugu stuff)"
-	@echo "    fullclean  Remove all built artifacts, including node_modules"
+	@echo "    fullclean   Remove all built artifacts, including node_modules"
+	@echo "    items       Download items database from Lucy and rebuild internal trie"
 	@echo "    package     Create a redistributable package in bin/"
 	@echo "    start       Build and start in development mode"
 	@echo "    test        Run go unit tests"
@@ -24,10 +25,14 @@ clean:
 
 # Clean up everything, including electron/node modules
 fullclean: clean
-	rm -rf electron/node_modules/* build/npm-installed electron/package-lock.json electron/package.json build/packagejsongen.exe build/rpcgen.exe
+	rm -rf electron/node_modules/* build/npm-installed electron/package-lock.json electron/package.json build/packagejsongen.exe build/rpcgen.exe build/itemscvt.exe build/itemlist.txt*
 
 test:
 	go test $$(dirname $$(find . -name \*_test.go))
+
+items: build/itemscvt.exe
+	curl -L https://lucy.allakhazam.com/itemlist.txt.gz -o build/itemlist.txt.gz
+	build/itemscvt.exe trie build/itemlist.txt.gz > internal/eqspec/parsed_trie.go
 
 ##
 ## ChutzParse main build steps
@@ -81,3 +86,6 @@ build/packagejsongen.exe: $(shell find internal/cmd/packagejsongen -name \*.go) 
 
 build/rpcgen.exe: $(shell find internal/cmd/rpcgen -name \*.go)
 	go build -tags native -o $@ ./internal/cmd/rpcgen
+
+build/itemscvt.exe: $(shellfind internal/cmd/itemscvt -name \*.go)
+	go build -tags native -o $@ ./internal/cmd/itemscvt
