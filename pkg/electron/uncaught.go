@@ -32,7 +32,6 @@ func init() {
 				electronAlert.Call("uncaughtException", false,
 					js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 						console.LogRaw(args[0])
-						JSValue().Get("app").Call("exit", 1)
 						return nil
 					}),
 					true, true).Invoke(args[0])
