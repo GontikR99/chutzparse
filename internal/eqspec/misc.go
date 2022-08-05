@@ -55,10 +55,11 @@ const (
 	DeadlyStrikeFlag  = HitFlag(1 << 10)
 	AssassinateFlag   = HitFlag(1 << 11)
 	HeadshotFlag      = HitFlag(1 << 12)
+	TwincastFlag      = HitFlag(1 << 13)
 )
 
 var hitFlagNames = []string{"Critical", "Riposte", "Rampage", "Wild Rampage", "Flurry", "Strikethrough", "Finishing Blow",
-	"Double Bow Shot", "Crippling Blow", "Slay Undead", "Deadly Strike", "Assassinate", "Headshot"}
+	"Double Bow Shot", "Crippling Blow", "Slay Undead", "Deadly Strike", "Assassinate", "Headshot", "Twincast"}
 
 func (hf HitFlag) String() string {
 	sb := &strings.Builder{}
@@ -115,6 +116,9 @@ func hitFlags(text string) HitFlag {
 	}
 	if strings.Contains(text, "Headshot") {
 		result |= HeadshotFlag
+	}
+	if strings.Contains(text, "Twincast") {
+		result |= TwincastFlag
 	}
 	return result
 }
